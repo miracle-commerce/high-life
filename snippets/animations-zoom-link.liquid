@@ -1,0 +1,14 @@
+<style>
+  @media (prefers-reduced-motion: no-preference) {
+    {{ selector }} {
+      overflow: hidden;
+    }
+    {{ selector }} a img {
+      transition: transform .7s ease-in-out;
+    }
+    {{ selector }} a:hover img,
+    {{ selector }} a:focus img {
+      transform: scale(1.1);
+    }
+  }
+</style>

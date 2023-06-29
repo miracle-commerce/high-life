@@ -1,0 +1,52 @@
+{% comment %}
+
+  Renders an icon and text in a content space.
+
+  Accepts:
+  - icon_and_text_img: {Object} Shopify Liquid Image object
+  - icon_and_text_text: {String} Label
+  - classes: {String} Custom classes to be applied to the <ul> element
+  - align: {String} Defines alignment of the armament. Accepts 'left', 'center' and 'right'. Defaults to 'left' if not passed (optional)
+  - border: {Boolean} Enables/disables separating lines
+  - content_icon_size: {String} the pixel width value of the icon
+
+  Usage:
+  <div class="icon-and-text-item{% if block.settings.border %} border_enabled{% endif %}">
+    {% render 'armament-icon-and-text-content' with 
+      icon_and_text_img: block.settings.image,
+      icon_and_text_text: block.settings.text
+    %}
+  </div>
+  
+{% endcomment %}
+
+{% liquid
+  if border
+    assign classes = 'py-s ' | append: classes
+  else
+    assign classes = 'pb-s ' | append: classes
+  endif
+
+  unless content_icon_size == blank 
+    case content_icon_size 
+      when 'small'
+        assign content_icon_size = '24px'
+      when 'large'
+        assign content_icon_size = '36px'
+      else
+        assign content_icon_size = content_icon_size
+    endcase
+  endunless
+
+  if content_icon_size == blank
+    assign content_icon_size = '24px'
+  endif
+%}
+
+{% render 'armament-icon-and-text' with 
+  icon: icon_and_text_img,
+  label: icon_and_text_text,
+  classes: classes,
+  align: align,
+  icon_width: content_icon_size
+%}

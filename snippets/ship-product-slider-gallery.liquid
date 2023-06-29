@@ -1,0 +1,81 @@
+{% comment %}
+    Renders a slider gallery for product images.
+    Accepts:
+    - slider_product {Object} Shopify product object
+    - scope_id: {String} Optional. Limits interaction to components with a matching scope id, eg. section id.
+    - zoom_enabled {Boolean} set to true if zoom is enabled
+    - loop_enabled {Boolean} set to true if video looping is enabled
+
+    Usage:
+    {% render 'ship-product-slider-gallery' with slider_product: product, zoom_enabled: section.settings.enable_zoom %}
+{% endcomment %}
+
+<slider-engine
+  mode="horizontal"
+  visible-slides="1"
+  auto-height="true"
+  mobile-indicator="true"
+  arrows="false"
+  class="block relative"
+  data-aid="product-collage-gallery"
+  data-name="scrollbar-target"
+  tabindex="0"
+  product-id="{{ slider_product.id }}"
+  featured-image-id="{{ slider_product.media[0].id }}"
+  {% if scope_id %}scope-id="{{ scope_id }}"{% endif %}
+>
+  <div
+    data-name="slider-wrap"
+    class="relative overflow-hidden"
+  >
+    <ul
+      data-name="slider"
+      data-armada-animation="general"
+      class="flex"
+      role="list"
+    >
+      {% for media in slider_product.media %}
+        <li
+          data-name="slide"
+          class="relative min-w-full flex place-content-center{% unless forloop.first %} h-0{% endunless %}"
+          type="{{ media.media_type }}"
+          slide-num="{{ forloop.index }}"
+          {% if media.id %}media-id="{{ media.id }}"{% endif %}
+        >
+          <div class="w-full grid"> {% comment %} You need this wrapper div so that Safari doesn't stretch the images to their attribute height :facepalm: {% endcomment %}
+            {% render 'armament-product-media' with media: media, enable_zoom: zoom_enabled, enable_loop: loop_enabled, include_modal: false, title: slider_product.title, product_id: slider_product.id %}
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+    {% if settings.custom_badges %}
+      <div class="absolute top-s lg:top-l left-0 z-50 pointer-events-none">
+        {% render 'engine-badges' with badges_product: slider_product %}
+      </div>
+    {% endif %}
+  </div>
+
+  {% comment %} Slider-specific elements {% endcomment %}
+  <template>
+    {% render 'armament-slider-arrows-condensed' with hide_on_mobile: false %}
+    <div data-name="mobile-indicator" class="block p-l lg:p-xl bg-page">
+      {% render 'armament-scroll-bar' with item_count: slider_product.media.size, parent: 'slider-engine', target: 'slider', indicator: 'progress' %}
+    </div>
+  </template>
+</slider-engine>
+<safe-load-scripts>
+  <script src="{{ 'engine-slider.min.js' | asset_url }}" defer="defer" type="module" data-armada-load-key="slider-engine"></script>
+</safe-load-scripts>
+
+{% for media in slider_product.media %}
+  <armada-modal
+    data-modal-id="{{ media.id }}"
+    data-modal-dismissable="true"
+    data-modal-heading=""
+    data-modal-underlay-classes="bg-black opacity-60"
+    class="invisible opacity-0"
+  >
+    {% render 'armament-image' with image: media, classes: 'relative object-contain m-auto' %}
+  </armada-modal>
+{% endfor %}
+<script src="{{ 'engine-modal.min.js' | asset_url }}" defer="defer" type="module"></script>

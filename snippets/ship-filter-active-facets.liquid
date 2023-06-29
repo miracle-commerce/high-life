@@ -1,0 +1,103 @@
+{% liquid
+  assign active_filters = false
+  assign priceFilterActive = false
+  assign sort_by = results.sort_by | default: results.default_sort_by
+
+  if results.url
+    assign results_url = results.url | append: '?sort_by=' | append: sort_by
+  else
+    assign terms = results.terms | escape
+    assign results_url = '?q=' | append: terms | append: '&options%5Bprefix%5D=last&sort_by=' | append: sort_by | append: '&type=product'
+    if product_count == 1
+      assign productCountString = 'products.facets.result_count.one' | t
+    else
+      assign productCountString = 'products.facets.result_count.other' | t
+    endif
+  endif
+
+  for filter in results.filters
+    if filter.min_value.value != nil or filter.max_value.value != nil
+      assign priceFilterActive = true
+
+      if product_count == 1
+        assign productCountString = 'products.facets.result_count.one' | t
+      else
+        assign productCountString = 'products.facets.result_count.other' | t
+      endif
+    endif
+    for value in filter.active_values
+      if product_count > 0
+        assign active_filters = true
+      endif
+
+      if product_count == 1
+        assign productCountString = 'products.facets.result_count.one' | t
+      else
+        assign productCountString = 'products.facets.result_count.other' | t
+      endif
+    endfor
+  endfor
+
+  if filter_position == 'sidebar'
+    assign container_classes = 'active-facets h-max w-full flex lg:grid lg:grid-cols-[1fr,minmax(0,auto)] items-center mt-0 lg:mb-0 flex-wrap lg:p-0'
+    if enable_sorting
+      assign count_heading_classes = 'text-h5 mr-xl hidden lg:block mt-l lg:mb-l lg:mt-0'
+    else
+      assign count_heading_classes = 'text-h5 mr-xl hidden lg:block mt-l lg:mb-0 lg:mt-xl'
+    endif
+  else
+    assign container_classes = 'active-facets h-max w-full flex items-center flex-wrap'
+    assign count_heading_classes = 'text-h5 mr-xl hidden'
+  endif
+
+  assign productCountText = '<span data-armada-selector="product-result-count">' | append: product_count | append: '</span> ' | append: productCountString
+%}
+
+<div class="{{ container_classes }}{% if classes %} {{ classes }}{% endif %}">
+  <div class="p-l justify-center items-center mx-auto pt-0 hidden" data-armada-selector="facets-loading">
+    <span class="block animate-spin w-xl h-xl rounded-full border-2 border-l-0 mx-auto"></span>
+  </div>
+  {% if active_filters or priceFilterActive %}
+    <div class="upto-lg:px-0 lg:col-start-1 lg:col-end-2 flex flex-wrap{% if filter_position == 'topbar' %} items-center w-full{% else %} px-xl items-center w-full lg:w-auto{% endif %}" data-armada-selector="active_facet_container">
+      {% render 'armament-heading' with tag: 'h6', heading_content: productCountText, classes: count_heading_classes, data_aid: 'filter-result-count' %}
+      {% for filter in results.filters %}
+        {% for value in filter.active_values %}
+          <facet-remove class="grid pr-l max-w-max mb-l grid-cols-1 grid-rows-1{% if filter_position == 'sidebar' %}{% if enable_sorting %} lg:mb-l lg:mt-0{% else %} lg:mb-0 lg:mt-xl{% endif %}{% endif %}">
+            <div class="block bg-body opacity-10 col-start-1 col-end-2 row-start-1 row-end-2"></div>
+            <a href="{{ value.url_to_remove }}" class="block pl-[12px] p-s py-xs col-start-1 col-end-2 row-start-1 row-end-2 z-50 border border-transparent rounded-theme" data-armada-selector="active-facets-button" data-aid="active-filter-{{ value.label | handleize }}" data-armada-animation="swatch">
+              <span class="flex justify-between items-center">
+                {% if filter.type == 'boolean' %}
+                  {{ filter.label | escape }}:
+                {% endif %}
+                <span>{% if filter.type == 'boolean' %}&nbsp;{% endif %}{{ value.label | escape }}</span>
+                {% render 'armament-icon' with icon: 'cancel', classes: 'ml-s' %}
+                <span class="sr-only">{{ 'products.facets.clear' | t }}</span>
+              </span>
+            </a>
+          </facet-remove>
+        {% endfor %}
+        {% if filter.type == "price_range" %}
+          {% if filter.min_value.value != nil or filter.max_value.value != nil %}
+            <facet-remove class="grid p-l mb-l grid-cols-1 grid-rows-1{% if filter_position == 'sidebar' %}{% if enable_sorting %} lg:mb-l lg:mt-0{% else %} lg:mb-0 lg:mt-xl{% endif %}{% endif %}" data-price-filter-active="true">
+              <div class="block bg-body opacity-10 col-start-1 col-end-2 row-start-1 row-end-2"></div>
+              <a href="{{ filter.url_to_remove }}" class="block pl-[12px] p-s py-xs col-start-1 col-end-2 row-start-1 row-end-2 z-50 border border-transparent rounded-theme" data-armada-selector="active-facets-button" data-aid="active-filter-price" data-armada-animation="swatch">
+                <span class="flex justify-between items-center">
+                  {%- if filter.min_value.value -%}{{ filter.min_value.value | money }}{%- else -%}{{ 0 | money }}{%- endif -%}-{%- if filter.max_value.value -%}{{ filter.max_value.value | money }}{%- else -%}{{ filter.range_max | money }}{%- endif -%}
+                  {% render 'armament-icon' with icon: 'cancel', classes: 'ml-s' %}
+                  <span class="sr-only">{{ 'products.facets.clear' | t }}</span>
+                </span>
+              </a>
+            </facet-remove>
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+      <facet-remove class="active-facets__button-remove mb-l{% if filter_position == 'topbar' %} flex-[1] text-right{% else %} flex-[1] text-right lg:text-left{% endif %}{% if filter_position == 'sidebar' %}{% if enable_sorting %} lg:mb-l lg:mt-0{% else %} lg:mb-0 lg:mt-xl{% endif %}{% endif %}" data-armada-selector="filters_clear_all">
+        <a href="{{ results_url }}" class="underline underline-offset-2 py-xs" data-aid="clear_all" data-armada-selector="filters_clear_all" data-armada-animation="text">
+          <span class="whitespace-nowrap">{{ 'products.facets.clear_all' | t }}</span>
+        </a>
+      </facet-remove>
+    </div>
+  {% elsif results.terms %}
+    {% render 'armament-heading' with tag: 'h6', heading_content: productCountText, classes: count_heading_classes, data_aid: 'filter-result-count' %}
+  {% endif %}
+</div>

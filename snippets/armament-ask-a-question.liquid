@@ -1,0 +1,186 @@
+{% comment %}
+    Renders ask-a-question button with a contact pop-up.
+
+    Accepts:
+    - icon: {Object} Shopify image object to be displayed in the armada-open-modal element
+    - title: {String} the text to be displayed in the armada-open-modal element
+    - title_classes: {String} classes to add to the title
+    - form_heading: {String} heading of the contact form
+    - form_subheading: {String} text to be displayed above the contact form
+    - name_input: {String} name input field displaying alternatives: 'hidden'/'optional'/'required'
+    - phone_input: {String} phone input field displaying alternatives: 'hidden'/'optional'/'required'
+    - form_product: {Object} Product object (optional)
+    - current_variant: {Object} Current variant object (optional)
+    - test_mode: {Bool} Visible ask-a-question modal on page load. Defaults to 'false' if not passed (optional)
+
+    Usage:
+    {% render 'armament-ask-a-question' with icon: block.settings.icon, link_title: 'Ask a question', heading: 'Got a question?', text: 'Enter your question below and we will get back to you as soon as possible.', name_input: 'required', phone_input: 'optional' %}
+
+    The contact form can contain hidden input fields which store product information (product title, variant name and SKU) (optional)
+
+{% endcomment %}
+
+<armada-modal-open data-modal-id="ask-a-question">
+  <a href="#" aria-label="Ask a question" data-armada-animation="icon"{% if title_classes %} class="{{ title_classes }}"{% endif %}>
+    {% if icon != blank %}
+      {% render 'armament-image' with image: icon, classes: "inline-block mr-xs", crop_width: 18, crop_height: 18 %}
+    {% else %}
+      {% render 'armament-icon' with icon: 'speech-bubble-left', classes: 'inline-block cursor-pointer mr-xs', fill: settings.color_body_general %}
+    {% endif %}
+    {% render 'armament-heading' with tag: 'h5', heading_type: 'heading-b1', classes: 'inline-block align-middle !pb-0', heading_content: title %}
+  </a>
+</armada-modal-open>
+<armada-modal
+  data-modal-id="ask-a-question"
+  data-modal-dismissable="true"
+  data-modal-underlay-classes="bg-black opacity-60"
+  data-color-scheme="general"
+  class="invisible opacity-0"
+  {%- if test_mode -%}data-modal-test-mode="true"{%- endif -%}
+>
+  <div
+    class="p-xl md:p-2xl bg-page text-body"
+  >
+    {% if form_heading != blank %}
+      {% render 'armament-heading' with tag: 'h2', heading_content: form_heading, heading_type: 'callout-heading' %}
+    {% endif %}
+    {% if form_subheading != blank %}
+      <p class="text-b1">{{ form_subheading }}</p>
+    {% endif %}
+    {% form 'contact', id: 'ContactForm', class: 'w-full flex flex-wrap md:gap-x-xl gap-y-l md:gap-y-xl' %}
+      {% if form.errors %}
+        <form-errors data-form-type="contact" data-form-name="Contact" data-errors='{{ form.errors | default_errors }}'></form-errors>
+      {% endif %}
+      {% if form.posted_successfully? %}
+        <form-success data-message="{{ 'templates.contact.form.post_success_heading' | t }}" data-info="{{ 'templates.contact.form.post_success_text' | t }}" class="hidden"></form-success>
+      {% endif %}
+      
+      {% liquid
+
+        if name_input == 'hidden'
+          assign show_name = false
+        else
+          assign show_name = true
+        endif
+
+        if phone_input == 'hidden'
+          assign show_phone = false
+        else
+          assign show_phone = true
+        endif
+        
+        assign input_full_width = 'w-full'
+
+        assign nameInputString = 'templates.contact.form.name' | t
+        assign formName = 'contact[' | append: nameInputString | append: ']'
+        assign emailInputString = 'templates.contact.form.email' | t
+        assign formEmailName = 'contact[' | append: emailInputString | downcase | append: ']'
+        assign telInputString = 'templates.contact.form.phone' | t
+        assign formTelName = 'contact[' | append: telInputString | append: ']'
+        assign msgInputString = 'templates.contact.form.message' | t
+        assign formMsgName = 'contact[' | append: msgInputString | append: ']'
+        assign productString = 'customer.order.product' | t
+        assign productInfoName = 'contact[' | append: productString | append: ']'
+        assign productVariantName = 'contact[Variant]'
+        assign productSKUName = 'contact[SKU]'
+
+        if form.name
+          assign nameInputVal = form.name
+        elsif customer
+          assign nameInputVal = customer.name
+        endif
+
+        if form.email
+          assign emailInputVal = form.email
+        elsif customer
+          assign emailInputVal = customer.email
+        endif
+
+        if form.phone
+          assign phoneInputVal = form.phone
+        elsif customer
+          assign phoneInputVal = customer.phone
+        endif
+      %}
+        
+      {% if show_name %}
+        {% liquid
+
+          if name_input == 'required'
+            assign name_required = true
+            assign nameLabelString = nameInputString | prepend: '*'
+          else
+            assign name_required = false
+            assign nameLabelString = nameInputString
+          endif
+
+          assign name_input_width = input_full_width | append: ' md:w-[calc(50%-12px)]'
+          assign formId = 'form_' | append: nameInputString | downcase | handleize
+          assign input_attr = 'aria-labelledby="' | append: formId | append: '" data-aid="name-input"'
+        %}
+        {% render 'armament-input' with type: 'text', has_label: true, animate_label: true, label_text: nameLabelString, id: formId, placeholder: nameInputString, classes: 'w-full text-body', container_classes: name_input_width, value: nameInputVal, name: formName, required: name_required, attributes: input_attr %}
+      {% endif %}
+
+      {% if show_phone %}
+        {% liquid
+
+          if phone_input == 'required'
+            assign phone_required = true
+            assign phoneLabelString = telInputString | prepend: '*'
+          else
+            assign phone_required = false
+            assign phoneLabelString = telInputString
+          endif
+
+          assign phone_input_width = input_full_width | append: ' md:w-[calc(50%-12px)]'
+          assign formId = 'form_' | append: telInputString | downcase | handleize
+          assign input_attr = 'aria-labelledby="' | append: formId | append: '" data-aid="tel-input"'
+        %}
+        {% render 'armament-input' with type: 'tel', has_label: true, animate_label: true, label_text: phoneLabelString, id: formId, placeholder: telInputString, classes: 'w-full text-body', container_classes: phone_input_width, value: phoneInputVal, name: formTelName, required: phone_required, attributes: input_attr %}
+      {% endif %}
+
+      {% liquid
+        assign emailLabelString = emailInputString | prepend: '*'
+
+        if show_name != show_phone
+          assign email_input_width = input_full_width | append: ' md:w-[calc(50%-12px)]'
+        else
+          assign email_input_width = input_full_width
+        endif
+        assign formId = 'form_' | append: emailInputString | downcase | handleize
+        assign input_attr = 'aria-labelledby="' | append: formId | append: '" data-aid="email-input"'
+      %}
+      {% render 'armament-input' with type: 'email', has_label: true, animate_label: true, label_text: emailLabelString, id: formId, placeholder: emailInputString, classes: 'w-full text-body', container_classes: email_input_width, value: emailInputVal, name: formEmailName, required: true, attributes: input_attr %}
+
+      {% liquid
+        assign msgInputString = msgInputString | prepend: '*'
+
+        assign formId = 'form_' | append: msgInputString | downcase | handleize
+        assign input_attr = 'aria-labelledby="' | append: formId | append: '" data-aid="message-input"'
+      %}
+      {% render 'armament-textarea' with id: formId, classes: 'py-l w-full text-body resize-none', placeholder: msgInputString, name: formMsgName, has_label: true, animate_label: true, label_text: msgInputString, attributes: input_attr, required: true, content: form.body, container_classes: input_full_width, rows: 8 %}
+
+      {% if form_product != blank %}
+          {% render 'armament-input' with type: 'hidden', id: 'form_product-title', value: form_product.title, name: productInfoName %}
+      {% endif %}
+
+      {% if current_variant != blank %}
+          {% render 'armament-input' with type: 'hidden', id: 'form_product-variant', value: current_variant.title, name: productVariantName %}
+  
+          {% render 'armament-input' with type: 'hidden', id: 'form_product-SKU', value: current_variant.sku, name: productSKUName %}
+      {% endif %}
+
+      {% liquid
+        assign submit_btn_text = 'templates.contact.form.send' | t
+        assign submit_btn_attrs = 'aria-label="' | append: submit_btn_text | append: '"'
+      %}
+      <div class="{{ input_full_width }}">
+        {% render 'armament-button' with type: 'submit', content: submit_btn_text, attributes: submit_btn_attrs, classes: 'w-full md:max-w-max', data_aid: 'contact-form-submit-button' %}
+      </div>
+    {% endform %}
+  </div>
+</armada-modal>
+<safe-load-scripts>
+  <script src="{{ 'engine-modal-open.min.js' | asset_url }}" defer="defer" type="module" data-armada-load-key="modal-open"></script>
+  <script src="{{ 'engine-modal.min.js' | asset_url }}" defer="defer" type="module" data-armada-load-key="modal"></script>
+</safe-load-scripts>

@@ -1,0 +1,53 @@
+<div data-aid="cross-sells" data-color-scheme="{{ block_settings.cross_sells_color_scheme }}" class="cross-sells bg-page text-body {% unless block_settings.cross_sells_color_scheme == 'general' %}p-l md:p-xl{% endunless %} w-full mx-auto">
+  {% if block_settings.title != blank %}
+    {% render 'armament-heading' with tag: 'h3', heading_content: block_settings.title, heading_type: 'heading-b1', data_aid: 'cross-sells-heading', classes: 'upto-md:pb-l md:pb-l' %}
+  {% endif %}
+
+  {% assign crop_position = block_settings.product_cards_crop_position | replace: 'object-', '' %}
+
+  <div class="gap-l flex flex-col md:flex-row">
+    <div class="w-full md:w-1/2">
+      {% if block_settings.cross_sells_product_1 == blank %}
+        <div class="bg-body">
+          {% render 'armament-placeholder' with name: 'product-5' %}
+        </div>
+      {% else %}
+        {%
+          render 'ship-product-card-simple' with
+          card_product: all_products[block_settings.cross_sells_product_1],
+          block_order: 'image,title,price,quick-add',
+          align: product_card_alignment,
+          enable_quick_view: enable_quick_view,
+          aspect_ratio: product_card_aspect_ratio,
+          position: crop_position
+          card_scope: 'block',
+          block_id: block.id,
+          classes: 'upto-md:gap-l',
+          card_font_size: 'text-b1'
+        %}
+      {% endif %}
+    </div>
+
+    <div class="w-full md:w-1/2">
+      {% if block_settings.cross_sells_product_2 == blank %}
+        <div class="bg-body">
+          {% render 'armament-placeholder' with name: 'product-3' %}
+        </div>
+      {% else %}
+        {%
+          render 'ship-product-card-simple' with
+          card_product: all_products[block_settings.cross_sells_product_2],
+          block_order: 'image,title,price,quick-add',
+          align: product_card_alignment,
+          enable_quick_view: enable_quick_view,
+          aspect_ratio: product_card_aspect_ratio,
+          position: crop_position
+          card_scope: 'block',
+          block_id: block.id,
+          classes: 'upto-md:gap-l',
+          card_font_size: 'text-b1'
+        %}
+      {% endif %}
+    </div>
+  </div>
+</div>

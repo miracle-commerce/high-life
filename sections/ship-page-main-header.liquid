@@ -1,0 +1,46 @@
+{% if section.settings.show_page_title %}
+  <section class="max-w-full flex items-center justify-center flex-col theme-section-padding bg-page text-body" data-color-scheme={{ section.settings.section_color_scheme }}>
+      <div class="flex flex-col items-center justify-center max-w-content {% if forloop.first %} mt-xl md:mt-2xl{% endif %}">
+          {% render 'armament-heading' with tag: 'h1', heading_content: page.title, heading_type: 'heading-2', classes: '!pb-0', data_aid: 'page-main-title' %}
+      </div>
+  </section>
+{% endif %}
+
+
+{% schema %}
+{
+  "name": "Page header",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_page_title",
+      "label": "Show page title",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "section_color_scheme",
+      "label": "Color scheme",
+      "options": [
+        {
+          "value": "general",
+          "label": "General"
+        },
+        {
+          "value": "accent-1",
+          "label": "Accent 1"
+        },
+        {
+          "value": "accent-2",
+          "label": "Accent 2"
+        },
+        {
+          "value": "accent-3",
+          "label": "Accent 3"
+        }
+      ],
+      "default": "general"
+    }
+  ]
+}
+{% endschema %}

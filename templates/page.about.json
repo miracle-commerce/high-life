@@ -1,0 +1,561 @@
+{
+  "sections": {
+    "page-header": {
+      "type": "ship-page-main-header",
+      "disabled": true,
+      "settings": {
+        "show_page_title": true,
+        "section_color_scheme": "general"
+      }
+    },
+    "page-content": {
+      "type": "armament-page-main-content",
+      "disabled": true,
+      "settings": {
+      }
+    },
+    "image-with-text-overlay": {
+      "type": "flotilla-image-with-text-overlay",
+      "blocks": {
+        "image-with-text-overlay-00": {
+          "type": "overlay_content",
+          "settings": {
+            "title": "Big, beautiful imagery",
+            "section_subheading": "Make an impact",
+            "button_1_link": "",
+            "button_1_text": "",
+            "button_1_style": "outline",
+            "button_2_link": "",
+            "button_2_text": "",
+            "button_2_style": "fill",
+            "text_color_scheme": "accent-3"
+          }
+        }
+      },
+      "block_order": [
+        "image-with-text-overlay-00"
+      ],
+      "settings": {
+        "desktop_height": "s",
+        "mobile_height": "s",
+        "image_link": "",
+        "section_width": "full",
+        "text_position": "center",
+        "background_color_scheme": "general",
+        "overlay_color_scheme": "light",
+        "overlay_opacity": 0
+      }
+    },
+    "image-with-text-00": {
+      "type": "ship-image-with-text",
+      "blocks": {
+        "image-with-text-00-00": {
+          "type": "text",
+          "settings": {
+            "subheading": "Make an impact",
+            "heading": "Image with text",
+            "body_text": "Use text slides, paired with a large image to create a captivating brand story, explain details of your products, or even provide reviews.",
+            "button_link": "",
+            "button_text": "",
+            "button_style": "outline"
+          }
+        }
+      },
+      "block_order": [
+        "image-with-text-00-00"
+      ],
+      "settings": {
+        "image_position": "md:flex-row-reverse",
+        "bg_color_scheme": "general",
+        "content_color_scheme": "accent-3"
+      }
+    },
+    "image-with-text-01": {
+      "type": "ship-image-with-text",
+      "blocks": {
+        "template--16560029401318__image-with-text-01-16655051862ac23eda-0": {
+          "type": "text",
+          "settings": {
+            "subheading": "Make an impact",
+            "heading": "Image with text",
+            "body_text": "Use text slides, paired with a large image to create a captivating brand story, explain details of your products, or even provide reviews.",
+            "button_link": "",
+            "button_text": "Shop now",
+            "button_style": "outline"
+          }
+        }
+      },
+      "block_order": [
+        "template--16560029401318__image-with-text-01-16655051862ac23eda-0"
+      ],
+      "settings": {
+        "image_position": "md:flex-row",
+        "bg_color_scheme": "general",
+        "content_color_scheme": "accent-3"
+      }
+    },
+    "rich-text-00": {
+      "type": "ship-rich-text",
+      "blocks": {
+        "subheading": {
+          "type": "subheading",
+          "settings": {
+            "subheading": "Captivate customers with"
+          }
+        },
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "heading": "Rich text"
+          }
+        },
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Use this text to share information about your brand. Describe a product, show store announcements, or welcome customers to your store.<\/p>"
+          }
+        },
+        "buttons": {
+          "type": "buttons",
+          "settings": {
+            "button_1_link": "shopify:\/\/collections\/all",
+            "button_1_text": "Learn more",
+            "button_1_style": "fill",
+            "button_2_link": "",
+            "button_2_text": "",
+            "button_2_style": "fill"
+          }
+        }
+      },
+      "block_order": [
+        "subheading",
+        "heading",
+        "text",
+        "buttons"
+      ],
+      "settings": {
+        "section_width": "narrow",
+        "horizontal_alignment": "text-left justify-start",
+        "section_color_scheme": "accent-2"
+      }
+    },
+    "gallery": {
+      "type": "flotilla-gallery",
+      "blocks": {
+        "gallery-00": {
+          "type": "image",
+          "settings": {
+            "link": "shopify:\/\/collections\/all",
+            "button_text": "",
+            "button_style": "outline",
+            "heading": "",
+            "text_position": "center",
+            "text_color_scheme": "general",
+            "overlay_style": "bg-black",
+            "overlay_opacity": 0
+          }
+        },
+        "gallery-01": {
+          "type": "image",
+          "settings": {
+            "link": "shopify:\/\/collections\/all",
+            "button_text": "",
+            "button_style": "outline",
+            "heading": "",
+            "text_position": "center",
+            "text_color_scheme": "general",
+            "overlay_style": "bg-black",
+            "overlay_opacity": 0
+          }
+        },
+        "gallery-02": {
+          "type": "image",
+          "settings": {
+            "link": "shopify:\/\/collections\/all",
+            "button_text": "",
+            "button_style": "outline",
+            "heading": "",
+            "text_position": "center",
+            "text_color_scheme": "general",
+            "overlay_style": "bg-black",
+            "overlay_opacity": 0
+          }
+        },
+        "gallery-03": {
+          "type": "image",
+          "settings": {
+            "link": "shopify:\/\/collections\/all",
+            "button_text": "",
+            "button_style": "outline",
+            "heading": "",
+            "text_position": "center",
+            "text_color_scheme": "general",
+            "overlay_style": "bg-black",
+            "overlay_opacity": 0
+          }
+        },
+        "gallery-04": {
+          "type": "image",
+          "settings": {
+            "link": "shopify:\/\/collections\/all",
+            "button_text": "",
+            "button_style": "outline",
+            "heading": "",
+            "text_position": "center",
+            "text_color_scheme": "general",
+            "overlay_style": "bg-black",
+            "overlay_opacity": 0
+          }
+        },
+        "gallery-05": {
+          "type": "image",
+          "settings": {
+            "link": "shopify:\/\/collections\/all",
+            "button_text": "",
+            "button_style": "outline",
+            "heading": "",
+            "text_position": "center",
+            "text_color_scheme": "general",
+            "overlay_style": "bg-black",
+            "overlay_opacity": 0
+          }
+        },
+        "gallery-06": {
+          "type": "image",
+          "settings": {
+            "link": "shopify:\/\/collections\/all",
+            "button_text": "",
+            "button_style": "outline",
+            "heading": "",
+            "text_position": "center",
+            "text_color_scheme": "general",
+            "overlay_style": "bg-black",
+            "overlay_opacity": 0
+          }
+        },
+        "gallery-07": {
+          "type": "image",
+          "settings": {
+            "link": "shopify:\/\/collections\/all",
+            "button_text": "",
+            "button_style": "outline",
+            "heading": "",
+            "text_position": "center",
+            "text_color_scheme": "general",
+            "overlay_style": "bg-black",
+            "overlay_opacity": 0
+          }
+        },
+        "gallery-08": {
+          "type": "image",
+          "settings": {
+            "link": "shopify:\/\/collections\/all",
+            "button_text": "",
+            "button_style": "outline",
+            "heading": "",
+            "text_position": "center",
+            "text_color_scheme": "general",
+            "overlay_style": "bg-black",
+            "overlay_opacity": 0
+          }
+        },
+        "gallery-09": {
+          "type": "image",
+          "settings": {
+            "link": "shopify:\/\/collections\/all",
+            "button_text": "",
+            "button_style": "outline",
+            "heading": "",
+            "text_position": "center",
+            "text_color_scheme": "general",
+            "overlay_style": "bg-black",
+            "overlay_opacity": 0
+          }
+        },
+        "gallery-10": {
+          "type": "image",
+          "settings": {
+            "link": "shopify:\/\/collections\/all",
+            "button_text": "",
+            "button_style": "outline",
+            "heading": "",
+            "text_position": "center",
+            "text_color_scheme": "general",
+            "overlay_style": "bg-black",
+            "overlay_opacity": 0
+          }
+        },
+        "gallery-11": {
+          "type": "image",
+          "settings": {
+            "link": "shopify:\/\/collections\/all",
+            "button_text": "",
+            "button_style": "outline",
+            "heading": "",
+            "text_position": "center",
+            "text_color_scheme": "general",
+            "overlay_style": "bg-black",
+            "overlay_opacity": 0
+          }
+        },
+        "gallery-12": {
+          "type": "image",
+          "settings": {
+            "link": "shopify:\/\/collections\/all",
+            "button_text": "",
+            "button_style": "outline",
+            "heading": "",
+            "text_position": "center",
+            "text_color_scheme": "general",
+            "overlay_style": "bg-black",
+            "overlay_opacity": 0
+          }
+        },
+        "gallery-13": {
+          "type": "image",
+          "settings": {
+            "link": "shopify:\/\/collections\/all",
+            "button_text": "",
+            "button_style": "outline",
+            "heading": "",
+            "text_position": "center",
+            "text_color_scheme": "general",
+            "overlay_style": "bg-black",
+            "overlay_opacity": 0
+          }
+        },
+        "gallery-14": {
+          "type": "image",
+          "settings": {
+            "link": "shopify:\/\/collections\/all",
+            "button_text": "",
+            "button_style": "outline",
+            "heading": "",
+            "text_position": "center",
+            "text_color_scheme": "general",
+            "overlay_style": "bg-black",
+            "overlay_opacity": 0
+          }
+        }
+      },
+      "block_order": [
+        "gallery-00",
+        "gallery-01",
+        "gallery-02",
+        "gallery-03",
+        "gallery-04",
+        "gallery-05",
+        "gallery-06",
+        "gallery-07",
+        "gallery-08",
+        "gallery-09",
+        "gallery-10",
+        "gallery-11",
+        "gallery-12",
+        "gallery-13",
+        "gallery-14"
+      ],
+      "settings": {
+        "section_subheading": "",
+        "section_heading": "",
+        "heading_alignment": "text-center",
+        "img_row_desktop": 5,
+        "img_row_mobile": "two",
+        "img_aspect_ratio": "natural",
+        "section_width": "full-with-padding",
+        "bg_color_scheme": "general"
+      }
+    },
+    "rich-text-01": {
+      "type": "ship-rich-text",
+      "blocks": {
+        "subheading": {
+          "type": "subheading",
+          "settings": {
+            "subheading": "Captivate customers with"
+          }
+        },
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "heading": "Rich text"
+          }
+        },
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Use this text to share information about your brand. Describe a product, show store announcements, or welcome customers to your store.<\/p>"
+          }
+        }
+      },
+      "block_order": [
+        "subheading",
+        "heading",
+        "text"
+      ],
+      "settings": {
+        "section_width": "narrow",
+        "horizontal_alignment": "text-left justify-start",
+        "section_color_scheme": "accent-3"
+      }
+    },
+    "video-section-00": {
+      "type": "ship-video-section",
+      "settings": {
+        "section_color_scheme": "accent-1",
+        "subheading": "",
+        "heading": "Share your brand story",
+        "text_alignment": "center",
+        "video_url": "https:\/\/www.youtube.com\/watch?v=_9VUPq3SxOc",
+        "section_width": "full-with-padding"
+      }
+    },
+    "video-section-01": {
+      "type": "ship-video-section",
+      "settings": {
+        "section_color_scheme": "accent-3",
+        "subheading": "",
+        "heading": "Share your brand story",
+        "text_alignment": "center",
+        "video_url": "https:\/\/www.youtube.com\/watch?v=_9VUPq3SxOc",
+        "section_width": "full-with-padding"
+      }
+    },
+    "video-section-02": {
+      "type": "ship-video-hero",
+      "settings": {
+        "video_url": "https:\/\/www.youtube.com\/watch?v=_9VUPq3SxOc",
+        "desktop_height": "m",
+        "mobile_height": "m",
+        "section_heading": "",
+        "caption_alignment": "left",
+        "caption_box_size": "small",
+        "section_color_scheme": "general",
+        "button_1_link": "",
+        "button_1_text": "Shop now",
+        "button_1_style": "outline",
+        "button_2_link": "",
+        "button_2_text": "Learn more",
+        "button_2_style": "filled"
+      }
+    },
+    "rich-text-02": {
+      "type": "ship-rich-text",
+      "blocks": {
+        "subheading": {
+          "type": "subheading",
+          "settings": {
+            "subheading": "Captivate customers with"
+          }
+        },
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "heading": "Rich text"
+          }
+        }
+      },
+      "block_order": [
+        "subheading",
+        "heading"
+      ],
+      "settings": {
+        "section_width": "narrow",
+        "horizontal_alignment": "text-left justify-start",
+        "section_color_scheme": "accent-1"
+      }
+    },
+    "icons-with-text": {
+      "type": "flotilla-icons-with-text",
+      "blocks": {
+        "icons-with-text-00": {
+          "type": "icon_with_text",
+          "settings": {
+            "heading": "Describe key features",
+            "text": "Use this text to emphasise your brand’s unique selling points.",
+            "link": ""
+          }
+        },
+        "icons-with-text-01": {
+          "type": "icon_with_text",
+          "settings": {
+            "heading": "Describe key features",
+            "text": "Use this text to emphasise your brand’s unique selling points.",
+            "link": ""
+          }
+        },
+        "icons-with-text-02": {
+          "type": "icon_with_text",
+          "settings": {
+            "heading": "Describe key features",
+            "text": "Use this text to emphasise your brand’s unique selling points.",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "icons-with-text-00",
+        "icons-with-text-01",
+        "icons-with-text-02"
+      ],
+      "settings": {
+        "text_alignment": "left",
+        "section_width": "full-with-padding",
+        "section_color_scheme": "general"
+      }
+    },
+    "accordion": {
+      "type": "ship-accordion-section",
+      "blocks": {
+        "accordion-00": {
+          "type": "tab_item",
+          "settings": {
+            "tab_item_header": "Heading\/FAQ",
+            "tab_item_content": "<p>Use this text to provide detailed information like sizing, shipping, ingredients, or to answer frequently asked questions.<\/p>"
+          }
+        },
+        "accordion-02": {
+          "type": "tab_item",
+          "settings": {
+            "tab_item_header": "Heading\/FAQ",
+            "tab_item_content": "<p>Use this text to provide detailed information like sizing, shipping, ingredients, or to answer frequently asked questions.<\/p>"
+          }
+        },
+        "accordion-01": {
+          "type": "tab_item",
+          "settings": {
+            "tab_item_header": "Heading\/FAQ",
+            "tab_item_content": "<p>Use this text to provide detailed information like sizing, shipping, ingredients, or to answer frequently asked questions.<\/p>"
+          }
+        }
+      },
+      "block_order": [
+        "accordion-00",
+        "accordion-02",
+        "accordion-01"
+      ],
+      "settings": {
+        "bg_color_scheme": "accent-2",
+        "subheading": "",
+        "heading": "",
+        "alignment": "text-center"
+      }
+    }
+  },
+  "order": [
+    "page-header",
+    "page-content",
+    "image-with-text-overlay",
+    "image-with-text-00",
+    "image-with-text-01",
+    "rich-text-00",
+    "gallery",
+    "rich-text-01",
+    "video-section-00",
+    "video-section-01",
+    "video-section-02",
+    "rich-text-02",
+    "icons-with-text",
+    "accordion"
+  ]
+}

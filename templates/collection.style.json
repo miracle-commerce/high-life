@@ -1,0 +1,526 @@
+{
+  "wrapper": "div.collection-template-wrapper",
+  "sections": {
+    "rich-text-00": {
+      "type": "ship-rich-text",
+      "blocks": {
+        "subheading": {
+          "type": "subheading",
+          "settings": {
+            "subheading": "Captivate customers with"
+          }
+        },
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "heading": "{{ collection.title }}"
+          }
+        }
+      },
+      "block_order": [
+        "subheading",
+        "heading"
+      ],
+      "settings": {
+        "section_width": "full-with-padding",
+        "horizontal_alignment": "text-center justify-center",
+        "section_color_scheme": "accent-2"
+      }
+    },
+    "description": {
+      "type": "ship-collection-description",
+      "disabled": true,
+      "settings": {
+        "color_scheme": "general",
+        "text_align": "center"
+      }
+    },
+    "filters": {
+      "type": "flotilla-collection-filters-topbar",
+      "settings": {
+        "enable_filtering": true,
+        "enable_sorting": true
+      }
+    },
+    "main": {
+      "type": "flotilla-collection-grid-main",
+      "blocks": {
+        "product_card_image": {
+          "type": "image",
+          "settings": {
+            "product_cards_aspect_ratio": "tall",
+            "product_cards_crop_position": "object-center",
+            "collection_hover_effect": "show_second_image"
+          }
+        },
+        "product_card_title": {
+          "type": "title",
+          "settings": {
+          }
+        },
+        "product_card_price": {
+          "type": "price",
+          "settings": {
+          }
+        },
+        "view_details_quick_add": {
+          "type": "view_details_quick_add",
+          "settings": {
+            "enable_view_details": true,
+            "view_details_open": false,
+            "view_details_open_all": true,
+            "show_quick_add": true
+          }
+        },
+        "stock-level-indicator": {
+          "type": "stock-level-indicator",
+          "settings": {
+            "stock_range": 5,
+            "show_stock_count": false,
+            "in_stock_message": "Ready to ship",
+            "low_stock_message": "Selling fast",
+            "out_of_stock_message": "Back in soon"
+          }
+        },
+        "local-pickup-availability": {
+          "type": "local-pickup-availability",
+          "settings": {
+          }
+        },
+        "divider-00": {
+          "type": "divider",
+          "settings": {
+          }
+        },
+        "icon-list": {
+          "type": "icon-list",
+          "settings": {
+          }
+        },
+        "highlight": {
+          "type": "highlight",
+          "settings": {
+          }
+        },
+        "divider-01": {
+          "type": "divider",
+          "settings": {
+          }
+        },
+        "specifications": {
+          "type": "specifications",
+          "settings": {
+            "spec-keys": ""
+          }
+        },
+        "divider-02": {
+          "type": "divider",
+          "settings": {
+          }
+        },
+        "reviews": {
+          "type": "reviews",
+          "settings": {
+          }
+        }
+      },
+      "block_order": [
+        "product_card_image",
+        "product_card_title",
+        "product_card_price",
+        "view_details_quick_add",
+        "stock-level-indicator",
+        "local-pickup-availability",
+        "divider-00",
+        "icon-list",
+        "highlight",
+        "divider-01",
+        "specifications",
+        "divider-02",
+        "reviews"
+      ],
+      "settings": {
+        "products_per_row": 4,
+        "products_per_page": 12,
+        "pagination_type": "load_more",
+        "product_card_alignment": "left"
+      }
+    },
+    "rich-text-01": {
+      "type": "ship-rich-text",
+      "blocks": {
+        "subheading": {
+          "type": "subheading",
+          "settings": {
+            "subheading": "Captivate customers with"
+          }
+        },
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "heading": "Rich text"
+          }
+        }
+      },
+      "block_order": [
+        "subheading",
+        "heading"
+      ],
+      "settings": {
+        "section_width": "narrow",
+        "horizontal_alignment": "text-left justify-start",
+        "section_color_scheme": "accent-1"
+      }
+    },
+    "hotspot-00": {
+      "type": "flotilla-hotspot-section",
+      "blocks": {
+        "hotspot-00-00": {
+          "type": "hotspot",
+          "settings": {
+            "modal_heading": "Additional information",
+            "modal_body_text": "<p>Take advantage of this section by including a few paragraphs detailing any additional information about the item, alternatively, include a product description or spec information.<\/p>",
+            "modal_button_label": "View product",
+            "modal_button_link": "",
+            "modal_button_style": "filled",
+            "hotspot_x_pos": 20,
+            "hotspot_y_pos": 25
+          }
+        },
+        "hotspot-00-01": {
+          "type": "hotspot",
+          "settings": {
+            "modal_heading": "Additional information",
+            "modal_body_text": "<p>Take advantage of this section by including a few paragraphs detailing any additional information about the item, alternatively, include a product description or spec information.<\/p>",
+            "modal_button_label": "View product",
+            "modal_button_link": "shopify:\/\/collections\/all",
+            "modal_button_style": "filled",
+            "hotspot_x_pos": 55,
+            "hotspot_y_pos": 85
+          }
+        }
+      },
+      "block_order": [
+        "hotspot-00-00",
+        "hotspot-00-01"
+      ],
+      "settings": {
+        "section_color_scheme": "general",
+        "card_color_scheme": "accent-2",
+        "hotspot_color_scheme": "accent-3",
+        "overlay_color_scheme": "accent-1",
+        "overlay_opacity": 0,
+        "text_alignment": "left",
+        "image_position": "right",
+        "hotspot_subheading": "Highlight Key Features",
+        "hotspot_heading": "Interactive image",
+        "hotspot_text": "<p>Use text paired with image hotspots to explain details about your products and highlight interesting or useful features.<\/p>",
+        "show_marker_labels": false,
+        "first_button_label": "Shop now",
+        "first_button_link": "shopify:\/\/collections\/all",
+        "first_button_style": "filled",
+        "second_button_label": "Shop all",
+        "second_button_link": "shopify:\/\/collections\/all",
+        "second_button_style": "outline"
+      }
+    },
+    "hotspot-01": {
+      "type": "flotilla-hotspot-section",
+      "blocks": {
+        "hotspot-01-00": {
+          "type": "hotspot",
+          "settings": {
+            "modal_heading": "Additional information",
+            "modal_body_text": "<p>Take advantage of this section by including a few paragraphs detailing any additional information about the item, alternatively, include a product description or spec information.<\/p>",
+            "modal_button_label": "View product",
+            "modal_button_link": "",
+            "modal_button_style": "filled",
+            "hotspot_x_pos": 24,
+            "hotspot_y_pos": 41
+          }
+        },
+        "hotspot-01-01": {
+          "type": "hotspot",
+          "settings": {
+            "modal_heading": "Additional information",
+            "modal_body_text": "<p>Take advantage of this section by including a few paragraphs detailing any additional information about the item, alternatively, include a product description or spec information.<\/p>",
+            "modal_button_label": "View product",
+            "modal_button_link": "",
+            "modal_button_style": "filled",
+            "hotspot_x_pos": 60,
+            "hotspot_y_pos": 88
+          }
+        }
+      },
+      "block_order": [
+        "hotspot-01-00",
+        "hotspot-01-01"
+      ],
+      "settings": {
+        "section_color_scheme": "general",
+        "card_color_scheme": "accent-2",
+        "hotspot_color_scheme": "accent-3",
+        "overlay_color_scheme": "accent-1",
+        "overlay_opacity": 0,
+        "text_alignment": "left",
+        "image_position": "left",
+        "hotspot_subheading": "Highlight Key Features",
+        "hotspot_heading": "Interactive image",
+        "hotspot_text": "<p>Use text paired with image hotspots to explain details about your products and highlight interesting or useful features.<\/p>",
+        "show_marker_labels": false,
+        "first_button_label": "Shop now",
+        "first_button_link": "shopify:\/\/collections\/all",
+        "first_button_style": "filled",
+        "second_button_label": "Shop all",
+        "second_button_link": "shopify:\/\/collections\/all",
+        "second_button_style": "outline"
+      }
+    },
+    "hotspot-02": {
+      "type": "flotilla-hotspot-section",
+      "blocks": {
+        "hotspot-02-00": {
+          "type": "hotspot",
+          "settings": {
+            "modal_heading": "Additional information",
+            "modal_body_text": "<p>Take advantage of this section by including a few paragraphs detailing any additional information about the item, alternatively, include a product description or spec information.<\/p>",
+            "modal_button_label": "View product",
+            "modal_button_link": "",
+            "modal_button_style": "filled",
+            "hotspot_x_pos": 76,
+            "hotspot_y_pos": 30
+          }
+        }
+      },
+      "block_order": [
+        "hotspot-02-00"
+      ],
+      "settings": {
+        "section_color_scheme": "general",
+        "card_color_scheme": "accent-2",
+        "hotspot_color_scheme": "accent-3",
+        "overlay_color_scheme": "accent-1",
+        "overlay_opacity": 0,
+        "text_alignment": "left",
+        "image_position": "right",
+        "hotspot_subheading": "Highlight Key Features",
+        "hotspot_heading": "Interactive image",
+        "hotspot_text": "<p>Use text paired with image hotspots to explain details about your products and highlight interesting or useful features.<\/p>",
+        "show_marker_labels": false,
+        "first_button_label": "Shop now",
+        "first_button_link": "shopify:\/\/collections\/all",
+        "first_button_style": "filled",
+        "second_button_label": "Shop all",
+        "second_button_link": "shopify:\/\/collections\/all",
+        "second_button_style": "outline"
+      }
+    },
+    "image-with-text-overlay": {
+      "type": "flotilla-image-with-text-overlay",
+      "blocks": {
+        "image-with-text-overlay-00": {
+          "type": "overlay_content",
+          "settings": {
+            "title": "Big, beautiful imagery",
+            "section_subheading": "Make an impact",
+            "button_1_link": "shopify:\/\/collections\/all",
+            "button_1_text": "Shop now",
+            "button_1_style": "filled",
+            "button_2_link": "",
+            "button_2_text": "",
+            "button_2_style": "filled",
+            "text_color_scheme": "accent-3"
+          }
+        }
+      },
+      "block_order": [
+        "image-with-text-overlay-00"
+      ],
+      "settings": {
+        "desktop_height": "s",
+        "mobile_height": "s",
+        "image_link": "",
+        "section_width": "full",
+        "text_position": "right",
+        "background_color_scheme": "general",
+        "overlay_color_scheme": "light",
+        "overlay_opacity": 0
+      }
+    },
+    "gallery": {
+      "type": "flotilla-gallery",
+      "blocks": {
+        "gallery-00": {
+          "type": "image",
+          "settings": {
+            "link": "shopify:\/\/collections\/all",
+            "button_text": "Shop now",
+            "button_style": "filled",
+            "heading": "Show off key features",
+            "text_position": "bottom_left",
+            "text_color_scheme": "accent-3",
+            "overlay_style": "bg-black",
+            "overlay_opacity": 0
+          }
+        },
+        "gallery-01": {
+          "type": "image",
+          "settings": {
+            "link": "shopify:\/\/collections\/all",
+            "button_text": "Shop now",
+            "button_style": "filled",
+            "heading": "Show off key features",
+            "text_position": "bottom_left",
+            "text_color_scheme": "accent-3",
+            "overlay_style": "bg-black",
+            "overlay_opacity": 0
+          }
+        },
+        "gallery-02": {
+          "type": "image",
+          "settings": {
+            "link": "shopify:\/\/collections\/all",
+            "button_text": "Shop now",
+            "button_style": "filled",
+            "heading": "Show off key features",
+            "text_position": "bottom_left",
+            "text_color_scheme": "accent-3",
+            "overlay_style": "bg-black",
+            "overlay_opacity": 0
+          }
+        },
+        "gallery-03": {
+          "type": "image",
+          "settings": {
+            "link": "shopify:\/\/collections\/all",
+            "button_text": "Shop now",
+            "button_style": "filled",
+            "heading": "Show off key features",
+            "text_position": "bottom_left",
+            "text_color_scheme": "accent-3",
+            "overlay_style": "bg-black",
+            "overlay_opacity": 0
+          }
+        },
+        "gallery-04": {
+          "type": "image",
+          "settings": {
+            "link": "shopify:\/\/products\/all",
+            "button_text": "Shop now",
+            "button_style": "filled",
+            "heading": "Show off key features",
+            "text_position": "bottom_left",
+            "text_color_scheme": "accent-3",
+            "overlay_style": "bg-black",
+            "overlay_opacity": 0
+          }
+        },
+        "gallery-05": {
+          "type": "image",
+          "settings": {
+            "link": "shopify:\/\/collections\/all",
+            "button_text": "Shop now",
+            "button_style": "filled",
+            "heading": "Show off key features",
+            "text_position": "bottom_left",
+            "text_color_scheme": "accent-3",
+            "overlay_style": "bg-black",
+            "overlay_opacity": 0
+          }
+        }
+      },
+      "block_order": [
+        "gallery-00",
+        "gallery-01",
+        "gallery-02",
+        "gallery-03",
+        "gallery-04",
+        "gallery-05"
+      ],
+      "settings": {
+        "section_subheading": "",
+        "section_heading": "",
+        "heading_alignment": "text-center",
+        "img_row_desktop": 3,
+        "img_row_mobile": "two",
+        "img_aspect_ratio": "square",
+        "section_width": "full-with-padding",
+        "bg_color_scheme": "general"
+      }
+    },
+    "icons-with-text": {
+      "type": "flotilla-icons-with-text",
+      "blocks": {
+        "icons-with-text-00": {
+          "type": "icon_with_text",
+          "settings": {
+            "heading": "Describe key features",
+            "text": "Use this text to emphasise your brand’s unique selling points.",
+            "link": ""
+          }
+        },
+        "icons-with-text-01": {
+          "type": "icon_with_text",
+          "settings": {
+            "heading": "Describe key features",
+            "text": "Use this text to emphasise your brand’s unique selling points.",
+            "link": ""
+          }
+        },
+        "icons-with-text-02": {
+          "type": "icon_with_text",
+          "settings": {
+            "heading": "Describe key features",
+            "text": "Use this text to emphasise your brand’s unique selling points.",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "icons-with-text-00",
+        "icons-with-text-01",
+        "icons-with-text-02"
+      ],
+      "settings": {
+        "text_alignment": "left",
+        "section_width": "full",
+        "section_color_scheme": "accent-2"
+      }
+    },
+    "testimonials": {
+      "type": "ship-testimonials",
+      "blocks": {
+        "testimonials-00": {
+          "type": "testimonial",
+          "settings": {
+            "star_rating": 5,
+            "testimonial_content": "“Use this section to add reviews or testimonials from your store’s happy customers”",
+            "testimonial_author": "John Smith"
+          }
+        }
+      },
+      "block_order": [
+        "testimonials-00"
+      ],
+      "settings": {
+        "section_subheading": "Build brand trust",
+        "section_heading": "Testimonials",
+        "section_color_scheme": "accent-1"
+      }
+    }
+  },
+  "order": [
+    "rich-text-00",
+    "description",
+    "filters",
+    "main",
+    "rich-text-01",
+    "hotspot-00",
+    "hotspot-01",
+    "hotspot-02",
+    "image-with-text-overlay",
+    "gallery",
+    "icons-with-text",
+    "testimonials"
+  ]
+}

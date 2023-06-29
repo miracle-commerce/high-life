@@ -1,0 +1,54 @@
+{% comment %}
+    Renders an expanded search bar that can be used in the header.
+
+    Accepts:
+    - search_icon: {String} eg. search
+    - cancel_icon: {String} eg. cancel
+    - search_icon_width: {Int} Optional specify a width.
+    - search_icon_height: {Int} Optional specify a height.
+    - clear_icon_width: {Int} Optional specify a width.
+    - clear_icon_height: {Int} Optional specify a height.
+
+    Usage:
+    {% render 'ship-expanded-search-bar' with search_icon: 'search', cancel_icon: 'cancel', icon_width: 20, icon_height: 20 %}
+{% endcomment %}
+
+{% liquid 
+  assign search_label = 'general.search.search_box_text' | t
+  assign search_close = 'general.search.close' | t
+  assign search_clear = 'general.search.clear_search' | t
+  assign search_value = search.terms | escape
+  assign placeholder_text = 'general.search.search_placeholder' | t
+  assign clear_icon_attrs =  'data-armada-animation="icon" tabindex="0" data-armada-selector="clear-search" aria-label="' | append: search_clear | append: '"'
+  assign close_icon_attrs = 'data-armada-animation="icon" tabindex="0" data-armada-selector="close-results" aria-label="' | append: search_close | append: '"'
+  assign search_classes = 'absolute grid lg:grid-cols-1 lg:grid-rows-[repeat(2,minmax(0,auto))] top-full z-[1000] w-full h-0 overflow-hidden opacity-0 invisible bg-page text-body'
+
+  unless search_icon
+    assign search_icon = 'search'
+  endunless
+
+  unless cancel_icon
+    assign cancel_icon = 'cancel'
+  endunless
+%}
+
+<div class="relative w-full max-w-full flex items-center justify-center">
+  <expanded-search-bar class="w-full" data-predictive-search-enabled="{{ settings.enable_predictive_search }}" data-search-overlays-header="true">
+    <form action="{{ routes.search_url }}" method="get" role="search" class="grid grid-cols-[minmax(0,auto),1fr,minmax(0,auto),minmax(0,auto)] items-center lg:pb-s bg-page text-body lg:row-start-1 lg:row-end-2 lg:h-[44px]">
+      {% render 'armament-input' with type: 'hidden', name: 'type', value: 'product' %}
+      {% render 'armament-input' with type: 'hidden', name: 'options[prefix]', value: 'last' %}
+      {% render 'armament-input' with type: 'search', name: 'q', value: search_value, has_label: false, classes: 'w-full col-start-2 col-end-5 row-start-1 row-end-2 p-0 border-0 min-h-[44px] bg-page text-b2 placeholder:text-body !rounded-none', placeholder: search_label, data_aid: 'expanded-search-bar-header', attributes: 'autocorrect="off" autocomplete="off"' %}
+      <div {{ clear_icon_attrs }} class="close-icon hidden cursor-pointer col-start-3 col-end-4 row-start-1 row-end-2 justify-self-end items-center justify-end h-11 w-11 group" tabindex="0">
+        <span class="text-b2 underline">{{ 'general.search.clear_search' | t }}</span>
+      </div>
+      <button type="submit" class="group flex w-11 h-full items-center justify-end col-start-4 col-end-5 row-start-1 row-end-2 lg:justify-self-end relative cursor-pointer bg-page text-body" data-aid="header-search-submit-button" data-armada-animation="icon"{% if settings.enable_predictive_search %} data-armada-selector="expanded-search-bar-button"{% endif %} aria-label="{{ search_label }}">
+        {% render 'armament-icon' with icon: search_icon, classes: 'z-20 hover:text-body', has_link: false, width: search_icon_width, height: search_icon_height %}
+      </button>
+    </form>
+    <hr class="upto-lg:hidden text-body-opacity-25">
+  </expanded-search-bar>
+</div>
+
+<safe-load-scripts>
+  <script src="{{ 'component-expanded-search-bar.min.js' | asset_url }}" defer="defer" type="module" data-armada-load-key="expanded-search-bar"></script>
+</safe-load-scripts>

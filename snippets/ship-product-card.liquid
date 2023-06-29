@@ -1,0 +1,610 @@
+{% comment %}
+    Renders a product card.
+
+    Accepts:
+    - card_product {Object} Shopify product object.
+    - section_blocks {Object} Shopify section blocks.
+    - align: {String} alignment of content under the image. One of: 'left', 'center', 'right'. Defaults to 'left' if blank.
+    - classes: {String} Additional classes for the element.
+    - gallery_mode: {String} Optional. Slider options as follows:
+      - preview: Show animated preview of the next slide on first load.
+      - peep: Show partial view of first slide (swipe to show full slide).
+      - vertical: Stack slides vertically.
+    - enable_quick_view: {Boolean} Show 'quick view' button over gallery or image.
+    - card_icon_size: {Object/String} setting value or "small", "large" or px value (optional)
+
+    Usage:
+    {% render 'ship-product-card' with card_product: product, section_blocks: section.blocks %}
+{% endcomment %}
+
+{%- capture block_order -%}
+  {%- for block in section_blocks -%}
+    {{ block.type }}{%- unless forloop.last -%},{%- endunless -%}
+  {%- endfor -%}
+{%- endcapture -%}
+
+{% liquid
+  if align == blank
+    assign align = 'left'
+  endif
+
+  assign block_names = block_order | split: ','
+
+  assign aspect_ratio = 'natural'
+  assign pclass = 'object-center'
+  assign gallery = ''
+
+  assign image_block = section_blocks | where: 'type', 'image' | first
+  assign gallery_block = section_blocks | where: 'type', 'gallery' | first
+  assign last_icons_block = section_blocks | where: 'type', 'icon-and-text' | last
+
+  if image_block != blank
+    assign aspect_ratio = image_block.settings.product_cards_aspect_ratio
+    assign pclass = image_block.settings.product_cards_crop_position
+    assign gallery = image_block.settings.collection_hover_effect
+  elsif gallery_block != blank
+    assign aspect_ratio = gallery_block.settings.product_cards_aspect_ratio
+    assign pclass = gallery_block.settings.product_cards_crop_position
+  endif
+
+  if gallery == 'show_second_image' and card_product.media.size > 1
+    assign hide_main_img = 'group-hover:hidden '
+  endif
+
+  if aspect_ratio == blank or aspect_ratio == 'natural'
+    assign img_classes = 'relative product-card-img ' | append: hide_main_img
+    assign second_img_classes = 'relative'
+  else
+    assign img_classes = 'absolute w-full h-full z-0 object-cover product-card-img ' | append: hide_main_img | append: pclass
+    assign second_img_classes = 'absolute w-full h-full z-0 object-cover ' | append: pclass
+  endif
+
+  assign position = pclass | replace: 'object-', ''
+%}
+
+{% if settings.custom_badges %}
+  {% capture badges %}
+  {% if gallery_block != blank %}
+    {% assign gallery_navigation_width = 92 %}
+    {% assign gallery_navigation_spacing_classes = "max-w-[calc(100%-" | append: gallery_navigation_width | append: "px)]" %}
+  {% endif %}
+    <div class="absolute top-s lg:top-l left-0 z-50 pointer-events-none{% if gallery_block != blank %} {{ gallery_navigation_spacing_classes }}{% endif %}">
+      {% render 'engine-badges' with badges_product: card_product %}
+    </div>
+  {% endcapture %}
+{%- endif -%}
+
+<product-card
+  class="max-w-full block no-js-hidden{% if classes %} {{ classes }}{% endif %}"
+  block-order="{{ block_order }}"
+  data-aid="product-card"
+>
+  {% assign block_classes = 'pb-s' %}
+  {% for block in section_blocks %}
+    {% if block.type == 'view_details_quick_add' %}
+      {%- liquid
+        if block.settings.enable_view_details
+          unless forloop.last
+            assign display_view_details = true
+          endunless
+          assign show_details = ''
+          assign view_details_open = block.settings.view_details_open
+
+          if block.settings.view_details_open_all
+            assign view_details_id = section.id
+          else
+            assign view_details_id = card_product.id
+          endif
+        endif
+        if block.settings.show_quick_add
+          assign display_quick_add = true
+        endif
+      -%}
+      {% if display_quick_add and display_view_details != true %}
+        <div class="details_quick_add_block flex mb-s border border-x-0 border-theme text-headings justify-end px-s">
+          <div class="self-center py-s">
+            {% render 'armament-quick-add-icons' with quick_product: card_product, scope_id: section.id %}
+          </div>
+        </div>
+        <div
+          data-name="quick-add"
+          class="px-s"
+          {{ block.shopify_attributes }}
+        >
+          {% render 'ship-quick-add' with quick_product: card_product, show_hide_button: true, separate_icons: true, scope_id: section.id, classes: 'pb-s' %}
+        </div>
+      {% endif %}
+    {% elsif block.type == 'image' %}
+      {% capture image_block %}
+        <div
+          data-name="image"
+          class="pb-s md:pb-l last:pb-0 relative"
+          {{ block.shopify_attributes }}
+        >
+          {{ badges }}
+          {% render 'ship-product-card-image-variant-switcher' with section_id: section.id, card_image_product: card_product, aspect_ratio: aspect_ratio, img_classes: img_classes, second_img_classes: second_img_classes, image_hover_effect: gallery, scope_id: section.id %}
+        </div>
+      {% endcapture %}
+
+      {% unless show_details %}
+        {{ image_block }}
+      {% else %}
+        {% assign show_details = show_details | append: ',image_block' %}
+      {% endunless %}
+
+    {% elsif block.type == 'title' %}
+      {% capture title_block %}
+        <div
+          data-name="title"
+          class="text-{{ align }} text-body px-s {{ block_classes }}"
+          {{ block.shopify_attributes }}
+        >
+          <a href="{{ card_product.url }}" title="{{ card_product.title | escape }}">
+            <span class="text-b1" data-aid="product-card-product-heading">{{ card_product.title }}</span>
+          </a>
+        </div>
+      {% endcapture %}
+
+      {% unless show_details %}
+        {{ title_block }}
+      {% else %}
+        {% assign show_details = show_details | append: ',title_block' %}
+      {% endunless %}
+
+    {% elsif block.type == 'price' %}
+      {% capture price_block %}
+        <div
+          data-name="price"
+          class="text-{{ align }} text-body {{ block_classes }} pb-s px-s"
+          {{ block.shopify_attributes }}
+        >
+          {% render 'armament-price', price_product: card_product, align: align, discount_type: settings.show_discount_savings %}
+        </div>
+      {% endcapture %}
+
+      {% unless show_details %}
+        {{ price_block }}
+      {% else %}
+        {% assign show_details = show_details | append: ',price_block' %}
+      {% endunless %}
+
+    {% elsif block.type == 'gallery' %}
+      {% capture gallery_block %}
+        {% if show_details and view_details_open != true %}
+          {% comment %} Don't load slider if hidden in show details on load {% endcomment %}
+          {% assign prevent_load = true %}
+        {% endif %}
+        <div
+          data-name="gallery"
+          class="relative"
+          {{ block.shopify_attributes }}
+        >
+          {{ badges }}
+          {%
+            render 'armament-product-thumbnail-slider' with
+            product_id: card_product.id,
+            media: card_product.media,
+            product_title: card_product.title,
+            aspect_ratio: aspect_ratio,
+            position: position,
+            arrows: true,
+            mode: gallery_mode,
+            url: card_product.url,
+            scope_id: section.id,
+            prevent_load: prevent_load
+          %}
+          {% if enable_quick_view %}
+            {%- liquid
+              if card_product.media.size > 1
+                assign quick_view_classes = '[bottom:32px] xl:bottom-0'
+              else
+                assign quick_view_classes = 'bottom-0'
+              endif
+            -%}
+            {% render 'ship-quick-view' with quick_view_product: card_product, button_only: quick_view_button_only, classes: quick_view_classes %}
+          {% endif %}
+        </div>
+      {% endcapture %}
+
+      {% unless show_details %}
+        {{ gallery_block }}
+      {% else %}
+        {% assign show_details = show_details | append: ',gallery_block' %}
+      {% endunless %}
+
+    {% elsif block.type == 'swatch' %}
+      {% capture swatch_block %}
+        <div
+          data-name="swatch"
+          class="text-{{ align }} px-s"
+          {{ block.shopify_attributes }}
+        >
+          {%- render 'armament-color-swatch' with swatch_product: card_product, touch_size: block.settings.touch_size, identifiers: 'color,colour,couleur,colore,farbe,색,色,färg,farve', change_on_hover: true, natural_img_aspect_ratio: natural_img_aspect_ratio, disabled: disable_swatches, scope_id: section.id, wrapper_classes: 'mb-xs -mt-xs -ml-xs', show_checked_state: true -%}
+        </div>
+      {% endcapture %}
+
+      {% unless show_details %}
+        {{ swatch_block }}
+      {% else %}
+        {% assign show_details = show_details | append: ',swatch_block' %}
+      {% endunless %}
+
+    {% elsif block.type == 'vendor' %}
+      {% capture vendor_block %}
+        <div
+          data-name="vendor"
+          {% if card_product.vendor != blank %}class="text-{{ align }} text-body {{ block_classes }} px-s"{% endif %}
+          {{ block.shopify_attributes }}
+        >
+          {% if card_product.vendor != blank %}
+            <span class="text-b2">{{ card_product.vendor }}</span>
+          {% endif %}
+        </div>
+      {% endcapture %}
+
+      {% unless show_details %}
+        {{ vendor_block }}
+      {% else %}
+        {% assign show_details = show_details | append: ',vendor_block' %}
+      {% endunless %}
+
+    {% elsif block.type == 'sku' %}
+      {% capture sku_block %}
+        <div
+          data-name="sku"
+          class="text-{{ align }} text-body {{ block_classes }} px-s"
+          {{ block.shopify_attributes }}
+        >
+          {% render 'armament-sku' with sku_product: card_product, sku_variant: card_product.selected_or_first_available_variant, sku_scope_id: section.id, classes: 'text-b2' %}
+        </div>
+      {% endcapture %}
+
+      {% unless show_details %}
+        {{ sku_block }}
+      {% else %}
+        {% assign show_details = show_details | append: ',sku_block' %}
+      {% endunless %}
+
+    {% elsif block.type == 'specifications' %}
+      {% capture specifications_block %}
+        <div
+          data-name="specifications"
+          class="hr-hide"
+          {{ block.shopify_attributes }}
+        >
+          {% liquid 
+            assign show_specifications = false
+            if card_product.metafields.specifications != blank
+              assign show_specifications = true
+            endif    
+          %}
+
+          {% if show_specifications == false or block.settings.spec-keys == blank %} 
+            {% capture metafieldMessage %}
+              <p class="text-left">To use this section create <a target="_blank" href="/admin/metafields/product/create">product metafields</a> with a namespace of “specifications”. Use any name for the key, this will be used for your label. We support all ‘Measurement’, ‘Text’ and ‘Rating’ content types. <a target="_blank" href="https://support.eightthemes.com/hc/en-us/articles/8283331726865">Learn more.</a></p>
+            {% endcapture %}
+            {% render 'armament-metafield-theme-editor-message' with is_full_width_editor_message: false, editor_message_metafield_type: 'specifications' metafield_message: metafieldMessage, block_level_editor_message_wrapper_classes: '!my-l !mt-0' %}
+          {% endif %}
+          {% if block.settings.spec-keys != blank %}
+            {% render 'ship-spec-table' with spec_product: card_product, type: 'product-card', keys: block.settings.spec-keys,
+            spec_aid: 'product-card-spec' %}
+          {% endif %}
+        </div>
+      {% endcapture %}
+
+      {% unless show_details %}
+        {{ specifications_block }}
+      {% else %}
+        {% assign show_details = show_details | append: ',specifications_block' %}
+      {% endunless %}
+
+    {% elsif block.type == 'icon-and-text' %}
+      {% capture icon_and_text_block %}
+          <div
+            data-name="icon-and-text"
+            {{ block.shopify_attributes }}
+            class="icon-and-text hr-hide px-s"
+          >
+            {% unless card_product.metafields.icons-with-text.icons-with-text.value == blank %}
+              {%
+                render 'armament-icon-and-text-product' with 
+                icons_and_text_object: card_product,
+                border: false,
+                align: align,
+                classes: 'text-b2',
+                content_icon_size: card_icon_size
+              %}
+            {% else %}
+              {% capture metafieldMessage %}
+                <p class="text-left !mt-0">To use this section create a <a target="_blank" href="/admin/metafields/product/create">product metafield</a> with the namespace of “icons-with-text” and the key “icons-with-text”. This needs to be a ‘file’ content type with the ‘List of files’ setting and alt tags assigned to the image. <a target="_blank" href="https://support.eightthemes.com/hc/en-us/articles/8388599633553">Learn more.</a></p>
+              {% endcapture %}
+              {% render 'armament-metafield-theme-editor-message' with is_full_width_editor_message: false, editor_message_metafield_type: 'icons with text' metafield_message: metafieldMessage, block_level_editor_message_wrapper_classes: '!my-l !mt-0' %}
+            {% endunless %}
+          </div>
+      {% endcapture %}
+
+      {% unless show_details %}
+        {{ icon_and_text_block }}
+      {% else %}
+        {% assign show_details = show_details | append: ',icon_and_text_block' %}
+      {% endunless %}
+
+    {% elsif block.type == 'local-pickup-availability' %}
+      {% case align %}
+        {% when 'left' %}
+          {% assign flex_align = 'start' %}
+        {% when 'center' %} 
+          {% assign flex_align = 'center' %}
+        {% when 'right' %}
+          {% assign flex_align = 'end' %}
+      {% endcase %}
+      {% capture local_pickup_block %}
+        <div
+          data-name="local-pickup-availability"
+          class="flex justify-{{ flex_align }} text-body text-b2 {{ block_classes }} px-s"
+          {{ block.shopify_attributes }}
+        >
+          {%- render 'armament-local-pickup-availability-summary' with pickup_product: card_product -%}
+        </div>
+      {% endcapture %}
+
+      {% unless show_details %}
+        {{ local_pickup_block }}
+      {% else %}
+        {% assign show_details = show_details | append: ',local_pickup_block' %}
+      {% endunless %}
+
+    {% elsif block.type == 'icon-list' %}
+      {% capture metafieldMessage %}
+        <p class="text-left !mt-0">To use this section create a <a target="_blank" href="/admin/metafields/product/create">product metafield</a> with the namespace of “icon” and the key “list”. This needs to be a ‘file’ content type with the ‘List of values’ setting. <a target="_blank" href="https://support.eightthemes.com/hc/en-us/articles/10615831834641">Learn more.</a></p>
+      {% endcapture %}
+
+      {% case align %}
+        {% when 'left' %}
+          {% assign flex_align = 'start' %}
+        {% when 'center' %} 
+          {% assign flex_align = 'center' %}
+        {% when 'right' %}
+          {% assign flex_align = 'end' %}
+      {% endcase %}
+      {% capture icon_list_block %}
+        <div
+          data-name="icon-list"
+          class="flex justify-{{ flex_align }} text-body hr-hide px-s"
+          {{ block.shopify_attributes }}
+        >
+          {% unless card_product.metafields.icon.list == blank %}
+            {% render 'armament-custom-icons' with icons_product: card_product, width: 18, classes: block_classes %}
+          {% else %}
+            {% render 'armament-metafield-theme-editor-message' with is_full_width_editor_message: false, editor_message_metafield_type: 'icon list' metafield_message: metafieldMessage, block_level_editor_message_wrapper_classes: '!my-l !mt-0' %}
+          {% endunless %}
+        </div>
+      {% endcapture %}
+      
+      {% unless show_details %}
+        {{ icon_list_block }}
+      {% else %}
+        {% assign show_details = show_details | append: ',icon_list_block' %}
+      {% endunless %}
+
+    {% elsif block.type == 'highlight' %}
+      {% case align %}
+        {% when 'left' %}
+          {% assign flex_align = 'start' %}
+        {% when 'center' %} 
+          {% assign flex_align = 'center' %}
+        {% when 'right' %}
+          {% assign flex_align = 'end' %}
+      {% endcase %}
+      {% capture highlight_block %}
+        <div
+          data-name="highlight"
+          class="flex justify-{{ flex_align }} text-body hr-hide px-s"
+          {{ block.shopify_attributes }}
+        >
+        {%-liquid
+          case align
+            when 'left'
+              assign highlights_alignment = 'justify-start '
+            when 'center'
+              assign highlights_alignment = 'relative justify-center '
+            when 'right'
+              assign highlights_alignment = 'relative justify-end '
+          endcase
+          assign highlights_classes = 'flex ' | append: highlights_alignment | append: block_classes
+
+          assign show_highlights = false
+          if card_product.metafields.highlights.list.value
+            assign show_highlights = true
+          endif
+
+        -%}
+          {% if show_highlights == false %}
+            {% capture metafieldMessage %}
+              <p class="text-left !mt-0">To use this section create a <a target="_blank" href="/admin/metafields/product/create">product metafield</a> with the namespace of “highlights” and the key “list”. This needs to be a ‘single text’ content type with the ‘List of values’ setting. <a target="_blank" href="https://support.eightthemes.com/hc/en-us/articles/8283374569361">Learn more.</a></p>
+            {% endcapture %}
+            {% render 'armament-metafield-theme-editor-message' with is_full_width_editor_message: false, editor_message_metafield_type: 'highlights' metafield_message: metafieldMessage, block_level_editor_message_wrapper_classes: '!my-l !mt-0' %}
+          {% endif %}
+          {% render 'armament-highlight' with highlight_product: card_product, classes: highlights_classes, items_padding: false, text_alignment: align %}
+        </div>
+      {% endcapture %}
+
+      {% unless show_details %}
+        {{ highlight_block }}
+      {% else %}
+        {% assign show_details = show_details | append: ',highlight_block' %}
+      {% endunless %}
+
+    {% elsif block.type == 'stock-level-indicator' %}
+      {% case align %}
+        {% when 'left' %}
+          {% assign flex_align = 'start' %}
+        {% when 'center' %} 
+          {% assign flex_align = 'center' %}
+        {% when 'right' %}
+          {% assign flex_align = 'end' %}
+      {% endcase %}
+      {% capture stock_level_block %}
+        <div
+          data-name="stock-level-indicator"
+          class="flex justify-{{ flex_align }} text-body hr-hide px-s"
+          {{ block.shopify_attributes }}
+        >
+          {% assign stock_indicator_summary_classes = block_classes | append: ' text-b2' %}
+          {%- render 'armament-stock-indicator-summary' with
+            stock_product: card_product,
+            stock_amt: block.settings.stock_range,
+            show_stock_count: block.settings.show_stock_count,
+            in_stock_message: block.settings.in_stock_message,
+            in_stock_icon: "success",
+            low_stock_message: block.settings.low_stock_message,
+            low_stock_icon: "warning",
+            out_of_stock_message: block.settings.out_of_stock_message,
+            out_of_stock_icon: "warning",
+            classes: stock_indicator_summary_classes
+          -%}
+        </div>
+      {% endcapture %}
+
+      {% unless show_details %}
+        {{ stock_level_block }}
+      {% else %}
+        {% assign show_details = show_details | append: ',stock_level_block' %}
+      {% endunless %}
+
+    {% elsif block.type == 'divider' %}
+      {% unless show_details %}
+        {% render 'armament-divider' %}
+      {% else %}
+        {% assign show_details = show_details | append: ',divider' %}
+      {% endunless %}
+
+    {% elsif block.type == 'text' %}
+      {%- capture text_block -%}
+        <div
+          data-name="text"
+          {%- if block.settings.text != blank -%}class="text-{{ align }} text-body text-b2 {{ block_classes }} px-s"{% endif %}
+          {{ block.shopify_attributes }}
+        >
+          {%- if block.settings.text != blank -%}
+            <p>{{ block.settings.text }}</p>
+          {%- endif -%}
+        </div>
+      {%- endcapture -%}
+
+      {% unless show_details %}
+        {{ text_block }}
+      {% else %}
+        {% assign show_details = show_details | append: ',text_block' %}
+      {% endunless %}
+
+    {% elsif block.type == 'reviews' %}
+      {%- capture reviews_block -%}
+        <div
+          data-name="reviews"
+          class="text-{{ align }} text-body hr-hide px-s"
+          {{ block.shopify_attributes }}
+        >
+          {%- 
+            render 'armament-star-rating' with 
+            rating: card_product.metafields.reviews.rating.value.rating,
+            rating_max: card_product.metafields.reviews.rating.value.scale_max,
+            show_rating_value: true,
+            classes: block_classes
+          -%}
+        </div>
+      {%- endcapture -%}
+
+      {% unless show_details %}
+        {{ reviews_block }}
+      {% else %}
+        {% assign show_details = show_details | append: ',reviews_block' %}
+      {% endunless %}
+
+    {% endif %}
+  {% endfor %}
+
+  {% if display_view_details %}
+    {%- liquid
+      assign show_details = show_details | remove_first: ',' | strip
+      case align
+        when 'left'
+          assign flex_align = 'start'
+        when 'center' 
+          assign flex_align = 'center'
+        when 'right'
+          assign flex_align = 'end'
+      endcase
+      assign view_details_classes = 'py-s'
+      unless display_quick_add
+        assign view_details_classes = view_details_classes | append: ' flex justify-' | append: flex_align
+      endunless
+    -%}
+    <div class="details_quick_add_block flex mb-s border border-x-0 border-theme text-headings px-s">
+        <div class="flex-1">
+          {% render 'armament-show-hide-details' with id: view_details_id, section_id: section.id, classes: view_details_classes, open: view_details_open %}
+        </div>
+      {% if display_quick_add %}
+        <div class="self-center py-s">
+          {% render 'armament-quick-add-icons' with quick_product: card_product, scope_id: section.id %}
+        </div>
+      {% endif %}
+    </div>
+    {% if display_quick_add %}
+      <div
+        data-name="quick-add"
+        class="px-s"
+        {{ block.shopify_attributes }}
+      >
+        {% render 'ship-quick-add' with quick_product: card_product, show_hide_button: true, separate_icons: true, scope_id: section.id, classes: 'pb-s' %}
+      </div>
+    {% endif %}
+  {% endif %}
+
+  {% if display_view_details %}
+    <div data-armada-details-id="{{ view_details_id }}" id="{{ view_details_id }}" class="{% unless view_details_open %}hidden{% endunless %}">
+      {% assign show_details_blocks = show_details | split: ',' %}
+
+      {% for show_details_name in show_details_blocks %}
+        {% if show_details_name == 'image_block' %}
+          {{ image_block }}
+        {% elsif show_details_name == 'title_block' %}
+          {{ title_block }}
+        {% elsif show_details_name == 'price_block' %}
+          {{ price_block }}
+        {% elsif show_details_name == 'gallery_block' %}
+          {{ gallery_block }}
+        {% elsif show_details_name == 'swatch_block' %}
+          {{ swatch_block }}
+        {% elsif show_details_name == 'vendor_block' %}
+          {{ vendor_block }}
+        {% elsif show_details_name == 'sku_block' %}
+          {{ sku_block }}
+        {% elsif show_details_name == 'specifications_block' %}
+          {{ specifications_block }}
+        {% elsif show_details_name == 'icon_and_text_block' %}
+          {{ icon_and_text_block }}
+        {% elsif show_details_name == 'local_pickup_block' %}
+          {{ local_pickup_block }}
+        {% elsif show_details_name == 'icon_list_block' %}
+          {{ icon_list_block }}
+        {% elsif show_details_name == 'highlight_block' %}
+          {{ highlight_block }}
+        {% elsif show_details_name == 'stock_level_block' %}
+          {{ stock_level_block }}
+        {% elsif show_details_name == 'divider' %}
+          {% render 'armament-divider' %}
+        {% elsif show_details_name == 'text_block' %}
+          {{ text_block }}
+        {% elsif show_details_name == 'reviews_block' %}
+          {{ reviews_block }}
+        {% endif %}
+      {% endfor %}
+    </div>
+  {% endif %}
+
+</product-card>
+
+<safe-load-scripts>
+  <script src="{{ 'component-product-card.min.js' | asset_url }}" defer="defer" type="module" data-armada-load-key="product-card"></script>
+</safe-load-scripts>

@@ -1,0 +1,26 @@
+{
+  "sections": {
+    "blog-navigation": {
+      "type": "ship-blog-navigation",
+      "disabled": true,
+      "settings": {
+        "blog_navigation": "",
+        "section_color_scheme": "general"
+      }
+    },
+    "blog-main": {
+      "type": "flotilla-blog-main",
+      "settings": {
+        "image_size": "square",
+        "text_alignment": "left",
+        "articles_per_page": 5,
+        "show_date": true,
+        "show_author": true
+      }
+    }
+  },
+  "order": [
+    "blog-navigation",
+    "blog-main"
+  ]
+}

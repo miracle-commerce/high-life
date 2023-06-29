@@ -1,0 +1,31 @@
+{% if search.performed %}
+  {%- liquid
+    assign search_type = search.types | join: ''
+    if search_type != 'product' and search_type != 'article' and search_type != 'page'
+      assign search_type = 'collections'
+    endif
+  -%}
+  <div>
+    {% render 'ship-search-navigation-items' with search_type: search_type, show_product_tab: true, has_bottom_border: false, inactive_item_has_opacity: true %}
+    {%- liquid
+      assign search_heading_classes = 'text-center p-xl md:p-2xl text-body bg-page !pb-0'
+      unless search_type == 'product' and search.results.size > 0
+        assign search_heading_classes = 'text-center p-xl md:p-2xl upto-md:pb-xl md:pb-2xl text-body bg-page'
+      endunless
+    -%}
+    {% render 'armament-heading' with tag: 'h1', heading_content: search.terms, heading_type: 'heading-3', classes: search_heading_classes, data_aid: 'search-results-heading' %}
+  </div>
+{% endif %}
+
+{% schema %}
+{
+  "class": "w-full",
+  "name": "Search navigation",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Show collection results, blog results or page results in order to show search navigation."
+    }
+  ]
+}
+{% endschema %}

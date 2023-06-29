@@ -1,0 +1,41 @@
+{%- liquid
+  if fast
+    assign distance = '30px'
+    assign keyframe = 'slideUpFast'
+    assign duration = '0.8s'
+  else
+    assign distance = '60px'
+    assign keyframe = 'slideUp'
+    assign duration = '1s'
+  endif
+-%}
+
+<style>
+  @media (prefers-reduced-motion: no-preference) {
+    {{ selector }} {
+      opacity: 0;
+      transform: translateY({{ distance }});
+    }
+    {{ selector }}[data-animated="true"],
+    .no-js {{ selector }} {
+      animation: {{ keyframe }} {{ duration }} cubic-bezier(0.165, 0.84, 0.44, 1) 100ms forwards;
+    }
+    @keyframes {{ keyframe }} {
+      0% {
+        opacity: 0;
+        transform: translateY({{ distance }});
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    @media (max-width: 1023px) {
+      {{ selector }}[data-armada-animation-disable-mobile="true"] {
+        opacity: unset;
+        transform: unset;
+        animation: none;
+      }
+    }
+  }
+</style>

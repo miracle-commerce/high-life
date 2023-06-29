@@ -1,0 +1,179 @@
+{% liquid
+  case section.settings.horizontal_alignment
+  when 'left'
+    assign section_align = 'items-start'
+    assign text_align = 'text-left'
+    assign flex_justify = 'justify-start'
+  when 'center'
+    assign section_align = 'items-center'
+    assign text_align = 'text-center'
+    assign flex_justify = 'justify-center'
+  when 'right'
+    assign section_align = 'items-end'
+    assign text_align = 'text-right'
+    assign flex_justify = 'justify-end'
+  endcase
+
+  assign subheading_classes = text_align
+
+  assign newsletter_id = 'NewsletterForm--' | append: section.id
+  assign form_classes = 'flex w-full flex-wrap sm:flex-nowrap max-w-full ' | append: flex_justify
+  assign label_text = 'newsletter.label' | t
+  assign btn_text = 'newsletter.button_label' | t
+  assign button_attributes = 'aria-label="' | append: btn_text | append: '"'
+
+  case section.settings.section_width 
+    when 'full-with-padding'
+      assign section_max_width = 'max-w-fullwidth'
+    when 'narrow'
+      assign section_max_width = 'max-w-content'
+  endcase
+%}
+
+<section data-color-scheme="{{ section.settings.section_color_scheme }}" class="bg-page text-body theme-section-padding">
+  <div class="{{ section_max_width }}">
+    <div class="flex flex-col {{ section_align }}">
+      {% liquid
+        if section.settings.section_subheading != blank
+          render 'armament-heading' with heading_content: section.settings.section_subheading, tag: 'h3', heading_type: 'section-subheading', classes: subheading_classes, data_aid: 'newsletter-subheading'
+        endif
+
+        if section.settings.section_heading != blank
+          render 'armament-heading' with heading_content: section.settings.section_heading, tag: 'h2', heading_type: 'section-heading', classes: text_align, data_aid: 'newsletter-heading'
+        endif
+      %}
+
+      {% form 'customer', class: form_classes %}
+        {% if form.errors %}
+          <form-errors data-form-type="customer" data-form-name="Newsletter" data-errors='{{ form.errors | default_errors }}'></form-errors>
+        {% endif %}
+        {% if form.posted_successfully? %}
+          <form-success data-message="{{ 'newsletter.success' | t }}"></form-success>
+        {% endif %}
+        {% render 'armament-input' with type: 'hidden', name: 'contact[tags]' %}
+        {% assign email_placeholder = 'newsletter.newsletter_email' | t %}
+        {% render 'armament-input' with
+        name: 'contact[email]',
+        type: 'email',
+        value: form.email,
+        id: newsletter_id,
+        placeholder: email_placeholder,
+        attributes: 'aria-required="true" autocorrect="off" autocapitalize="off" autocomplete="email" required',
+        classes: 'inline-block border-1 bg-page text-body border-body min-w-[200px] md:min-w-[380px] ',
+        has_label: true,
+        animate_label: true,
+        label_text: label_text %}
+
+        {% render 'armament-button' with
+        content: btn_text,
+        type: 'submit',
+        attributes: button_attributes,
+        classes: 'inline-block py-[8px] min-w-[120px] md:min-w-[150px] min-w-[fit-content] leading-[inherit] !h-auto',
+        loading: true,
+        data_aid: 'newsletter_submit' %}
+      {% endform %}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Newsletter",
+  "settings": [
+    {
+      "type": "text",
+      "id": "section_subheading",
+      "label": "Subheading",
+      "default": "Signup now"
+    },
+    {
+      "type": "textarea",
+      "id": "section_heading",
+      "label": "Heading",
+      "default": "Get the newsletter"
+    },
+    {
+      "type": "select",
+      "id": "horizontal_alignment",
+      "label": "Alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "header",
+      "content": "Color scheme"
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "Section width",
+      "info": "These changes may only be visible on larger screens",
+      "options": [
+        {
+          "value": "full-with-padding",
+          "label": "Full width with padding"
+        },
+        {
+          "value": "narrow",
+          "label": "Narrow"
+        }
+      ],
+      "default": "full-with-padding"
+    },
+    {
+      "type": "select",
+      "id": "section_color_scheme",
+      "label": "Color scheme",
+      "options": [
+        {
+          "value": "general",
+          "label": "General"
+        },
+        {
+          "value": "accent-1",
+          "label": "Accent 1"
+        },
+        {
+          "value": "accent-2",
+          "label": "Accent 2"
+        },
+        {
+          "value": "accent-3",
+          "label": "Accent 3"
+        }
+      ],
+      "default": "general"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Newsletter",
+      "settings": {
+      },
+      "blocks": [
+
+      ]
+    }
+  ],
+  "disabled_on": {
+    "groups": [
+      "header",
+      "custom.overlay",
+      "custom.announcement"
+    ]
+  }
+}
+{% endschema %}

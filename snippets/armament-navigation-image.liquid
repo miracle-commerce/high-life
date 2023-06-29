@@ -1,0 +1,57 @@
+{% comment %}
+    Renders a navigation image
+
+    Accepts:
+    - image: {Object} Shopify image object
+    - classes: {String} Custom classes to be applied to the container div
+    - image_container_classes: {String} Custom classes to be applied to the image container div
+    - text_color: {String} Optional override for the text color
+    - image_heading: {String} Optional - image heading
+
+    Usage:
+    {% render 'armament-navigation-image' with image: image_1 %}
+{% endcomment %}
+
+{% liquid
+
+  assign text_color_class = 'text-page'
+  if text_color != blank
+    assign text_color_class = text_color
+  endif
+
+  assign text_classes = "absolute top-0 w-full h-full flex items-end text-h4 leading-none outline-offset-[-5px] p-l lg:p-xl " | append: text_color_class
+  assign image_classes = image_classes | append: ' w-full h-full object-cover'
+
+  if aspect == 'original'
+    assign image_classes = image_classes | append: ' max-h-[400px]'
+  endif
+
+  if animation_grid_item
+    assign animation_type = "grid-item"
+  else
+    assign animation_type = "image-load"
+  endif
+%}
+
+<div class="row-start-1 overflow-hidden{% if classes %} {{ classes }}{% endif %}" data-armada-animation="{{ animation_type }}">
+  {% if image_link %}
+    <div data-armada-animation="image-link">
+      <a 
+        href="{{ image_link }}"
+        {% if image_heading == blank %}aria-label="{{ image_link | split: '/' | last | replace: '-', ' ' | capitalize }}"{% endif %}
+      >
+  {% endif %}
+    <div class="relative aspect-square overflow-hidden{% if aspect == 'original' %} lg:pb-0{% endif %}">
+      <div class="absolute{% if aspect == 'original' %} lg:static{% endif %} w-full h-full {{ image_container_classes }}">
+        {% render 'armament-image' with image: image, classes: image_classes %}
+      </div>
+      <div class="{{ overlay_bg }} absolute top-0 w-full h-full" {{ bg_opacity }}></div>
+      <div class="{{ text_classes }}">
+        <span class="!font-heading heading-font-styles">{{ image_heading }}</span>
+      </div>
+    </div>
+  {% if image_link %}
+    </a>
+      </div>
+  {% endif %}
+</div>

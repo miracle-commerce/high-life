@@ -1,0 +1,47 @@
+{% comment %}
+    Renders a tabbed navigation
+
+    Accepts:
+    - nav_item: {Object} The navigation to be displayed
+    - container_classes: {String} Classes to add to the outer container
+    - classes: {String} any custom classes to pass into the navigation armament
+    - main_attributes: {Sting} attributes to pass to the navigation-banner element
+    - has_bottom_border: {Boolean} does the link have an underline?
+    - nav_banner_line_height: {String} eg. leading-normal (optional)
+
+    Usage:
+    {% render 'armament-navigation-banner' with nav_item: linklists.main-menu.links %}
+{% endcomment %}
+
+<navigation-banner class="flex{% if container_classes %} {{ container_classes }}{% endif %}" data-aid="armament-navigation-banner"{% if main_attributes %} {{ main_attributes }}{% endif %}>
+  {% for item in nav_item %}
+
+    {% liquid
+      unless has_bottom_border == true or has_bottom_border == false 
+        assign has_bottom_border = true
+      endunless
+
+      unless has_bottom_border 
+        assign remove_text_padding = '!pb-0 '
+      endunless
+
+      if has_bottom_border
+        assign border_classes = ' after:absolute after:left-0 after:right-0 after:-bottom-s after:h-xs after:bg-body '
+      endif
+
+      if request.path == item.url
+        assign class = 'active' | append: ' nav-item cursor-pointer relative ' | append: remove_text_padding | append: border_classes | append: classes
+        assign link_styles = 'opacity-100'
+        assign link_attr = 'data-active-nav-item="true"'
+      else
+        assign class = 'nav-item cursor-pointer ' | append: remove_text_padding | append: border_classes | append: classes
+        assign link_styles = 'opacity-30'
+        assign link_attr = 'data-active-nav-item="false"'
+      endif
+    %}
+
+    <a href="{{ item.url }}" aria-label="{{ item.title }}" class="mr-l pb-s lg:mr-2xl last:pr-0 relative {{ link_styles }}" data-armada-animation="on-page-navigation" {{ link_attr }}>
+      <span class="!flex flex-row items-center" data-on-page-nav-text>{% render 'armament-heading' with tag: 'h5', heading_content: item.title, heading_type: "section-subheading", classes: class, data_aid: 'nav-banner-heading', heading_line_height: nav_banner_line_height %}</span>
+    </a>
+  {% endfor %}
+</navigation-banner>

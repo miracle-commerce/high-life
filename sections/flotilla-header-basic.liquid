@@ -1,0 +1,196 @@
+{% liquid 
+  if section.settings.logo_position == 'center'
+    assign logo_text_alignment = 'lg:text-center ' 
+    assign logo_img_classes = 'mx-auto' 
+  endif 
+
+  if section.settings.logo_position == 'left'
+    assign logo_text_margin = 'lg:inline-block' 
+    assign logo_img_classes = 'upto-lg:mx-auto' 
+  endif 
+
+  assign logo_classes = logo_text_alignment | append: logo_text_margin | append: ' text-h4 leading-none upto-lg:text-center'
+
+  assign header_mobile_layout_cols = 'upto-lg:grid-cols-[1fr,2fr,1fr]'
+  if section.settings.show_region_selector or section.settings.show_language_selector 
+    assign header_layout_cols = header_mobile_layout_cols | append: ' lg:grid-cols-[2fr,1fr,2fr] xl:grid-cols-3'
+  else
+    assign header_layout_cols = header_mobile_layout_cols | append: ' lg:grid-cols-3'
+  endif
+%}
+
+<header-basic data-show-language="{{ section.settings.show_language_selector }}" data-show-country="{{ section.settings.show_region_selector }}" class="block py-s lg:pt-l lg:pb-m px-xl lg:px-2xl bg-page text-body" data-color-scheme="{{ section.settings.header_color_scheme }}" data-search-bar-enabled="{{ section.settings.show_search_bar }}" data-predictive-search-enabled="{{ settings.enable_predictive_search }}" data-search-overlays-header="true" data-search-enabled="{{ section.settings.enable_search }}">
+  <header role="banner" data-section-id="{{ section.id }}" data-aid="header-section" class="grid grid-rows-1 items-center justify-center {{ header_layout_cols }}">
+    <div class="upto-lg:row-start-1 upto-lg:row-end-2 upto-lg:col-start-1 upto-lg:col-end-2 lg:hidden">
+      {% render 'armament-navigation-toggle' %}
+    </div>
+    <div class="upto-lg:col-start-2 upto-lg:col-end-3 row-start-1 row-end-2{% if section.settings.logo_position == 'left' %} col-start-1 col-end-2{% else %} col-start-2 col-end-3 lg:flex lg:items-center lg:justify-center{% endif %}">
+      {% render 'armament-logo' with logo_image: section.settings.logo_image, width_desktop: section.settings.logo_width_desktop, width_mobile: section.settings.logo_width_mobile, tag: 'h1', section_id: section.id, image_classes: logo_img_classes, text_classes: logo_classes, link_classes: 'upto-lg:mx-auto' %}
+    </div>
+    {% if section.settings.enable_search and section.settings.show_search_bar %}
+      {% unless template.name contains 'search' %}
+        <div class="upto-lg:hidden row-start-1 row-end-2 {% if section.settings.logo_position == 'left' %} col-start-2 col-end-3{% else %} col-start-1 col-end-2 lg:pr-xl{% endif %} flex flex-row items-center justify-center">
+          {% render 'ship-expanded-search-bar' with search_icon: 'search', cancel_icon: 'cancel' %}
+        </div>
+      {% endunless %}
+    {% endif %}
+    <div class="upto-lg:col-start-3 upto-lg:col-end-4 row-start-1 row-end-2 col-start-3 col-end-4 {% unless section.settings.show_search_bar %}upto-lg:flex upto-lg:justify-end{% endunless %}">
+      {% render 'ship-header-cta' with enable_search: section.settings.enable_search, hide_search_icon_on_search_page: true, show_cart_count: false, search_expands_on_click: false, show_icons: section.settings.use_icons, show_country: section.settings.show_region_selector, show_languages: section.settings.show_language_selector, search_expanded: section.settings.show_search_bar, cart_icon: 'cart', search_icon: 'search', account_icon: 'account' %}
+    </div>
+  </header>
+</header-basic>
+
+<safe-load-scripts>
+  <script src="{{ 'component-header-basic.min.js' | asset_url }}" defer="defer" type="module" data-armada-load-key="header-basic"></script>
+</safe-load-scripts>
+
+{% render 'armament-structured-data' %}
+
+{% if section.settings.enable_sticky_header %}
+  <style>
+    .sticky-header {
+      position: sticky;
+      z-index: 101;
+    }
+  </style>
+{% else %}
+  <style>
+    .sticky-header {
+      top: auto;
+    }
+  </style>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Header",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Color scheme"
+    },
+    {
+      "type": "select",
+      "id": "header_color_scheme",
+      "label": "Color scheme",
+      "options": [
+        {
+          "value": "general",
+          "label": "General"
+        },
+        {
+          "value": "accent-1",
+          "label": "Accent 1"
+        },
+        {
+          "value": "accent-2",
+          "label": "Accent 2"
+        },
+        {
+          "value": "accent-3",
+          "label": "Accent 3"
+        }
+      ],
+      "default": "general"
+    },
+    {
+      "type": "header",
+      "content": "Logo"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_image",
+      "label": "Logo image"
+    },
+    {
+      "type": "range",
+      "id": "logo_width_desktop",
+      "min": 80,
+      "max": 270,
+      "step": 10,
+      "unit": "px",
+      "label": "Logo width (desktop)",
+      "default": 270
+    },
+    {
+      "type": "range",
+      "id": "logo_width_mobile",
+      "min": 50,
+      "max": 160,
+      "step": 10,
+      "unit": "px",
+      "label": "Logo width (mobile)",
+      "default": 160
+    },      
+    {
+      "type": "select",
+      "id": "logo_position",
+      "label": "Logo position (desktop)",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        }
+      ],
+      "default": "left"
+    },         
+    {
+      "type": "header",
+      "content": "Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_sticky_header",
+      "label": "Enable sticky header",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Localization"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_region_selector",
+      "label": "Show country/region selector",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_language_selector",
+      "label": "Show language selector",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Header icons"
+    }, 
+    {
+      "type": "checkbox",
+      "id": "use_icons",
+      "label": "Use header icons",
+      "info": "Icons display as default on mobile",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Search"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_search",
+      "label": "Enable search",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_search_bar",
+      "label": "Show search bar",
+      "default": true
+    }
+  ]
+}
+{% endschema %}

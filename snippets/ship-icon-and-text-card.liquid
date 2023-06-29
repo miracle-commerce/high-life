@@ -1,0 +1,44 @@
+{% comment %}
+    Renders a card with an icon, heading and text.
+    Accepts:
+    - icon_image: {Object} Shopify image object
+    - heading: {String} Heading content
+    - text: {String} Text content
+    - text_alignment: {String} Text alignment of the heading and text - 'left', 'right' or 'center' (left by default)
+    - link_url: {String} Url if card is a link
+
+    Usage:
+    {% render 'ship-icon-and-text-card' with icon_image: block.settings.icon_image, heading: block.settings.heading, text: block.settings.text, link_url: block.settings.link %}
+{% endcomment %}
+
+{%- liquid
+  if text_alignment == 'center'
+    assign text_align_class = 'text-center'
+  elsif text_alignment == 'right'
+    assign text_align_class = 'text-right'
+  endif
+-%}
+
+<div class="w-full upto-md:pb-xl text-body bg-page {{ text_align_class }}" data-aid="icon-and-text-card" data-armada-animation="grid-item">
+  {% if link_url %}
+    <a href="{{ link_url }}" class="block" data-aid="icon-and-text-link">
+  {% endif %}
+
+    {% if icon_image %}
+      {% render 'armament-thumbnail' with url: icon_image, width: 100, class: 'inline-block mb-s md:mb-l max-h-[100px] max-w-[100px] object-contain' %}
+    {% else %}
+      {% render 'armament-placeholder' with name: 'product-1', classes: 'inline-block mb-s md:mb-l h-2xl w-5' %}
+    {% endif %}
+
+    {% if heading %}
+      {% render 'armament-heading' with tag: 'h3', heading_type: 'heading-4', heading_content: heading, data_aid: 'icon-text-card-heading' %}
+    {% endif %}
+
+    {% if text %}
+      <p data-aid="icon-and-text-text">{{ text }}</p>
+    {% endif %}
+
+  {% if link_url %}
+    </a>
+  {% endif %}
+</div>

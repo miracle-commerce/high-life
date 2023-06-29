@@ -1,0 +1,389 @@
+{% liquid 
+  if section.settings.image_position == 'left'
+    assign text_grid_position = 'md:col-start-2 md:col-end-3 md:row-start-1 md:row-end-2'
+    assign image_grid_position = 'md:col-start-1 md:col-end-2 md:row-start-1 md:row-end-2'
+  else 
+    assign text_grid_position = 'md:col-start-1 md:col-end-2 md:row-start-1 md:row-end-2'
+    assign image_grid_position = 'md:col-start-2 md:col-end-3 md:row-start-1 md:row-end-2'
+  endif
+
+  if section.settings.section_color_scheme != section.settings.card_color_scheme
+    assign wrapper_padding = 'theme-section-padding'
+  else 
+    assign wrapper_padding = 'p-0 md:p-0'
+  endif
+
+  assign text_wrapper_classes = 'col-start-1 col-end-2 row-start-1 row-end-2 md:self-center ' | append: text_grid_position
+%}
+
+<section class="w-full flex items-center justify-center bg-page text-body" data-color-scheme="{{ section.settings.section_color_scheme }}">
+  <div data-color-scheme="{{ section.settings.card_color_scheme }}" class="max-w-content {{ wrapper_padding }} theme-section-margin bg-page text-body w-full grid gap-y-xl md:gap-x-2xl grid-cols-1 grid-rows-1 md:grid-cols-2 md:grid-rows-1">
+    {% render 'ship-heading-with-text-and-cta' with block_color_scheme: section.settings.card_color_scheme, block_subheading_content: section.settings.hotspot_subheading, block_subheading_tag: 'h4', block_heading_content: section.settings.hotspot_heading, block_heading_type: 'heading-1', block_heading_tag: 'h2', block_text_content: section.settings.hotspot_text, block_button_1_label: section.settings.first_button_label, block_button_1_link: section.settings.first_button_link, block_button_1_style: section.settings.first_button_style, block_button_2_label: section.settings.second_button_label, block_button_2_link: section.settings.second_button_link, block_button_2_style: section.settings.second_button_style, block_wrapper_classes: text_wrapper_classes, body_text_size: 'text-b1', block_text_alignment: section.settings.text_alignment, button_1_aid: 'hotspot-section-button-1', button_2_aid: 'hotspot-section-button-2' %}
+    <div class="w-full overflow-hidden md:self-center grid grid-cols-1 grid-rows-1 bg-page text-body col-start-1 col-end-2 row-start-2 row-end-3 {{ image_grid_position }}">
+      {% if section.settings.section_main_img != blank %}
+        <div class="col-start-1 col-end-2 row-start-1 row-end-2 flex" data-armada-animation="image-load-on-scroll" >
+          {% render 'armament-image' with image: section.settings.section_main_img, classes: 'm-auto' %}
+        </div>
+      {% else %}
+        {% render 'armament-placeholder' with name: 'product-1', classes: 'col-start-1 col-end-2 row-start-1 row-end-2' %}
+      {% endif %}
+      {% for block in section.blocks %}
+        {% assign hotspot_aid = 'hotspot-' | append: forloop.index %}
+        {% render 'ship-image-hotspot' with hotspot_block_id: block.id, hotspot_modal_text_alignment: section.settings.text_alignment, hotspot_x_pos: block.settings.hotspot_x_pos, hotspot_y_pos: block.settings.hotspot_y_pos, hotspot_modal_heading: block.settings.modal_heading, hotspot_modal_text: block.settings.modal_body_text, hotspot_modal_button_label: block.settings.modal_button_label, hotspot_modal_button_link: block.settings.modal_button_link, modal_button_style: block.settings.modal_button_style, hotspot_modal_image: block.settings.hotspot_image, hotspot_color_scheme: section.settings.hotspot_color_scheme, modal_color_scheme: section.settings.section_color_scheme, hotspot_modal_image_position: section.settings.image_position, hotspot_block_heading: block.settings.modal_heading, hotspot_aid: hotspot_aid, label_heading_tag: 'h6', modal_overlay_opacity: section.settings.overlay_opacity, shopify_attributes: block.shopify_attributes, show_label_on_hover: section.settings.show_marker_labels %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+  {
+    "name": "Interactive image",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Color scheme"
+      },
+      {
+        "type": "select",
+        "id": "section_color_scheme",
+        "label": "Background color scheme",
+        "options": [
+          {
+            "value": "general",
+            "label": "General"
+          },
+          {
+            "value": "accent-1",
+            "label": "Accent 1"
+          },
+          {
+            "value": "accent-2",
+            "label": "Accent 2"
+          },
+          {
+            "value": "accent-3",
+            "label": "Accent 3"
+          }
+        ],
+        "default": "general"
+      },
+      {
+        "type": "select",
+        "id": "card_color_scheme",
+        "label": "Card color scheme",
+        "options": [
+          {
+            "value": "general",
+            "label": "General"
+          },
+          {
+            "value": "accent-1",
+            "label": "Accent 1"
+          },
+          {
+            "value": "accent-2",
+            "label": "Accent 2"
+          },
+          {
+            "value": "accent-3",
+            "label": "Accent 3"
+          }
+        ],
+        "default": "general"
+      },
+      {
+        "type": "select",
+        "id": "hotspot_color_scheme",
+        "label": "Hotspot color scheme",
+        "options": [
+          {
+            "value": "general",
+            "label": "General"
+          },
+          {
+            "value": "accent-1",
+            "label": "Accent 1"
+          },
+          {
+            "value": "accent-2",
+            "label": "Accent 2"
+          },
+          {
+            "value": "accent-3",
+            "label": "Accent 3"
+          }
+        ],
+        "default": "general"
+      },
+      {
+        "type": "select",
+        "id": "overlay_color_scheme",
+        "label": "Overlay color scheme",
+        "options": [
+          {
+            "value": "general",
+            "label": "General"
+          },
+          {
+            "value": "accent-1",
+            "label": "Accent 1"
+          },
+          {
+            "value": "accent-2",
+            "label": "Accent 2"
+          },
+          {
+            "value": "accent-3",
+            "label": "Accent 3"
+          }
+        ],
+        "default": "accent-1"
+      },
+      {
+        "type": "range",
+        "id": "overlay_opacity",
+        "min": 0,
+        "max": 100,
+        "step": 5,
+        "unit": "%",
+        "label": "Overlay opacity",
+        "default": 50
+      },      
+      {
+        "type": "header",
+        "content": "Main settings"
+      },
+      {
+        "type": "image_picker",
+        "id": "section_main_img",
+        "label": "Image"
+      },
+      {
+        "type": "select",
+        "id": "text_alignment",
+        "label": "Text alignment",
+        "options": [
+          {
+            "value": "left",
+            "label": "Left"
+          },
+          {
+            "value": "center",
+            "label": "Center"
+          },
+          {
+            "value": "right",
+            "label": "Right"
+          }
+        ],
+        "default": "left"
+      },
+      {
+        "type": "select",
+        "id": "image_position",
+        "label": "Image position (desktop)",
+        "options": [
+          {
+            "value": "left",
+            "label": "Left"
+          },
+          {
+            "value": "right",
+            "label": "Right"
+          }
+        ],
+        "default": "right"
+      },
+      {
+        "type": "text",
+        "id": "hotspot_subheading",
+        "label": "Subheading",
+        "default": "Highlight Key Features"
+      },
+      {
+        "type": "text",
+        "id": "hotspot_heading",
+        "label": "Heading",
+        "default": "Interactive image"
+      },
+      {
+        "type": "richtext",
+        "id": "hotspot_text",
+        "label": "Body text",
+        "default": "<p>Use text paired with image hotspots to explain details about your products and highlight interesting or useful features.</p>"
+      },
+      {
+        "type": "checkbox",
+        "id": "show_marker_labels",
+        "label": "Show marker labels on hover",
+        "default": true
+      },
+      {
+        "type": "header",
+        "content": "Buttons"
+      },
+      {
+        "type": "text",
+        "id": "first_button_label",
+        "label": "First button label",
+        "default": "View spec sheet"
+      },
+      {
+        "type": "url",
+        "id": "first_button_link",
+        "label": "First button link",
+        "default": "/collections/all"
+      },
+      {
+        "type": "radio",
+        "id": "first_button_style",
+        "label": "First button style",
+        "options": [
+          {
+            "value": "filled",
+            "label": "Primary"
+          },
+          {
+            "value": "outline",
+            "label": "Secondary"
+          }
+        ],
+        "default": "filled"
+      },
+      {
+        "type": "text",
+        "id": "second_button_label",
+        "label": "Second button label",
+        "default": "Shop now"
+      },
+      {
+        "type": "url",
+        "id": "second_button_link",
+        "label": "Second button link",
+        "default": "/collections/all"
+      },
+      {
+        "type": "radio",
+        "id": "second_button_style",
+        "label": "Second button style",
+        "options": [
+          {
+            "value": "filled",
+            "label": "Primary"
+          },
+          {
+            "value": "outline",
+            "label": "Secondary"
+          }
+        ],
+        "default": "filled"
+      }             
+    ],
+    "blocks": [
+    {
+      "name": "Hotspot",
+      "type": "hotspot",
+      "limit": 6,
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "hotspot_image",
+          "label": "Hotspot image"
+        },
+        {
+          "type": "text",
+          "id": "modal_heading",
+          "label": "Heading",
+          "default": "Additional information",
+          "info": "Also used as the marker label on hover."
+        },
+        {
+          "type": "richtext",
+          "id": "modal_body_text",
+          "label": "Body text",
+          "default": "<p>Take advantage of this section by including a few paragraphs detailing any additional information about the item, alternatively, include a product description or spec information.</p>"
+        },
+        {
+          "type": "text",
+          "id": "modal_button_label",
+          "label": "Button label",
+          "default": "View product"
+        },
+        {
+          "type": "url",
+          "id": "modal_button_link",
+          "label": "Button link",
+          "default": "/collections/all"
+        },
+        {
+          "type": "radio",
+          "id": "modal_button_style",
+          "label": "Button style",
+          "options": [
+            {
+              "value": "filled",
+              "label": "Primary"
+            },
+            {
+              "value": "outline",
+              "label": "Secondary"
+            }
+          ],
+          "default": "filled"
+        },
+        {
+          "type": "range",
+          "id": "hotspot_x_pos",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "label": "Marker position (horizontal)",
+          "default": 50
+        },
+        {
+          "type": "range",
+          "id": "hotspot_y_pos",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "label": "Marker position (vertical)",
+          "default": 50
+        }                            
+      ]
+    }
+    ],
+    "presets": [
+      {
+        "name": "Interactive image",
+        "settings": {
+        },
+        "blocks": [
+          {
+            "type": "hotspot",
+            "settings": {
+              "hotspot_y_pos": 45,
+              "hotspot_x_pos": 60
+            }
+          },
+          {
+            "type": "hotspot",
+            "settings": {
+              "hotspot_y_pos": 65,
+              "hotspot_x_pos": 50
+            }
+          }
+        ]
+      }
+    ],
+    "disabled_on": {
+      "groups": [
+        "header",
+        "footer",
+        "custom.overlay",
+        "custom.announcement"
+      ]
+    }
+  }
+{% endschema %}

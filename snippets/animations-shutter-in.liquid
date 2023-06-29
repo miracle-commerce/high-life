@@ -1,0 +1,81 @@
+<style>
+  @media (prefers-reduced-motion: no-preference) {
+    /* Primary button animation */
+    {{ selector }}[data-armada-animation$="button-primary"],
+    .shopify-payment-button__button--unbranded {
+      position: relative;
+      transition: color .5s ease-out;
+      background-color: transparent;
+    }
+    {{ selector }}[data-armada-animation$="button-primary"]:not(:disabled):hover,
+    {{ selector }}[data-armada-animation$="button-primary"]:focus,
+    .shopify-payment-button__button--unbranded:not(:disabled):hover,
+    .shopify-payment-button__button--unbranded:focus {
+      color: var(--colors-body-text);
+      background-color: transparent !important;
+    }
+    {{ selector }}[data-armada-animation$="button-primary"]:after,
+    .shopify-payment-button__button--unbranded:after {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      right: -1px;
+      left: 0;
+      z-index: -1;
+      background-color: var(--colors-body-text);
+      transition: transform .3s ease-out;
+      transform: scaleX(1);
+      will-change: transform;
+    }
+    {{ selector }}[data-armada-animation$="button-primary"]:not(:disabled):hover:after,
+    {{ selector }}[data-armada-animation$="button-primary"]:focus:after,
+    .shopify-payment-button__button--unbranded:not(:disabled):hover:after,
+    .shopify-payment-button__button--unbranded:focus:after {
+      transform: scaleX(0);
+    }
+    /* Secondary button animation */
+    {{ selector }}[data-armada-animation$="button-secondary"] {
+      position: relative;
+      transition: color .5s ease-out;
+    }
+    {{ selector }}[data-armada-animation$="button-secondary"]:not(:disabled):hover,
+    {{ selector }}[data-armada-animation$="button-secondary"]:focus {
+      color: var(--colors-background);
+    }
+    {{ selector }}[data-armada-animation$="button-secondary"]:after {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      right: 0;
+      transform-origin: 100% 50%;
+      z-index: -1;
+      background-color: var(--colors-body-text);
+      transition: transform .3s ease-out;
+      transform: scaleX(0);
+      will-change: transform;
+    }
+    {{ selector }}[data-armada-animation$="button-secondary"]:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 50%;
+      transform-origin: 0 50%;
+      z-index: -1;
+      background-color: var(--colors-body-text);
+      transition: transform .3s ease-out;
+      transform: scaleX(0);
+      will-change: transform;
+    }
+    {{ selector }}[data-armada-animation$="button-secondary"]:not(:disabled):hover:before,
+    {{ selector }}[data-armada-animation$="button-secondary"]:not(:disabled):hover:after,
+    {{ selector }}[data-armada-animation$="button-secondary"]:focus:before,
+    {{ selector }}[data-armada-animation$="button-secondary"]:focus:after {
+      transform: scaleX(1);
+    }
+  }
+</style>

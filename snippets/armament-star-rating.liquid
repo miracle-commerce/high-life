@@ -1,0 +1,73 @@
+{% comment %}
+  Renders a star rating for a given rating value and maximum, with an option to also display the rating value in number form.
+
+  Accepts:
+  - rating: {Number} value of the rating
+  - rating_max: {Number} value of the rating scale maximum
+  - show_rating_value: {Boolean} display the rating value in number form next to the stars
+  - classes: {String} Custom classes to be applied to the container element
+
+  Usage:
+  {% render 'armament-star-rating' with 
+    rating: product.metafields.reviews.rating.value.rating
+    rating_max: product.metafields.reviews.rating.value.scale_max
+    show_rating_value: true
+  %}
+{% endcomment %}
+
+{% if rating != blank %}
+  {% liquid
+    assign rating_decimal = 0
+    assign decimal = rating | modulo: 1
+    if decimal >= 0.3 and decimal <= 0.7
+      assign rating_decimal = 0.5
+    elsif decimal > 0.7
+      assign rating_decimal = 1
+    endif
+    assign unicode = ''
+    assign max_stars = rating_max | round
+    for i in (1..max_stars)
+      assign unicode = unicode | append: '\2605'
+    endfor
+  %}
+  <div {% if classes %}class="{{ classes }}"{% endif %} data-product-card-content data-aid="star-rating">
+    <div class="inline-block" role="img" aria-label="{{ 'accessibility.star_rating_info' | t: rating_value: rating, rating_max: rating_max }}">
+      <span aria-hidden="true" class="rating-star" style="--rating: {{ rating | floor }}; --rating-max: {{ rating_max }}; --rating-decimal: {{ rating_decimal }};"></span>
+    </div>
+    {% if show_rating_value %}
+      <span aria-hidden="true" class="text-b2 !pb-0">{{ rating | round: 1 }}</span>
+    {% endif %}
+  </div>
+
+  <style>
+    .rating-star {
+      --letter-spacing: 0.3;
+      --font-size: 1;
+    }
+
+    .rating-star {
+      --percent: calc(
+        (
+          var(--rating) / var(--rating-max) + var(--rating-decimal) *
+            var(--font-size) /
+            (var(--rating-max) * (var(--letter-spacing) + var(--font-size)))
+        ) * 100%
+      );
+      letter-spacing: calc(var(--letter-spacing) * 1rem);
+      font-size: calc(var(--font-size) * 1rem);
+      line-height: 1;
+      font-family: Times;
+    }
+
+    .rating-star::before {
+      content: "{{ unicode }}";
+      background: linear-gradient(
+        90deg,
+        var(--colors-body-text) var(--percent),
+        var(--colors-body-text-opacity-20) var(--percent)
+      );
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+  </style>
+{% endif %}

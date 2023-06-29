@@ -1,0 +1,156 @@
+{
+  "type": "header",
+  "name": "Header Group",
+  "sections": {
+    "header": {
+      "type": "flotilla-header-basic",
+      "settings": {
+        "header_color_scheme": "accent-1",
+        "logo_image": "shopify:\/\/shop_images\/highlife_competitions_file.png",
+        "logo_width_desktop": 260,
+        "logo_width_mobile": 150,
+        "logo_position": "center",
+        "enable_sticky_header": true,
+        "show_region_selector": false,
+        "show_language_selector": false,
+        "use_icons": true,
+        "enable_search": false,
+        "show_search_bar": false
+      }
+    },
+    "navigation": {
+      "type": "flotilla-navigation",
+      "blocks": {
+        "mega_menu-0": {
+          "type": "mega_menu",
+          "disabled": true,
+          "settings": {
+            "heading": "Mega menu",
+            "heading_link": "",
+            "menu": "main-menu",
+            "image_heading_1": "",
+            "image_link_1": "",
+            "image_heading_2": "",
+            "image_link_2": "",
+            "image_heading_3": "",
+            "image_link_3": "",
+            "image_aspect": "square",
+            "overlay_color_scheme": "dark",
+            "overlay_opacity": 0,
+            "text_color_scheme": "light"
+          }
+        },
+        "mega_menu-1": {
+          "type": "mega_menu",
+          "disabled": true,
+          "settings": {
+            "heading": "Mega menu",
+            "heading_link": "",
+            "menu": "main-menu",
+            "image_heading_1": "",
+            "image_link_1": "",
+            "image_heading_2": "",
+            "image_link_2": "",
+            "image_heading_3": "",
+            "image_link_3": "",
+            "image_aspect": "square",
+            "overlay_color_scheme": "dark",
+            "overlay_opacity": 0,
+            "text_color_scheme": "light"
+          }
+        },
+        "gallery_nav-0": {
+          "type": "gallery_nav",
+          "disabled": true,
+          "settings": {
+            "heading": "Gallery",
+            "heading_link": "",
+            "image_heading_1": "",
+            "image_link_1": "",
+            "image_heading_2": "",
+            "image_link_2": "",
+            "image_heading_3": "",
+            "image_link_3": "",
+            "image_heading_4": "",
+            "image_link_4": "",
+            "image_aspect": "original",
+            "overlay_color_scheme": "dark",
+            "overlay_opacity": 0,
+            "text_color_scheme": "light"
+          }
+        },
+        "gallery_nav-1": {
+          "type": "gallery_nav",
+          "disabled": true,
+          "settings": {
+            "heading": "Gallery",
+            "heading_link": "",
+            "image_heading_1": "",
+            "image_link_1": "",
+            "image_heading_2": "",
+            "image_link_2": "",
+            "image_heading_3": "",
+            "image_link_3": "",
+            "image_heading_4": "",
+            "image_link_4": "",
+            "image_aspect": "original",
+            "overlay_color_scheme": "dark",
+            "overlay_opacity": 0,
+            "text_color_scheme": "dark"
+          }
+        },
+        "standard_menu": {
+          "type": "standard_menu",
+          "settings": {
+            "default_navigation": "main-menu"
+          }
+        }
+      },
+      "block_order": [
+        "mega_menu-0",
+        "mega_menu-1",
+        "gallery_nav-0",
+        "gallery_nav-1",
+        "standard_menu"
+      ],
+      "settings": {
+        "alignment": "justify-center",
+        "top_level_font": "headings",
+        "show_desktop_icons": true,
+        "show_top_divider": true,
+        "show_bottom_divider": true,
+        "color_scheme": "general"
+      }
+    },
+    "quick-search": {
+      "type": "engine-quick-search",
+      "blocks": {
+        "engine-quick-search-0": {
+          "type": "search_navigation",
+          "settings": {
+            "navigation_header": "Trending",
+            "search_menu": ""
+          }
+        },
+        "engine-quick-search-1": {
+          "type": "search_collection",
+          "settings": {
+            "featured_collection_header": "Best sellers",
+            "collection": ""
+          }
+        }
+      },
+      "block_order": [
+        "engine-quick-search-0",
+        "engine-quick-search-1"
+      ],
+      "settings": {
+      }
+    }
+  },
+  "order": [
+    "header",
+    "navigation",
+    "quick-search"
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "sections": {
+    "main": {
+      "type": "flotilla-customer-addresses",
+      "settings": {
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

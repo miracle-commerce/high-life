@@ -1,0 +1,68 @@
+{% comment %}
+    Renders a styled 'button' (<a> or <button> depending on context).
+    Accepts:
+    - url: {String} url if the button is a link. If no url is specified, a <button> element will be rendered
+    - content: {String} the content to be displayed in the button
+    - style: {String} 'filled' or 'outline' button style. Defaults to 'filled'
+    - classes: {String} custom classes to be applied to the button, eg. for margin or width
+    - type: {String} sets the value of the type attribute if a <button> element. If none is specified, the type will be 'submit' by default
+    - attributes: {String} custom attributes of the element, eg. data attribute or aria-label
+    - loading: {Boolean} set to true if a loading icon is to be displayed. If unspecified, loading is set to false by default
+    - icon_position_class: {String} the top and left value of the icon (optional)
+    - data_aid: {String} value of the data-aid attribute of the button (testing)
+    - target: {Obj} defines target of btn's action
+
+    Usage:
+    {% render 'armament-button' with url: section.settings.url, content: section.settings.button_label, style: section.settings.button_style, classes: 'mb-xl' %}
+    {% render 'armament-button' with content: 'Add to cart', attributes: 'data-add-to-cart aria-label="Add to cart"', classes: 'w-1/2' %}
+
+    If loading is set to true, a loading icon will display when a data-attribute of data-button-loading is added to the button element
+
+{% endcomment %}
+
+{%- liquid
+  assign type = type | default: "submit"
+  if url
+    assign tag = 'a'
+    assign href = 'href=' | append: url
+    assign button_type = ''
+  else
+    assign tag = 'button'
+    assign href = ''
+    assign button_type = 'type=' | append: type
+  endif
+
+  if style == 'outline'
+    assign style_classes = "text-body"
+    assign style_type = 'button-secondary'
+  else
+    assign style_classes = "text-page bg-body"
+    assign style_type = 'button-primary'
+  endif
+
+  unless settings.misc_animation == 'style_1'
+    assign button_classes = "text-h6 h-fit font-heading button-case heading-weight heading-style text-center overflow-hidden rounded-theme min-h-[44px] py-l px-xl md:px-2xl inline-block border border-body z-10 armament-button" | append: " " | append: style_classes
+  else 
+    assign button_classes = "text-h6 h-fit font-heading button-case heading-weight heading-style text-center overflow-hidden rounded-theme min-h-[44px] py-l px-xl md:px-2xl inline-block z-10 armament-button" | append: " " | append: style_classes
+  endunless
+-%}
+
+<{{ tag }}
+  {{ href }}
+  {{ button_type }}
+  {% if attributes %}{{ attributes }}{% endif %}
+  class="{{ button_classes }}{% if classes %} {{ classes }}{% endif %}"
+  data-aid="{{ data_aid }}"
+  {% if target %}data-target="{{ target }}"{% endif %}
+  data-armada-animation="{{ style_type }}"
+>
+  <span class="!flex items-center justify-center" data-armada-button-text>{{ content }}</span>
+    
+  {% if settings.misc_animation == 'style_1' %}
+    <span class="border border-body rounded-theme absolute top-0 left-0 right-0 bottom-0"></span>
+  {% endif %}
+
+  {% if loading and tag == "button" %}
+    <span data-armada-button-load-icon class="hidden absolute animate-spin w-xl h-xl rounded-full border-2{% if icon_position_class %} {{ icon_position_class }}{% else %} left-[calc(50%-2px)] top-1/2{% endif %}"></span>
+  {% endif %}
+</{{ tag }}>

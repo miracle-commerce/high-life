@@ -1,0 +1,85 @@
+{%- liquid
+  assign title_string = 'templates.404.title' | t
+  assign subtext_string = 'templates.404.subtext' | t
+  assign search_string = 'templates.404.search' | t
+  assign continue_string = 'templates.404.continue' | t
+-%}
+
+<section data-color-scheme="{{ section.settings.section_color_scheme }}" class="text-body bg-page text-center theme-section-padding">
+  {% render 'armament-heading' with tag: 'h1', heading_content: title_string, heading_type: 'heading-4', data_aid: '404-title' %}
+  {% render 'armament-heading' with tag: 'h2', heading_content: subtext_string, heading_type: 'heading-2', data_aid: '404-subtext' %}
+  <p class="mb-l md:mb-2xl">{{ 'templates.404.information' | t }}</p>
+  <div class="md:flex md:w-[500px] md:m-auto md:gap-xl">
+    <search-toggle class="inline-block w-full mb-l md:mb-0" data-predictive-search-enabled="{{ settings.enable_predictive_search }}" data-search-overlays-header="true">
+      {% render 'armament-button' with url: routes.search_url, content: search_string, classes: 'w-full', data_aid: '404-search-button', style: section.settings.button_1_style %}
+    </search-toggle>
+    <safe-load-scripts>
+      <script src="{{ 'component-search-toggle.min.js' | asset_url }}" defer="defer" type="module" data-armada-load-key="search-toggle"></script>
+    </safe-load-scripts>
+    {% render 'armament-button' with url: routes.all_products_collection_url, content: continue_string, classes: 'w-full', style: section.settings.button_2_style, data_aid: '404-continue-button' %}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "404 page",
+  "settings": [
+    {
+      "type": "select",
+      "id": "section_color_scheme",
+      "label": "Color scheme",
+      "options": [
+        {
+          "value": "general",
+          "label": "General"
+        },
+        {
+          "value": "accent-1",
+          "label": "Accent 1"
+        },
+        {
+          "value": "accent-2",
+          "label": "Accent 2"
+        },
+        {
+          "value": "accent-3",
+          "label": "Accent 3"
+        }
+      ],
+      "default": "general"
+    },
+    {
+      "type": "radio",
+      "id": "button_1_style",
+      "label": "First button style",
+      "options": [
+        {
+          "value": "filled",
+          "label": "Primary"
+        },
+        {
+          "value": "outline",
+          "label": "Secondary"
+        }
+      ],
+      "default": "filled"
+    },
+    {
+      "type": "radio",
+      "id": "button_2_style",
+      "label": "Second button style",
+      "options": [
+        {
+          "value": "filled",
+          "label": "Primary"
+        },
+        {
+          "value": "outline",
+          "label": "Secondary"
+        }
+      ],
+      "default": "outline"
+    }
+  ]
+}
+{% endschema %}

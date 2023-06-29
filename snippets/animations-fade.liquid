@@ -1,0 +1,13 @@
+<style>
+  @media (prefers-reduced-motion: no-preference) {
+    {{ selector }}{% if sub_selector %} {{ sub_selector }}{% endif %} {
+      opacity: 1;
+      transition: opacity .4s ease-in-out;
+    }
+
+    {{ selector }}:hover{% if sub_selector %} {{ sub_selector }}{% endif %},
+    {{ selector }}:focus-visible{% if sub_selector %} {{ sub_selector }}{% endif %} {
+      opacity: .5;
+    }
+  }
+</style>

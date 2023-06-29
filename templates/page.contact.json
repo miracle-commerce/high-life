@@ -1,0 +1,147 @@
+{
+  "sections": {
+    "image-with-text-overlay": {
+      "type": "flotilla-image-with-text-overlay",
+      "blocks": {
+        "image-with-text-overlay-00": {
+          "type": "overlay_content",
+          "settings": {
+            "button_1_link": "shopify:\/\/collections\/all",
+            "button_1_text": "",
+            "button_1_style": "outline",
+            "button_2_link": "",
+            "button_2_text": "",
+            "button_2_style": "fill",
+            "text_color_scheme": "accent-3"
+          }
+        }
+      },
+      "block_order": [
+        "image-with-text-overlay-00"
+      ],
+      "settings": {
+        "desktop_height": "s",
+        "mobile_height": "s",
+        "image_link": "",
+        "section_width": "full",
+        "text_position": "center",
+        "background_color_scheme": "general",
+        "overlay_color_scheme": "light",
+        "overlay_opacity": 0
+      }
+    },
+    "page-header": {
+      "type": "ship-page-main-header",
+      "disabled": true,
+      "settings": {
+        "show_page_title": true,
+        "section_color_scheme": "general"
+      }
+    },
+    "page-main": {
+      "type": "armament-page-main-content",
+      "settings": {
+      }
+    },
+    "page-contact-form": {
+      "type": "ship-contact-form",
+      "blocks": {
+        "name_input": {
+          "type": "name_input",
+          "settings": {
+            "required": true,
+            "input_width": "partial"
+          }
+        },
+        "email_input": {
+          "type": "email_input",
+          "settings": {
+            "input_width": "partial"
+          }
+        },
+        "tel_input": {
+          "type": "tel_input",
+          "settings": {
+            "required": true,
+            "input_width": "full"
+          }
+        },
+        "7d0f07b7-0225-4eff-86cf-fe0f21878a50": {
+          "type": "custom_input",
+          "settings": {
+            "placeholder": "How did you hear about us?",
+            "required": false,
+            "input_width": "full"
+          }
+        },
+        "message_input": {
+          "type": "message_input",
+          "settings": {
+            "required": true,
+            "input_width": "full"
+          }
+        }
+      },
+      "block_order": [
+        "name_input",
+        "email_input",
+        "tel_input",
+        "7d0f07b7-0225-4eff-86cf-fe0f21878a50",
+        "message_input"
+      ],
+      "settings": {
+        "form_title": "Send a message",
+        "section_color_scheme": "general"
+      }
+    },
+    "rich-text": {
+      "type": "ship-rich-text",
+      "blocks": {
+        "subheading": {
+          "type": "subheading",
+          "settings": {
+          }
+        },
+        "heading": {
+          "type": "heading",
+          "settings": {
+          }
+        },
+        "text": {
+          "type": "text",
+          "settings": {
+          }
+        },
+        "buttons": {
+          "type": "buttons",
+          "settings": {
+            "button_1_link": "",
+            "button_1_text": "Learn more",
+            "button_1_style": "fill",
+            "button_2_link": "",
+            "button_2_text": "",
+            "button_2_style": "fill"
+          }
+        }
+      },
+      "block_order": [
+        "subheading",
+        "heading",
+        "text",
+        "buttons"
+      ],
+      "settings": {
+        "section_width": "narrow",
+        "horizontal_alignment": "text-left justify-start",
+        "section_color_scheme": "accent-2"
+      }
+    }
+  },
+  "order": [
+    "image-with-text-overlay",
+    "page-header",
+    "page-main",
+    "page-contact-form",
+    "rich-text"
+  ]
+}

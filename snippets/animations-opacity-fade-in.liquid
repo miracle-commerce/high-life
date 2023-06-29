@@ -1,0 +1,46 @@
+{% comment %}
+    Fades in from provided opacity value eg. from opacity: 0.3 to opacity: 1
+
+    Accepts:
+    - selector {String} The CSS selector (required)
+    - opacity_from: {Number} the starting opacity eg. 0.4 (optional - defaults to 0.4)
+    - opacity_to: {Number} the opacity end value eg. 1 (optional - defaults to 1)
+    - speed: {String} the animation speed eg. ".4s" (optional - defaults to .4s)
+
+    Usage:
+    {% render 'animations-fade-in' with selector: '[data-armada-animation="page-nav-link"]', opacity_from: 0.4, opacity_to: 1, speed: '.4s' %}
+{% endcomment %}
+
+{% liquid 
+  if opacity_from == blank
+    assign opacity_from = 0.3
+  else 
+    assign opacity_from = opacity_from
+  endif
+
+  if opacity_to == blank
+    assign opacity_to = 1
+  else 
+    assign opacity_to = opacity_to
+  endif
+
+  if speed == blank
+    assign speed = '.4s'
+  else 
+    assign speed = speed
+  endif
+%}
+
+<style>
+  @media (prefers-reduced-motion: no-preference) {
+    {{ selector }} {
+      opacity: {{ opacity_from }};
+      transition: opacity {{ speed }} ease-in-out;
+    }
+
+    {{ selector }}:hover,
+    {{ selector }}:focus {
+      opacity: {{ opacity_to }};
+    }
+  }
+</style>

@@ -1,0 +1,12 @@
+<style>
+  @media (prefers-reduced-motion: no-preference) {
+    {{ selector }}{% if sub_selector %} {{ sub_selector }}{% endif %} {
+      transform: translateX(0);
+      transition: transform .2s ease-in-out;
+    }
+    {{ selector }}:hover{% if sub_selector %} {{ sub_selector }}{% endif %},
+    {{ selector }}:focus-visible{% if sub_selector %} {{ sub_selector }}{% endif %} {
+      transform: translateX(4px);
+    }
+  }
+</style>

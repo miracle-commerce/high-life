@@ -1,0 +1,141 @@
+{%- comment -%}
+    Renders a set of color swatch options.
+
+    Accepts:
+    - swatch_product {Object} Shopify product object.
+    - identifiers {String} Comma separated list to identify the color option in multiple languages.
+    - change_on_hover {Boolean} Set to true to check radio inputs on hover instead of click.
+    - disabled {Boolean} Set to true to disable radio inputs (for non interactive swatches).
+    - scope_id {String} limits variant change interaction to components with a matching scope id, eg. section.id (optional)
+    - has_border_radius {Boolean} if true, the swatch will have a 2px border-radius
+    - label_classes {String} custom classes for the label element (optional)
+    - wrap_swatches {Boolean} if set to true the swatches will wrap onto a new line when they no longer fit on the same line.
+      If set to false, the additional swatches will be hidden and a number will display with the amount reflecting the
+      non-visible swatches, clicking on the number will take the user to the product detail page.
+    - double_spaced {Boolen} if set to true, the space between swatches will be 8px on either side. If set to false,
+      the space between swatches will be 4px on either side.
+    - show_checked_state {Boolean} If set to true, the currently selected swatch will have a 1.5px border around it.
+    - wrapper_classes: {String} Optional wrapper classes.
+    - natural_img_aspect_ratio: {Boolean} Images which will be changed on hover have Natural aspect ratio. Pass this parameter if you want to support natural type of images (optional)
+    - touch_size: {String} Size in pixels of touch target for an individual swatch
+
+    Usage:
+    {% render 'armament-color-swatch' with swatch_product: product, identifiers: 'color,colour,couleur,colore,farbe,색,色,färg,farve' %}
+{%- endcomment -%}
+
+{%- comment -%} Identify the color option index in product.options {%- endcomment -%}
+{%- liquid
+
+  assign currently_selected_variant = swatch_product.selected_or_first_available_variant
+
+  if identifiers == blank
+    assign identifiers = 'color,colour,couleur,colore,farbe,색,色,färg,farve'
+  endif
+
+  assign color_langs = identifiers | split: ','
+  assign hasColorSwatches = false
+
+  for option in swatch_product.options
+    assign downcased_option = option | downcase
+    if color_langs contains downcased_option
+      assign option_index0 = forloop.index0
+      assign option_index = forloop.index
+      assign hasColorSwatches = true
+    break
+    endif
+  endfor
+
+  assign color_label = ''
+  assign color_droppers = ''
+  assign color_uploads = ''
+
+  for variant in swatch_product.variants
+    assign color_label = color_label | append: ',' | append: variant.options[option_index0] | downcase
+
+    if variant.metafields.swatches.color != blank
+      assign color_droppers = color_droppers | append: ',' | append: variant.metafields.swatches.color | append: '----' | append: variant.options[option_index0] | downcase
+    else
+      assign color_droppers = color_droppers | append: ',' | append: variant.options[option_index0]
+    endif
+
+    if variant.metafields.swatches.image != blank
+      assign img_url = variant.metafields.swatches.image | file_url
+      assign color_uploads = color_uploads | append: ',' | append: img_url | append: '----' | append: variant.options[option_index0] | downcase
+    else
+      assign color_uploads = color_uploads | append: ',' | append: variant.options[option_index0]
+    endif
+  endfor
+
+  assign colors = color_label | remove_first: ',' | split: ',' | uniq
+  assign droppers = color_droppers | remove_first: ',' | split: ',' | uniq
+  assign image_uploads = color_uploads | remove_first: ',' | split: ',' | uniq
+
+  unless has_border_radius
+    assign has_border_radius = false
+  endunless
+
+  if wrap_swatches == false
+    assign wrap_classes = 'grid grid-rows-[auto]'
+  endif
+
+  if double_spaced
+    assign spacing_classes = '!my-0 !mx-auto'
+  endif
+-%}
+
+{%- if hasColorSwatches -%}
+  <div class="{{ wrapper_classes }}">
+    {% if wrap_swatches == false %}
+      <div data-armada-selector="color-swatch-wrapper" class="grid grid-cols-[1fr,minmax(52px,52px)] grid-rows-1 w-full -ml-s">
+    {% endif %}
+        <color-swatch
+          class="max-h-[44px]{% if wrap_swatches == false %} grid grid-rows-[auto] grid-cols-[repeat(auto-fill,minmax(52px,52px))] auto-rows-[0] overflow-hidden{% endif %}"
+          option-index="{{ option_index0 }}"
+          data-aid="color-swatch"
+          {% if wrap_swatches == false %}data-armada-no-wrap="true"{% endif %}
+          product-variants="{{ swatch_product.variants | json | escape }}"
+          product-id="{{ swatch_product.id }}"
+          {% if change_on_hover %}data-change-on-hover="{{ change_on_hover }}"{% endif %}
+          {% if scope_id %}scope-id="{{ scope_id }}"{% endif %}
+          {% if natural_img_aspect_ratio %}natural-img-aspect-ratio="{{ natural_img_aspect_ratio }}"{% endif %}
+        >
+          {% for value in colors %}
+            {% assign dropper_value = false %}
+            {% assign image_value = false %}
+            {% assign check_colors = droppers[forloop.index0] | split: '----' %}
+            {% assign check_uploads = image_uploads[forloop.index0] | split: '----' %}
+
+            {%- if color_droppers contains value and check_colors[0] contains '#' -%}
+              {% assign dropper_value = check_colors[0] %}
+            {%- endif -%}
+
+            {%- if color_uploads contains value and check_uploads[0] contains '/' -%}
+              {% assign image_value = check_uploads[0] %}
+            {%- endif -%}
+
+            {% assign name = section.id | append: '-product-' | append: swatch_product.id | append: '-option-' | append: option_index %}
+            {% assign radio_id = name | append: '-value-' | append: forloop.index0 %}
+            {% if currently_selected_variant.options[option_index0] == value %}
+              {% assign checked = true %}
+            {% else %}
+              {% assign checked = false %}
+            {% endif %}
+            {% render 'armament-swatch-option' with name: name, touch_size: touch_size, id: radio_id, value: value, disabled: disabled, color_dropper: dropper_value, image_upload: image_value, attributes: 'data-name="product-option-radio" data-aid="armament-radio-item-color"', border_radius: has_border_radius, label_classes: spacing_classes, has_checked_state: show_checked_state, option_id: swatch_product.id, checked: checked %}
+          {% endfor %}
+        </color-swatch>
+
+        {% if wrap_swatches == false %}
+          <a href="{{ swatch_product.url }}" class="hidden items-center justify-start w-auto relative h-[44px] max-h-[44px] text-h5 font-heading heading-font-styles opacity-50{% unless disabled %} cursor-pointer{% endunless %}">
+            <span data-armada-selector="hidden-swatch-count"></span>
+          </a>
+        {% endif %}
+
+    {% if wrap_swatches == false %}
+      </div>
+    {% endif %}
+  </div>
+
+  <safe-load-scripts>
+    <script src="{{ 'component-color-swatch.min.js' | asset_url }}" defer="defer" type="module" data-armada-load-key="color-swatch"></script>
+  </safe-load-scripts>
+{%- endif -%}

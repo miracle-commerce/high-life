@@ -1,0 +1,59 @@
+{% comment %}
+
+  Renders a list of icons with image ALT as label, within scope of a Product object. 
+  Compatible with a Product metafield with the namespace of “icons-with-text” and the key “icons-with-text”. 
+
+  Accepts:
+  - icons_and_text_object: {Object} Product Liquid object
+  - classes: {String} Custom classes to be applied to the <ul> element
+  - align: {String} Defines alignment of the armament. Accepts 'left', 'center' and 'right'. Defaults to 'left' if not passed (optional)
+  - border: {Boolean} Enables/disables separating lines between <li>'s
+  - content_icon_size: {String} the pixel width value of the icon
+
+  Usage:
+  {% render 'armament-icon-and-text-product' with 
+    icons_and_text_object: product,
+    align: 'center',
+    border: true
+  %}
+
+{% endcomment %}
+
+{%- liquid
+  assign icon_imgs = icons_and_text_object.metafields.icons-with-text.icons-with-text.value
+
+  if border
+    assign classes = 'py-s ' | append: classes
+  else
+    assign classes = 'pb-s ' | append: classes
+  endif
+
+  unless content_icon_size == blank 
+    case content_icon_size 
+      when 'small'
+        assign content_icon_size = '18px'
+      when 'large'
+        assign content_icon_size = '24px'
+      else
+        assign content_icon_size = content_icon_size
+    endcase
+  endunless
+
+  if content_icon_size == blank
+    assign content_icon_size = '18px'
+  endif
+-%}
+
+<ul class="flex flex-col" data-aid="icon-and-text-product" data-product-card-content>
+{% for icon in icon_imgs %}
+  <li class="w-full icon-and-text-item{% if border %} border_enabled{% endif %}" data-aid="icon-and-text-item">
+    {% render 'armament-icon-and-text' with 
+      icon: icon,
+      label: icon.alt
+      classes: classes,
+      align: align,
+      icon_width: content_icon_size
+    %}
+  </li>
+{% endfor %}
+</ul>

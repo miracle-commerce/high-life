@@ -1,0 +1,64 @@
+{% comment %}
+    Renders condensed-style (inline) slider navigation arrows.
+    Accepts:
+    - hide_on_mobile: {Boolean} Set to true to hide arrows on mobile (defaults to false)
+    - reveal_on_hover: {Boolean} If set to true, the arrows will only show on hover (defaults to false)
+    - arrow_top_pos: {String} (Use tailwind class eg. top-xs) How far should the arrows sit from the top? (defaults to top-xs - 4px)
+    - arrow_right_pos: {String} (Use tailwind class eg. right-xs) How far should the arrows sit from the right? (defaults to right-xs - 4px)
+    - classes: {String} Custom classes to be applied to the arrows
+    - attributes: {String} Attributes to be applied to the arrows
+
+    Usage:
+    {% render 'armament-slider-arrows-condensed' with hide_on_mobile: true, classes: arrow_classes %}
+{% endcomment %}
+
+{%- liquid
+  if reveal_on_hover != true and reveal_on_hover != false 
+    assign reveal_on_hover = false
+  endif
+
+  if arrow_top_pos == blank 
+    assign arrow_top_pos = 'top-[2px]'
+  endif
+
+  if arrow_right_pos == blank 
+    assign arrow_right_pos = 'right-xs'
+  endif
+
+  assign arrow_classes = 'relative w-11 h-11 overflow-hidden flex items-center z-10 cursor-pointer animate-slide '
+
+  if hide_on_mobile
+    assign arrow_classes = arrow_classes | append: 'hidden md:flex '
+  endif
+
+  unless classes
+    assign classes = 'absolute'
+  endunless
+-%}
+
+<div data-name="prev_next_container" class="flex flex-row {{ arrow_top_pos }} {{ arrow_right_pos }}{% if reveal_on_hover == true %} opacity-0{% endif %}{% if classes %} {{ classes }}{% endif %}" {% if reveal_on_hover == true %} data-armada-animation="fade"{% endif %}>
+  <button
+  data-icon-type="prev"
+  data-name="icon-prev"
+  class="justify-end {{ arrow_classes }}"
+  data-armada-animation="fade"
+  aria-label="Go to previous slide"
+  {% if attributes %}{{ attributes }}{% endif %}
+  >
+    <div class="flex items-center bg-page text-body justify-center rounded-full w-8 h-8 shrink-0 border border-theme" data-armada-animation="arrow">
+      {% render 'armament-arrow' with icon: 'arrow-right', direction: 'left' %}
+    </div>
+  </button>
+  <button
+    data-icon-type="next"
+    data-name="icon-next"
+    class="justify-start pl-s {{ arrow_classes }}"
+    data-armada-animation="fade"
+    aria-label="Go to next slide"
+    {% if attributes %}{{ attributes }}{% endif %}
+  >
+    <div class="flex items-center bg-page text-body rounded-full w-8 h-8 justify-center shrink-0 animate-slide-right border border-theme" data-armada-animation="arrow">
+      {% render 'armament-arrow' with icon: 'arrow-right' %}
+    </div>
+  </button>
+</div>

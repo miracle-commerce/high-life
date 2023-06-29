@@ -1,0 +1,88 @@
+{% comment %}
+    Renders a stock level indicator including an icon, message and optional stock count
+
+    Accepts:
+    - stock_product: {Object} product Liquid object
+    - stock_variant: {Object} variant Liquid object
+    - stock_scope_id: {String} limits variant change interaction to components with a matching scope id, eg. section.id (optional)
+    - stock_amt: {Number} the number at which to display a low stock warning
+    - show_stock_count: {Boolean} Display stock count or not
+    - in_stock_message: {String} Custom message displayed after 'In stock'
+    - low_stock_message: {String} Custom message displayed after 'Low stock'
+    - out_of_stock_message: {String} Custom message displayed after 'Out of stock'
+    - preorder: {Boolean} Enable preorder message
+    - preorder_message: {String} Custom message displayed after 'Out of stock'
+    - classes: {String} custom classes to be applied to the stock level indicator component (optional)
+
+    Usage:
+    {% render 'armament-stock-indicator' with stock_variant: current_variant, stock_amt: block.settings.stock_range %}
+{% endcomment %}
+
+{%- liquid
+  assign low_stock_string = 'products.product.low_stock' | t
+  assign in_stock_string = 'products.product.in_stock' | t
+  assign out_of_stock_string = 'products.product.out_of_stock' | t
+  assign preorder_string = 'products.product.preorder' | t
+  assign variant_count = 0
+-%}
+
+<stock-level-indicator
+  data-armada-product-id="{{ stock_product.id }}"
+  data-armada-variant-id="{{ stock_variant.id }}"
+  {% if stock_scope_id %}data-armada-scope-id="{{ stock_scope_id }}"{% endif %}
+  {% if classes %}class="{{ classes }}"{% endif %}
+>
+  {% for inventory_variant in stock_product.variants %}
+    {% if inventory_variant.inventory_management != blank and inventory_variant.inventory_policy != 'continue' %}
+      {% assign variant_count = variant_count | plus: 1 %}
+      <div
+        data-armada-selector="stock-level-indicator--{{ inventory_variant.id }}"
+        {% unless inventory_variant == stock_variant %}class="hidden"{% endunless %}
+      >
+        {% if inventory_variant.inventory_quantity > stock_amt %}
+          <span class="flex items-center">{% render 'armament-icon' with icon: in_stock_icon, classes: 'mr-s' %}
+            {{ in_stock_message | default: in_stock_string }}
+            {% if show_stock_count %}
+              <span class="mx-s">-</span> <span class="mr-xs" data-armada-selector="variant_stock_count">{{ inventory_variant.inventory_quantity }}</span> {{ 'products.product.stock_left' | t }}
+            {% endif %}
+          </span>
+        {% elsif inventory_variant.available == false %}
+          <span class="flex items-center">{% render 'armament-icon' with icon: low_stock_icon, classes: 'mr-xs' %}
+            {{ out_of_stock_message | default: out_of_stock_string }}
+          </span>
+        {% else %}
+          <span class="flex items-center">{% render 'armament-icon' with icon: out_of_stock_icon, classes: 'mr-xs' %}
+            {{ low_stock_message | default: low_stock_string }}
+            {% if show_stock_count %}
+              <span class="mx-s">-</span> <span class="mr-xs" data-armada-selector="variant_stock_count">{{ inventory_variant.inventory_quantity }}</span> {{ 'products.product.stock_left' | t }}
+            {% endif %}
+          </span>
+        {% endif %}
+      </div>
+    {% elsif preorder %}
+      {% assign variant_count = variant_count | plus: 1 %}
+      <div
+        data-armada-selector="stock-level-indicator--{{ inventory_variant.id }}"
+        {% unless inventory_variant == stock_variant %}class="hidden"{% endunless %}
+      >
+        {% assign today_date = 'now' | date: '%s' %}
+        {% assign pre_date = preorder_message | date: '%s' %}
+
+        <span class="flex items-center">{% render 'armament-icon' with icon: preorder_icon, classes: 'mr-xs' %}
+          {%- if today_date > pre_date -%}
+            {% comment %} Preorder date is in the past or preorder message is empty {% endcomment %}
+            {{ preorder_string }}
+          {%- else -%}
+            {% comment %} Preorder date is in future or is not present in the message {% endcomment %}
+            {{ preorder_message }}
+          {%- endif -%}
+        </span>
+      </div>
+    {% endif %}
+  {% endfor %}
+</stock-level-indicator>
+{% if variant_count > 1 %}
+  <safe-load-scripts>
+    <script src="{{ 'component-stock-level-indicator.min.js' | asset_url }}" defer="defer" type="module" data-armada-load-key="stock-level-indicator"></script>
+  </safe-load-scripts>
+{% endif %}

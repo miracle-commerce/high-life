@@ -1,0 +1,145 @@
+{% comment %}
+    Renders a re-usable block that supports a subheading, heading, text and buttons
+    - reference/context: https://share.getcloudapp.com/geuRy6QO
+
+    Accepts:
+    - block_subheading_classes: {String} Additional classes for the subheading (optional)
+    - body_text_classes: {String} custom classes for the body text container
+    - block_subheading_content: {String} The heading text (if applicable)
+    - block_subheading_type: {String} eg. heading-1 (If left blank, the heading type will match the tag eg. h3 will be heading-3)
+    - block_subheading_tag: {String} eg. h3
+    - block_heading_classes: {String} Additional classes for the heading (optional)
+    - block_heading_content: {String} The sub-heading text (if applicable)
+    - block_heading_tag: {String} eg. h2
+    - block_heading_type: {String} eg. heading-1 (If left blank, the heading type will match the tag eg. h2 will be heading-2)
+    - block_text_content: {String} The text content (if applicable)
+    - body_text_size: {String} the text size for the body text eg. text-b2
+    - block_button_1_classes: {String} Any additional classes for the first button (optional)
+    - block_button_1_label: {String} The text for the first button (if applicable)
+    - block_button_1_link: {String} The link for the first button (if applicable)
+    - block_button_1_style: {String} The first button's style eg. filled/outline (if applicable)
+    - block_button_2_classes: {String} Any additional classes for the second button (optional)
+    - block_button_2_label: {String} The text for the second button (if applicable)
+    - block_button_2_link: {String} The link for the second button (if applicable)
+    - block_button_2_style: {String} The second button's style eg. filled/outline (if applicable)
+    - button_1_aid: {String} the data-aid for the first button (required)
+    - button_2_aid: {String} the data-aid for the second button (required)
+    - block_color_scheme: {Object} eg. section.settings.color_scheme (required)
+    - block_wrapper_classes: {String} any additional classes for the wrapper
+    - block_text_alignment: {String} eg. section.settings.text_alignment
+
+    Usage:
+    {% render 'heading-with-text-and-cta' with block_subheading_content: section.settings.subheading, block_heading_content: section.settings.heading, block_text_content: section.settings.text, block_button_1_text: section.settings.button_1_text, block_button_1_link: section.settings.button_href %}
+{% endcomment %}
+
+{% liquid 
+
+  assign first_button_margins = 'mb-l md:mb-0 '
+  if block_button_2_label != blank and block_button_2_link != blank 
+    assign first_button_margins = first_button_margins | append: 'mr-l md:mr-xl '
+  endif
+
+  assign first_button_classes = 'w-full  md:w-auto ' | append: first_button_margins
+  if block_button_1_classes != blank
+    assign first_button_classes = first_button_classes | append: block_button_1_classes
+  endif
+
+
+  assign second_button_classes = 'w-full md:w-auto '
+  if block_button_2_classes != blank
+    assign second_button_classes = second_button_classes | append: block_button_2_classes
+  endif
+
+  unless block_subheading_tag
+    assign block_subheading_tag = 'h4'
+  endunless
+
+  unless block_heading_tag
+    assign block_heading_tag = 'h2'
+  endunless
+
+  unless block_subheading_type
+    if block_subheading_tag != blank 
+      assign subheading_tag_value = block_subheading_tag | remove: 'h'
+      assign subheading_type = 'heading-' | append: subheading_tag_value
+    endif
+  else 
+    assign subheading_type = block_subheading_type
+  endunless
+
+  unless block_heading_type
+    if block_heading_tag != blank 
+      assign heading_tag_value = block_heading_tag | remove: 'h'
+      assign heading_type = 'heading-' | append: heading_tag_value
+    endif
+  else 
+    assign heading_type = block_heading_type
+  endunless
+
+  unless block_text_alignment
+    assign text_align = 'text-left'
+  else 
+    case block_text_alignment
+      when 'left'
+        assign text_align = 'text-left'
+      when 'center'
+        assign text_align = 'text-center'
+      when 'right'
+        assign text_align = 'text-right'
+    endcase
+  endunless
+
+  unless disable_anims
+    assign heading_attributes = 'data-armada-animation="grid-item"'
+  endunless
+%}
+
+<div data-color-scheme="{{ block_color_scheme }}" class="bg-page text-body {{ text_align }}{% if block_wrapper_classes %} {{ block_wrapper_classes }}{% endif %}"{% unless disable_anims %} data-armada-animation="grid-on-scroll"{% endunless %}>
+
+  {% if block_subheading_content != blank %}
+    {% if block_heading_content == blank and block_text_content == blank %}
+      {% assign block_subheading_classes = block_subheading_classes | append: ' !pb-l md:!pb-xl' %}
+    {% endif %}
+    {% render 'armament-heading' with 
+    tag: block_subheading_tag, 
+    classes: block_subheading_classes, 
+    heading_content: block_subheading_content, 
+    heading_type: subheading_type,
+    attributes: heading_attributes %}
+  {% endif %}
+
+  {% if block_heading_content != blank %}
+    {% render 'armament-heading' with 
+    tag: block_heading_tag, 
+    classes: block_heading_classes, 
+    heading_content: block_heading_content, 
+    heading_type: heading_type,
+    attributes: heading_attributes %}
+  {% endif %}
+
+  {% if block_text_content != blank %}
+    <div class="prose{% if body_text_size %} {{ body_text_size }}{% else %} text-b1{% endif %}{% if body_text_classes %} {{ body_text_classes }}{% endif %}"{% unless disable_anims %} data-armada-animation="grid-item"{% endunless %}>{{ block_text_content }}</div>
+  {% endif %}
+
+  <div{% unless disable_anims %} data-armada-animation="grid-item"{% endunless %}>
+    {% if block_button_1_label != blank and block_button_1_link != blank %}
+      {% render 'armament-button' with 
+      url: block_button_1_link, 
+      content: block_button_1_label, 
+      style: block_button_1_style, 
+      classes: first_button_classes, 
+      type: 'button', 
+      data_aid: button_1_aid %}
+    {% endif %}
+
+    {% if block_button_2_label != blank and block_button_2_link != blank %}
+      {% render 'armament-button' with 
+      url: block_button_2_link, 
+      content: block_button_2_label, 
+      style: block_button_2_style, 
+      classes: second_button_classes, 
+      type: 'button', 
+      data_aid: button_2_aid %}
+    {% endif %}
+  </div>
+</div>

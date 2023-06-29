@@ -1,0 +1,89 @@
+{
+  "wrapper": "div.collection-template-wrapper",
+  "sections": {
+    "collection-header": {
+      "type": "ship-collection-header",
+      "settings": {
+        "show_collection_title": true,
+        "text_align": "center",
+        "show_collection_image": false,
+        "content_overlays_image": false,
+        "image_aspect_ratio": "wide",
+        "section_color_scheme": "accent-1",
+        "overlay_color_scheme": "bg-black",
+        "overlay_opacity": 20
+      }
+    },
+    "description": {
+      "type": "ship-collection-description",
+      "settings": {
+        "color_scheme": "general",
+        "text_align": "center"
+      }
+    },
+    "filters": {
+      "type": "flotilla-collection-filters-topbar",
+      "settings": {
+        "enable_filtering": true,
+        "enable_sorting": true
+      }
+    },
+    "main": {
+      "type": "flotilla-collection-grid-main",
+      "blocks": {
+        "product_card_image": {
+          "type": "image",
+          "settings": {
+            "product_cards_aspect_ratio": "natural",
+            "product_cards_crop_position": "object-center",
+            "collection_hover_effect": "show_second_image"
+          }
+        },
+        "product_card_title": {
+          "type": "title",
+          "settings": {
+          }
+        },
+        "product_card_price": {
+          "type": "price",
+          "settings": {
+          }
+        },
+        "view_details_quick_add": {
+          "type": "view_details_quick_add",
+          "settings": {
+            "enable_view_details": true,
+            "view_details_open": false,
+            "view_details_open_all": true,
+            "show_quick_add": true
+          }
+        },
+        "specifications": {
+          "type": "specifications",
+          "settings": {
+            "spec-keys": ""
+          }
+        }
+      },
+      "block_order": [
+        "product_card_image",
+        "product_card_title",
+        "product_card_price",
+        "view_details_quick_add",
+        "specifications"
+      ],
+      "settings": {
+        "products_per_row": 4,
+        "products_per_page": 12,
+        "pagination_type": "paged",
+        "product_card_alignment": "left"
+      }
+    }
+  },
+  "order": [
+    "collection-header",
+    "description",
+    "filters",
+    "main"
+  ]
+}

@@ -1,0 +1,35 @@
+{% comment %}
+    Renders an in-section navigation. (example: flotilla-multi-collections)
+
+    Accepts:
+    - section_nav_block_id: {String} eg. block.id (required)
+    - section_nav_animation_type: {String} eg. "on-page-navigation" (optional)
+    - section_nav_classes: {String} classes to apply to the button element (optional)
+    - section_nav_data_aid: {String} (required)
+    - section_nav_heading_tag: {String} eg. 'h6' (optional)
+    - section_nav_heading_content: {String} the button text (required)
+    - section_nav_heading_line_height: {String} eg. leading-normal (optional)
+    - has_bottom_border: {Boolean} set to true if the nav item has a bottom border
+    - section_nav_index: {Number} eg. forloop.index
+
+    Usage:
+      {% render 'ship-in-section-navigation' with section_nav_block_id: block_id, section_nav_animation_type: 'on-page-navigation', has_bottom_border: false, section_nav_classes: nav_classes, section_nav_data_aid: 'multi-collection-nav-item', section_nav_heading_tag: 'h5', section_nav_heading_content: button_content, section_nav_index: forloop.index %}
+{% endcomment %}
+{% liquid 
+  unless has_bottom_border == true or has_bottom_border == false
+    assign has_bottom_border = true
+  endunless
+
+  assign has_bottom_border = has_bottom_border
+
+  unless has_bottom_border == true 
+    assign heading_classes = 'pointer-events-none !pb-0'
+  else 
+    assign heading_classes = 'pointer-events-none'
+  endunless
+%}
+
+
+<button type="button" data-nav-btn data-block-id="{{ section_nav_block_id }}" data-armada-animation="{{ section_nav_animation_type }}" class="{{ section_nav_classes }} mb-s md:mb-l mr-s md:mr-2xl last:mr-0 relative{% if has_bottom_border == true %} pb-s after:absolute after:left-0 after:right-0 after:bottom-0 after:h-xs after:bg-body{% endif %}" {% if section_nav_index == 1 %}data-active-nav-item="true"{% endif %} data-aid="{{ section_nav_data_aid }}">
+  <span class="!flex flex-row items-center" data-on-page-nav-text>{% render 'armament-heading' with tag: section_nav_heading_tag, heading_content: section_nav_heading_content, heading_type: 'heading-4', classes: heading_classes, heading_line_height: section_nav_heading_line_height %}</span>
+</button>

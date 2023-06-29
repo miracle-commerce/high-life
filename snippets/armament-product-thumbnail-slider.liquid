@@ -1,0 +1,141 @@
+{% comment %}
+    Renders a product thumbnail slider.
+
+    Accepts:
+    - product_id {Int} Optional. Shopify product ID.
+    - media {Object} Shopify product object.
+    - product_title {String} Product title (displays when product has no media)
+    - aspect_ratio: {Int} Optional. Normalise all images to a set aspect ratio
+    - position: {String} Optional. If the image is cropped via aspect ratio, where should it crop from.
+    - arrows: {Boolean} Optional. Display prev/next arrows.
+    - mode: {String} Optional. Slider options as follows:
+        - preview: Show animated preview of the next slide on first load.
+        - peep: Show partial view of first slide (swipe to show full slide).
+        - vertical: Stack slides vertically.
+    - url: {String}: Optional. Product URL.
+    - scope_id {String} limits variant change interaction to components with a matching scope id, eg. section.id (optional)
+    - prevent_load: {Boolean} Sets the slider engine "load" attribute to false
+
+    Usage:
+    {% render 'armament-product-thumbnail-slider' with product_id: product.id, media: product.media %}
+{% endcomment %}
+
+{% liquid
+  if mode == blank
+    assign mode = 'horizontal'
+  endif
+
+  if aspect_ratio == blank
+    assign aspect_ratio = 'natural'
+  endif
+
+  if arrows == blank
+    assign arrows = 'false'
+  endif
+
+  case position
+    when 'center'
+      assign position = 'object-center'
+    when 'left'
+      assign position = 'object-left'
+    when 'left-top'
+      assign position = 'object-left-top'
+    when 'left-bottom'
+      assign position = 'object-left-bottom'
+    when 'right'
+      assign position = 'object-right'
+    when 'right-top'
+      assign position = 'object-right-top'
+    when 'right-bottom'
+      assign position = 'object-right-bottom'
+    when 'top'
+      assign position = 'object-top'
+    when 'bottom'
+      assign position = 'object-bottom'
+    else
+      assign position = 'object-center'
+  endcase
+
+  if aspect_ratio == 'natural'
+    assign classes = 'relative object-contain'
+    assign heading_classes = 'relative !py-3xl px-m'
+  else
+    assign classes = 'absolute w-full h-full z-0 object-cover ' | append: position
+    assign heading_classes = 'absolute top-1/2'
+  endif
+%}
+
+{% if media != blank %}
+  <slider-engine
+    visible-slides="1"
+    aspect="{{ aspect_ratio }}"
+    arrows="{{ arrows }}"
+    mobile-indicator="true"
+    reveal-on-hover="true"
+    class="block group relative overflow-hidden hover:overflow-visible focus-within:overflow-visible"
+    data-aid="product-thumbnail-gallery"
+    data-name="scrollbar-target"
+    tabindex="0"
+    mode="{{ mode }}"
+    {% if product_id %}product-id="{{ product_id }}"{% endif %}
+    {% if scope_id %}scope-id="{{ scope_id }}"{% endif %}
+    {% if prevent_load %}load="false"{% endif %}
+  >
+    <div
+      data-name="slider-wrap"
+      class="relative overflow-hidden mb-l"
+    >
+      <ul
+        data-name="slider"
+        data-armada-animation="general"
+        class="flex"
+        role="list"
+      >
+        {% for media in media %}
+          <li
+            data-name="slide"
+            class="relative min-w-full flex {% if aspect_ratio %}aspect-{{ aspect_ratio }}{% endif %}"
+            type="{{ media.media_type }}"
+            slide-num="{{ forloop.index }}"
+            {% if media.id %}media-id="{{ media.id }}"{% endif %}
+          >
+            <div> {% comment %} You need this wrapper div so that Safari doesn't stretch the images to their attribute height :facepalm: {% endcomment %}
+              {%- if url -%}
+                <a href="{{ url }}" class="h-full">
+              {%- endif -%}
+                {% render 'armament-image' with image: media, classes: classes %}
+              {%- if url -%}
+                </a>
+              {%- endif -%}
+              {% if media.media_type == 'model' %}
+                <div data-icon-type="model" class="absolute top-l right-3 z-10">
+                  {% render 'armament-icon' with icon: '3d-model', no_animation: true %}
+                </div>
+              {% elsif media.media_type contains 'video' %}
+                <div data-icon-type="video" class="absolute top-l right-3 z-10">
+                  {% render 'armament-icon' with icon: 'play', no_animation: true %}
+                </div>
+              {% endif %}
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    {% comment %} Slider-specific elements {% endcomment %}
+    <template>
+      {% render 'armament-slider-arrows-condensed' with hide_on_mobile: true, classes: '!absolute group-hover:opacity-100', reveal_on_hover: true %}
+      <div data-name="mobile-indicator" class="block pb-s md:hidden">
+        {% render 'armament-scroll-bar' with item_count: media.size, parent: 'slider-engine', target: 'slider', indicator: 'progress', loop_forward: 'false' %}
+      </div>
+    </template>
+  </slider-engine>
+
+  <script src="{{ 'engine-slider.min.js' | asset_url }}" defer="defer" type="module"></script>
+{% else %}
+  <a href="{{ url }}" title="{{ card_image_product.title | escape }}" class="block">
+    <div class="{% if aspect_ratio %}aspect-{{ aspect_ratio }}{% endif %} relative group flex items-center justify-center bg-body-opacity-10 mb-l">
+      {% render 'armament-heading' with heading_type: 'heading-5', heading_content: product_title, data_aid: 'product-heading-no-image', classes: heading_classes %}
+    </div>
+  </a>
+{% endif %}

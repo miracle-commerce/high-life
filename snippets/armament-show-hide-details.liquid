@@ -1,0 +1,42 @@
+{% comment %}
+    Renders a show/hide details button.
+    Accepts:
+    - id: {any} Unique identifier, eg. section.id, which matches the value of data-armada-details-id attribute of the element to be shown/hidden
+    - section_id: {String} section.id
+    - classes: {String} custom classes to be applied to the component
+    - open: {Boolean} open/expanded by default
+
+    Usage:
+    {% render 'armament-show-hide-details' with id: section.id, section_id: section.id %}
+    <div data-armada-details-id="{{ section.id }}" id="product-details--{{ section.id }}">
+      [Content to be shown/hidden]
+    </div>
+{% endcomment %}
+
+<show-hide-details
+  data-armada-show-hide-id="{{ id }}"
+  data-armada-show-hide-section-id="{{ section_id }}"
+  role="button"
+  tabindex="0"
+  data-aid="show-hide-details-button"
+  aria-expanded="{{ open }}"
+  aria-controls="product-details--{{ id }}"
+  class="block text-h5 leading-none{% if classes %} {{ classes }}{% endif %}"
+>
+  {%- liquid
+    assign show_details_string = 'products.product.show_details' | t
+    assign hide_details_string = 'products.product.hide_details' | t
+  -%}
+  <span data-armada-selector="show-hide-button-content" class="flex items-center{% if open %} hidden{% endif %}">
+    {% render 'armament-icon' with icon: 'view-eye', classes: 'mr-s', width: '18px', height: '18px' %}
+    {% render 'armament-heading' with tag: 'span', heading_content: show_details_string, heading_type: 'heading-5', classes: '!pb-0' %}
+  </span>
+  <span data-armada-selector="show-hide-button-content" class="flex items-center{% unless open %} hidden{% endunless %}">
+    {% render 'armament-icon' with icon: 'hide-eye', classes: 'mr-s', width: '18px', height: '18px' %}
+    {% render 'armament-heading' with tag: 'span', heading_content: hide_details_string, heading_type: 'heading-5', classes: '!pb-0' %}
+  </span>
+</show-hide-details>
+
+<safe-load-scripts>
+  <script src="{{ 'component-show-hide-details.min.js' | asset_url }}" defer="defer" type="module" data-armada-load-key="show-hide-details"></script>
+</safe-load-scripts>

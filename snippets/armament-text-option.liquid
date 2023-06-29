@@ -1,0 +1,41 @@
+{% comment %}
+    Renders a product variant option containing text, eg. a size option (radio input and label)
+    Accepts:
+    - name: {String} value of the name attribute of the input
+    - id: {String} value of the id attribute of the input
+    - value: {String} value of the value attribute of the input
+    - checked: {Boolean} adds a checked attribute to the input
+    - attributes: {String} Optional. Custom attributes of the element, eg. data attribute or aria-label
+
+    Usage:
+    {% for value in option.values %}
+      {%- liquid
+        assign id = section.id | append: '-' | append: option.name | append: '-' | append: forloop.index0
+        assign checked = false
+        if forloop.index0 == 0
+          assign checked = true
+        endif
+      -%}
+      {% render 'armament-text-option' with name: option.name, id: id, value: value, checked: checked %}
+    {% endfor %}
+{% endcomment %}
+
+<div class="inline-block mr-s mb-l armament-text-option">
+  <input
+    type="radio"
+    id="{{ id }}"
+    name="{{ name }}"
+    value="{{ value | escape }}"
+    class="sr-only peer"
+    {% if checked %}checked{% endif %}
+    {% if attributes %}{{ attributes }}{% endif %}
+  >
+  <label
+    for="{{ id }}"
+    class="inline-block relative text-b1 text-body py-s px-l cursor-pointer before:absolute before:inset-0 before:border before:rounded-theme before:border-theme peer-checked:before:border-body peer-checked:before:border-selected"
+    data-aid="text-option"
+    data-armada-animation="swatch"
+  >
+    {{ value }}
+  </label>
+</div>

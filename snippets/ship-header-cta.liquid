@@ -1,0 +1,227 @@
+{% comment %}
+    Renders the localization selectors and header search, cart & account CTA's
+
+    enable_search: {Boolean} eg. section.settings.enable_search 
+    show_cart_count: {Boolean} eg. true
+    show_icons: {Boolean} eg. show_icons
+    show_country: {Boolean} eg. section.settings.show_country 
+    show_languages: {Boolean} eg. section.settings.show_languages
+    search_expanded: {Boolean} eg. section.settings.search_expanded
+    cart_icon: {String} eg. cart (will have default if left blank)
+    search_icon: {String} eg. search (will have default if left blank)
+    account_icon: {String} eg. account (will have default if left blank)
+    search_icon_width: {Int} Optional specify a width.
+    search_icon_height: {Int} Optional specify a height.
+    cart_icon_width: {Int} Optional specify a width.
+    cart_icon_height: {Int} Optional specify a height.
+    account_icon_width: {Int} Optional specify a width.
+    account_icon_height: {Int} Optional specify a height.
+    search_expands_on_click: {Boolean} should the search redirect to the search page on click or should it open a search bar?
+    hide_search_icon_on_search_page: {Boolean} hide/show header search on the search template
+
+    Usage:
+    {% render 'ship-header-cta' with enable_search: section.settings.enable_search, show_cart_count: true, show_icons: section.settings.show_icons, show_country: section.settings.show_country, show_languages: section.settings.show_languages, search_expanded: section.settings.search_expanded %}
+{% endcomment %}
+
+{% liquid
+  assign aria_search = 'general.search.search_button_label' | t
+  assign aria_account = 'customer.account.title' | t
+  assign aria_cart = 'templates.cart.cart' | t
+
+  unless enable_search
+    assign enable_search = section.settings.enable_search
+  endunless
+
+  unless show_cart_count
+    assign show_cart_count = true
+  endunless
+
+  unless show_icons 
+    assign show_icons = section.settings.show_icons
+  endunless
+
+  unless show_country 
+    assign show_country = section.settings.show_country
+  endunless
+
+  unless show_languages
+    assign show_languages = section.settings.show_languages
+  endunless
+
+  unless cart_icon 
+    assign cart_icon = 'bag'
+  endunless 
+
+  unless search_icon 
+    assign search_icon = 'search'
+  endunless 
+
+  unless account_icon
+    assign account_icon = 'account'
+  endunless
+
+  if search_expands_on_click == ''
+    assign search_expands_on_click = true
+  endif
+
+  if hide_search_icon_on_search_page == ''
+    assign hide_search_icon_on_search_page = false
+  endif
+%}
+
+{%- capture cart_count -%}
+  <cart-count
+    class="absolute top-0 right-0 -mr-[2px] pointer-events-none{% if cart.item_count == 0 %} hidden{% endif %}"
+    count="{{ cart.item_count }}"
+  >
+    <div
+      data-armada-selector="cart-count"
+      class="inline-flex place-items-center place-content-center min-w-[25px] min-h-[25px] border-2 border-page rounded-full text-xs font-semibold font-body leading-[0.9rem] bg-body text-page"
+    >
+      {{ cart.item_count }}
+    </div>
+  </cart-count>
+
+  <safe-load-scripts>
+    <script src="{{ 'component-cart-count.min.js' | asset_url }}" defer="defer" type="module" data-armada-load-key="component-cart-count"></script>
+  </safe-load-scripts>
+{%- endcapture -%}
+
+<noscript>
+  {% if enable_search and search_expanded == false %}
+    {% if template.name contains 'search' and hide_search_icon_on_search_page == false %}
+        {% render 'armament-icon' with icon: search_icon, width: search_icon_width, height: search_icon_height, classes: 'cursor-pointer', has_link: true, link_href: routes.search_url, link_label: aria_search, link_classes: 'header-mobile-search flex lg:hidden w-11 h-11 items-center lg:justify-center' %}
+    {% else %}
+      {% unless template.name contains 'search' %}
+          {% render 'armament-icon' with icon: search_icon, width: search_icon_width, height: search_icon_height, classes: 'cursor-pointer', has_link: true, link_href: routes.search_url, link_label: aria_search, link_classes: 'header-mobile-search flex lg:hidden w-11 h-11 items-center lg:justify-center' %}
+      {% endunless %}
+    {% endif %}
+  {% endif %}
+</noscript>
+
+{% if enable_search and search_expanded == false %}
+  {% if template.name contains 'search' and hide_search_icon_on_search_page == false %}
+    <div class="header-mobile-search flex lg:hidden w-11 h-11 items-center justify-end lg:justify-center group cursor-pointer{% if template.name == 'search' %} pointer-events-none{% endif %}" data-armada-selector="search_toggle"{% if template.name == 'search' %} aria-hidden="true"{% else %} tabindex="0"{% endif %} data-armada-animation="icon">
+      {% if search_expands_on_click == false and settings.enable_predictive_search == false %}<a href="{{ routes.search_url }}">{% endif %}
+        {% render 'armament-icon' with icon: search_icon, has_link: false, width: search_icon_width, height: search_icon_height %}
+      {% if search_expands_on_click == false and settings.enable_predictive_search == false %}</a>{% endif %}
+    </div>
+  {% else %}
+    {% unless template.name contains 'search' %}
+      <div class="header-mobile-search flex lg:hidden w-11 h-11 items-center justify-end lg:justify-center group cursor-pointer{% if template.name == 'search' %} pointer-events-none{% endif %}" data-armada-selector="search_toggle"{% if template.name == 'search' %} aria-hidden="true"{% else %} tabindex="0"{% endif %} data-armada-animation="icon">
+        {% if search_expands_on_click == false and settings.enable_predictive_search == false %}<a href="{{ routes.search_url }}">{% endif %}
+          {% render 'armament-icon' with icon: search_icon, has_link: false, width: search_icon_width, height: search_icon_height %}
+        {% if search_expands_on_click == false and settings.enable_predictive_search == false %}<a href="{{ routes.search_url }}">{% endif %}
+      </div>
+    {% endunless %}
+  {% endif %}
+{% endif %}
+
+<div class="flex items-center justify-end" style="grid-area:cta;" data-armada-selector="header-cta-container">
+  <div data-armada-selector="header-locale-selectors" class="hidden w-full items-end gap-l lg:mr-l lg:w-auto justify-end lg:flex p-l px-xl lg:p-0 {% unless settings.enable_animations %} disable-animation{% endunless %}">
+    {% render 'armament-localization-selector' with show_country: show_country, show_languages: show_languages, classes: 'font-heading heading-font-styles', country_attributes: 'style="grid-area:cta;"', country_selector_id: 'countryListDesktop', language_selector_id: 'languageListDesktop' %}
+  </div>
+
+  {% if enable_search and show_icons and search_expanded == false %}
+    <noscript>
+      {% if template.name contains 'search' and hide_search_icon_on_search_page == false %}
+        <div class="header-search hidden lg:flex w-11 h-11 items-center lg:justify-end group cursor-pointer{% if template.name == 'search' %} pointer-events-none{% endif %}" data-armada-selector="search_toggle"{% if template.name == 'search' %} aria-hidden="true"{% else %} tabindex="0"{% endif %} aria-label="{{ aria_search }}" data-armada-selector="header-search-icon">
+          <a href="{{ routes.search_url }}">{% render 'armament-icon' with icon: search_icon, has_link: false, width: search_icon_height, height: search_icon_height %}</a>
+        </div>
+      {% else %}
+        {% unless template.name contains 'search' %}
+          <div class="header-search hidden lg:flex w-11 h-11 items-center lg:justify-end group cursor-pointer{% if template.name == 'search' %} pointer-events-none{% endif %}" data-armada-selector="search_toggle"{% if template.name == 'search' %} aria-hidden="true"{% else %} tabindex="0"{% endif %} aria-label="{{ aria_search }}" data-armada-selector="header-search-icon">
+            <a href="{{ routes.search_url }}">{% render 'armament-icon' with icon: search_icon, has_link: false, width: search_icon_height, height: search_icon_height %}</a>
+          </div>
+        {% endunless %}
+      {% endif %}
+    </noscript>
+    <div class="header-search hidden lg:flex w-11 h-11 items-center lg:justify-end no-js-hidden group cursor-pointer{% if template.name == 'search' %} pointer-events-none{% endif %}" data-armada-selector="search_toggle"{% if template.name == 'search' %} aria-hidden="true"{% else %} tabindex="0"{% endif %} aria-label="{{ aria_search }}" data-armada-selector="header-search-icon" data-armada-animation="icon">
+      {% if enable_search %}
+        {% if template.name contains 'search' and hide_search_icon_on_search_page == false %}
+          {% if search_expands_on_click == false and settings.enable_predictive_search == false %}<a href="{{ routes.search_url }}">{% endif %}
+            {% render 'armament-icon' with icon: search_icon, has_link: false, width: search_icon_height, height: search_icon_height %}
+          {% if search_expands_on_click == false and settings.enable_predictive_search == false %}</a>{% endif %}
+        {% else %}
+          {% unless template.name contains 'search' %}
+            {% if search_expands_on_click == false and settings.enable_predictive_search == false %}<a href="{{ routes.search_url }}">{% endif %}
+              {% render 'armament-icon' with icon: search_icon, has_link: false, width: search_icon_height, height: search_icon_height %}
+            {% if search_expands_on_click == false and settings.enable_predictive_search == false %}</a>{% endif %}
+          {% endunless %}
+        {% endif %}
+      {% endif %}
+    </div>
+  {% elsif enable_search and search_expanded == false %}
+    {% unless show_icons %}
+      {% if template.name contains 'search' and hide_search_icon_on_search_page == false %}
+        {% if search_expands_on_click == false and settings.enable_predictive_search == false %}<a href="{{ routes.search_url }}">{% endif %}
+          <span data-armada-selector="search_toggle" class="mr-l hidden lg:flex items-center h-11 font-heading heading-font-styles text-h5 cursor-pointer" tabindex="0" aria-label="{{ aria_search }}" data-armada-animation="menu-link">{{ aria_search }}</span>
+        {% if search_expands_on_click == false and settings.enable_predictive_search == false %}</a>{% endif %}
+        <noscript>
+          <a class="mr-l hidden lg:flex items-center h-11 font-heading heading-font-styles text-h5" href="{{ routes.search_url }}" aria-label="{{ aria_search }}" data-armada-animation="menu-link">{{ aria_search }}</a>
+        </noscript>
+      {% else %}
+        {% unless template.name contains 'search' %}
+          {% if search_expands_on_click == false and settings.enable_predictive_search == false %}<a href="{{ routes.search_url }}">{% endif %}
+            <span data-armada-selector="search_toggle" class="mr-l hidden lg:flex items-center h-11 font-heading text-h5 cursor-pointer" tabindex="0" aria-label="{{ aria_search }}" data-armada-animation="menu-link">{{ aria_search }}</span>
+          {% if search_expands_on_click == false and settings.enable_predictive_search == false %}</a>{% endif %}
+          <noscript>
+            <a class="mr-l hidden lg:flex items-center h-11 font-heading heading-font-styles hover:opacity-50 transition-opacity duration-150" href="{{ routes.search_url }}" aria-label="{{ aria_search }}">{{ aria_search }}</a>
+          </noscript>
+        {% endunless %}
+      {% endif %}
+    {% endunless %}
+  {% endif %}
+
+  {% unless show_icons %}
+    <a
+      class="mr-l hidden lg:flex items-center h-11 font-heading heading-font-styles text-h5"
+      href="{{ routes.account_url }}"
+      aria-label="{{ aria_account }}"
+      data-armada-animation="menu-link"
+    >
+      {{ aria_account }}
+    </a>
+    <a
+      class="relative mr-l hidden lg:flex items-center h-11 font-heading heading-font-styles text-h5"
+      href="{{ routes.cart_url }}"
+      aria-label="{{ aria_cart }}"
+      data-armada-animation="menu-link"
+    >
+      <span class="flex items-center h-full">{{ aria_cart }}</span>
+    </a>
+    <div class="hidden lg:block translate-x-[4px] -translate-y-[22px]">
+      {{ cart_count }}
+    </div>
+  {% endunless %}
+
+  {% comment %} Classes for mobile, where icon is always shown. {% endcomment %}
+  {% assign account_classes = 'hidden' %}
+  {% assign bag_classes = 'header-cart flex lg:hidden w-11 h-11 items-center justify-end group' %}
+  {% assign count_classes = 'block translate-x-[18px] -translate-y-[45px] lg:hidden' %}
+
+  {% comment %} Classes for desktop, dependent on setting. {% endcomment %}
+  {% if show_icons %}
+    {% assign account_classes = 'header-account flex upto-lg:hidden w-11 h-11 items-center justify-end group' %}
+    {% assign bag_classes = 'header-cart flex w-11 h-11 items-center justify-end group' %}
+    {% assign count_classes = 'block translate-x-[18px] -translate-y-[45px]' %}
+  {% endif %}
+
+  {% render 'armament-icon' with icon: account_icon, width: account_icon_width, height: account_icon_height, classes: 'cursor-pointer', has_link: true, link_href: routes.account_url, link_label: aria_account, link_classes: account_classes, link_attributes: 'data-armada-animation="icon"' %}
+
+  {% comment %} TODO: this should be a web component? {% endcomment %}
+  <div>
+    {% render 'armament-icon' with icon: cart_icon, width: cart_icon_width, height: cart_icon_height, classes: 'cursor-pointer', has_link: true, link_href: routes.cart_url, link_label: aria_cart, link_classes: bag_classes, link_attributes: 'data-armada-animation="icon"' %}
+    <div class="{{ count_classes }}">
+      {{ cart_count }}
+    </div>
+  </div>
+</div>
+
+<safe-load-scripts>
+  <script src="{{ 'component-product-card.min.js' | asset_url }}" defer="defer" type="module" data-armada-load-key="product-card"></script>
+  <script src="{{ 'engine-slider.min.js' | asset_url }}" defer="defer" type="module" data-armada-load-key="slider-engine"></script>
+  <script src="{{ 'component-armament-scroll-bar.min.js' | asset_url }}" defer="defer" type="module" data-armada-load-key="scroll-bar"></script>
+  <script src="{{ 'component-search-bar.min.js' | asset_url }}" defer="defer" type="module"></script>
+  <script src="{{ 'engine-quick-search.min.js' | asset_url }}" defer="defer" type="module"></script>
+</safe-load-scripts>

@@ -1,0 +1,179 @@
+{% comment %}
+    Renders a product card slider for a given collection.
+    Accepts:
+    - slider_collection {Object} Shopify collection object
+    - section_blocks: {Object} Shopify block objects (optional). If not specified, a simple product card will be rendered
+    - heading: {String} Collection heading
+    - visible_slides: {Number} Number of visible slides in the slider
+    - product_limit: {Number} Maximum number of products to show in the slider
+    - view_all_slide: {Boolean} Set the true to show a 'view all' collection slide as the last slide
+    - block_index: {Number} Index of the block
+    - button_style: {String} Style of the 'view all' button - 'filled' or 'outline' (defaults to 'filled')
+    - product_card_alignment: {String} which way the product cards are aligned
+    - aspect_ratio: {String} Normalise all images of slides to a set aspect ratio (optional)
+    - position: {String} slides image position (optional)
+    - slides_container_classes: {String} classes to apply to all slides container (optional)
+    - slides_classes: {String} classes to apply to every single slide container. Defaults to 'mr-xs' if not specified (optional)
+
+    Usage:
+    {% render 'flotilla-product-card-slider' with slider_collection: block.settings.collection, heading: block.settings.heading, visible_slides: section.settings.visible_products, product_limit: block.settings.products_to_show, view_all_slide: true, block_index: forloop.index %}
+{% endcomment %}
+
+{%- liquid
+  if slider_collection != blank
+    assign number_of_slides = slider_collection.products_count | at_most: product_limit
+  else
+    assign number_of_slides = product_limit
+  endif
+
+  if view_all_slide
+    assign number_of_slides = number_of_slides | plus: 1
+  endif
+
+  if number_of_slides > visible_slides
+    assign show_arrows = true
+    else
+    assign show_arrows = false
+  endif
+
+  assign gallery_type = 'none'
+  if settings.collection_hover_effect == 'show_second_image'
+    assign gallery_type = 'show_second_image'
+  endif
+
+  assign init_slide_width = 100 | divided_by: visible_slides | append: '%'
+-%}
+
+<style>
+  .product-card-slider--{{ section.id }} li[data-name="slide"] {
+    min-width: 50%;
+  }
+
+  @media screen and (min-width: 769px) {
+    .product-card-slider--{{ section.id }} li[data-name="slide"] {
+      width: {{ init_slide_width }};
+    }
+  }
+</style>
+
+<slider-engine
+  mode="horizontal"
+  arrows="true"
+  mobile-indicator="true"
+  visible-slides='{ "sm": 1, "md": {{ visible_slides }} }'
+  class="block relative product-card-slider--{{ section.id }}"
+  tabindex="0"
+  data-name="scrollbar-target"
+>
+  <div
+    class="relative overflow-hidden upto-md:mb-s"
+    data-name="slider-wrap"
+  >
+    <ul
+      data-name="slider"
+      data-armada-animation="general"
+      class="flex {{ slides_container_classes }}"
+      role="list"
+    >
+      {% if slider_collection != blank %}
+        {% if section_blocks != blank %}
+          {% liquid 
+            for block in section_blocks 
+              case block.settings.icon_size 
+                when 'small'
+                  assign icon_px_width = '18px'
+                when 'large'
+                  assign icon_px_width = '24px'
+              endcase
+            endfor
+          %}
+
+          {% for slider_product in slider_collection.products limit: product_limit %}
+            <li data-name="slide" slide-num="{{ forloop.index }}" class="relative flex place-content-center {{ slide_class }} {{ slides_classes }}" data-armada-animation="grid-item">
+              <div class="w-full">
+                {%
+                  render 'ship-product-card' with
+                  card_product: slider_product,
+                  section_blocks: section_blocks,
+                  classes: 'w-full',
+                  align: product_card_alignment,
+                  aspect_ratio: aspect_ratio,
+                  position: position,
+                  card_icon_size: icon_px_width
+                %}
+              </div>
+            </li>
+          {% endfor %}
+        
+        {% else %}
+
+          {% for slider_product in slider_collection.products limit: product_limit %}
+          <li data-name="slide" slide-num="{{ forloop.index }}" class="relative flex place-content-center {{ slide_class }} {{ slides_classes }}" data-armada-animation="grid-item">
+            <div class="w-full">
+              {%
+                render 'ship-product-card-simple' with
+                card_product: slider_product,
+                classes: 'w-full',
+                align: product_card_alignment,
+                aspect_ratio: aspect_ratio,
+                position: position
+              %}
+            </div>
+          </li>
+        {% endfor %}
+      {% endif %}
+            
+
+      {% else %}
+
+        {% for i in (1..product_limit) %}
+          <li data-name="slide" class="relative flex place-content-center {{ slide_class }} {{ slides_classes }}" style="min-width: {{ init_slide_width }}" data-armada-animation="grid-item" slide-num="{{ forloop.index }}">
+            <div class="w-full flex flex-col">
+              {% if block_index == blank %}
+                {% assign block_index = 1 %}
+              {% else %}
+                {% assign block_index = block_index | modulo: 6 | plus: 1 %}
+              {% endif %}
+              {% assign placeholder_name = 'product-' | append: block_index %}
+              {% render 'armament-placeholder' with name: placeholder_name %}
+              <div class="px-l pt-s">
+                {% render 'armament-heading' with tag: 'h5', heading_content: 'Example product title' %}
+                <span>{{ 1999 | money }}</span>
+              </div>
+            </div>
+          </li>
+        {% endfor %}
+
+      {% endif %}
+
+      {% if view_all_slide %}
+        {%- liquid
+          assign view_all_string = 'templates.collection.view_all' | t
+          if slider_collection != blank
+            assign card_button_link = slider_collection.url
+          else
+            assign card_button_link = routes.all_products_collection_url
+          endif
+        -%}
+        <li data-name="slide" slide-num="{{ number_of_slides }}" class="relative flex place-content-center {{ slide_class }}" style="min-width: {{ init_slide_width }}">
+          <div class="w-full flex items-center justify-center text-center">
+            {% render 'ship-text-card' with heading: heading, button_label: view_all_string, button_link: card_button_link, button_style: button_style %}
+          </div>
+        </li>
+      {% endif %}
+    </ul>
+  </div>
+
+  <template>
+    {% if show_arrows == false %}
+      {% assign arrow_classes = 'md:hidden !absolute' %}
+    {% endif %}
+    {% render 'armament-slider-arrows-condensed' with classes: arrow_classes %}
+    <div data-name="mobile-indicator" class="block md:hidden">
+      {% render 'armament-scroll-bar' with item_count: number_of_slides, parent: 'slider-engine', target: 'slider', indicator: 'progress' %}
+    </div>
+  </template>
+</slider-engine>
+<safe-load-scripts>
+  <script src="{{ 'engine-slider.min.js' | asset_url }}" defer="defer" type="module" data-armada-load-key="slider-engine"></script>
+</safe-load-scripts>

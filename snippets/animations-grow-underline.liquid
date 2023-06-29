@@ -1,0 +1,24 @@
+<style>
+  {{ selector }}:after {
+    content: '';
+    position: absolute;
+    height: 3px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--colors-body-text);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    {{ selector }}:after {
+      animation: growUnderline .3s linear;
+    }
+  }
+  @keyframes growUnderline {
+    0% {
+      transform: scaleX(0);
+    }
+    100% {
+      transform: scaleX(1);
+    }
+  }
+</style>

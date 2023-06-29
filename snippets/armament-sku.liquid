@@ -1,0 +1,24 @@
+{% comment %}
+    Renders the sku of a given product variant, with an option to dynamically update when the changeVariant named event is emitted for the product.
+
+    Accepts:
+    - sku_variant: {Object} variant liquid object
+    - sku_product: {Object} product liquid object (optional - allows sku to dynamically update on variant change)
+    - sku_scope_id: {String} limits variant change interaction to components with a matching scope id, eg. section.id (optional)
+    - classes: {String} custom classes to be applied to the sku component (optional)
+
+    Usage:
+    {% render 'armament-sku' with sku_product: product, sku_variant: product.selected_or_first_available_variant, sku_scope_id: section.id, classes: "p-s" %}
+{% endcomment %}
+
+<armada-sku
+  {% if sku_product %}data-armada-product="{{ sku_product | json | escape }}"{% endif %}
+  {% if sku_scope_id %}data-armada-scope-id="{{ sku_scope_id }}"{% endif %}
+  class="break-all{% if classes %} {{ classes }}{% endif %}"
+>
+{{ 'products.product.sku' | t }}{% if sku_variant.sku != '' %} {{ sku_variant.sku }}{% else %} {{ 'products.product.no_reference' | t }}{% endif %}
+</armada-sku>
+
+<safe-load-scripts>
+  <script src="{{ 'component-sku.min.js' | asset_url }}" defer="defer" type="module" data-armada-load-key="sku"></script>
+</safe-load-scripts>

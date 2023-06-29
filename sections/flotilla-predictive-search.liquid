@@ -1,0 +1,121 @@
+{% liquid
+  assign products_heading = 'templates.search.products' | t
+  assign collection_heading = 'templates.search.collections' | t
+  assign suggestions_heading = 'templates.search.queries' | t
+  assign view_all = 'templates.search.view_all' | t
+  assign view_all_collections = 'templates.search.view_all_collections' | t
+  assign view_all_products = 'templates.search.view_all_products' | t
+  assign search_close = 'general.search.close' | t
+  assign close_icon_attrs = 'data-armada-animation="icon" tabindex="0" data-armada-selector="close-results" aria-label="' | append: search_close | append: '"'
+  assign no_results_text = 'general.search.search_for' | t: terms: predictive_search.terms
+%}
+
+{% if settings.enable_predictive_search %}
+  {% if predictive_search.performed %}
+    <div data-armada-selector="predictive-search-results">
+      {% if predictive_search.resources.products.size == 0 and predictive_search.resources.collections.size == 0 and predictive_search.resources.queries.size == 0 %}
+        <div class="col-start-1 col-end-3 lg:col-end-4 row-start-1 row-end-3 justify-center items-center min-h-[300px] z-10" data-armada-selector="empty-state-container">
+          <div data-armada-selector="empty-state-content">
+            <div class="max-w-max mx-auto px-xl lg:px-3xl py-xl lg:py-3xl">
+              <a class="grid grid-cols-[repeat(2,minmax(0,auto))] grid-rows-2 items-center justify-center group" href="{{ routes.search_url | append: '?q=' | append: predictive_search.terms }}">
+                {% render 'armament-heading' with heading_content: no_results_text, classes: 'text-h5 row-start-1 row-end-2 col-start-1 col-end-2', data_aid: 'predictive-search-no-results' %}
+                {% render 'armament-icon' with icon: 'chevron', classes: "text-body bg-page ml-l row-start-1 row-end-2 col-start-2 col-end-3" %}
+              </a>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+
+      {% if predictive_search.resources.queries.size > 0 %}
+        <div data-armada-selector="queries-results-container" class="flex flex-col px-xl pt-l col-start-1 col-end-2 lg:py-xl lg:pr-xl lg:pl-0 row-start-2 row-end-3 lg:col-start-1 lg:col-end-2 lg:row-start-1 lg:row-end-2">
+          <div data-armada-selector="queries-results">
+            {% render 'armament-heading' with tag: 'h4', heading_type: 'heading-4', heading_content: suggestions_heading, data_aid: 'predictive_results_queries_heading', classes: '!pb-l lg:!pb-xl' %}
+            <ul class="flex flex-col" role="navigation">
+              {% for query in predictive_search.resources.queries %}
+                <a href="{{ query.url }}&type=product" data-armada-animation="menu-link" class="pb-l"><li class="list-none !pb-0 text-b2">{{ query.styled_text }}</li></a>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      {% endif %}
+
+      {% if predictive_search.resources.collections.size > 0 %}
+        <div data-armada-selector="collection-results-container" class="flex flex-col px-xl pt-l col-auto lg:py-xl lg:pr-xl lg:pl-0 row-start-2 row-end-3 lg:col-start-2 lg:col-end-3 lg:row-start-1 lg:row-end-2">
+          <div data-armada-selector="collection-results">
+            {% render 'armament-heading' with tag: 'h4', heading_type: 'heading-4', heading_content: collection_heading, data_aid: 'predictive_results_collection_heading', classes: '!pb-l lg:!pb-xl' %}
+            <ul class="flex flex-col" role="navigation">
+              {% for collection in predictive_search.resources.collections %}
+                <a href="{{ collection.url }}" data-armada-animation="menu-link" class="pb-l last:pb-xs"><li class="list-none !pb-0 text-b2">{{ collection.title }}</li></a>
+              {% endfor %}
+            </ul>
+          </div>
+          <a href="{{ routes.search_url | append: '?type=collection&options%5Bprefix%5D=last&q=' | append: predictive_search.terms }}">
+            <span class="sr-only">{{ view_all_collections }}</span>
+            <div class="flex flex-row gap-xs items-center" data-armada-animation="arrow">
+              {% render 'armament-heading' with tag: 'h5', heading_content: view_all, classes: 'text-h5 col-start-2 col-end-3', data_aid: 'predictive_search_view_all_collections', attributes: 'data-armada-arrow-text' %}
+              {% render 'armament-arrow' with icon: 'arrow-right', classes: '-translate-x-xs text-headings' %}
+            </div>
+          </a>
+        </div>
+      {% endif %}
+
+      {% if predictive_search.resources.products.size > 0 %}
+        <div class="flex-col pt-l lg:py-xl px-xl lg:px-0 row-start-1 row-end-2 col-start-1 col-end-3 lg:col-start-3 lg:col-end-4 lg:row-start-1 lg:row-end-2 {% if predictive_search.resources.collections.size > 0 %}lg:pl-0 xl:pl-0{% endif %}" data-armada-selector="product-results-wrapper">
+          <div class="relative mb-l lg:mb-xl" data-armada-selector="product-results-header">
+            {% render 'armament-heading' with tag: 'h4', heading_type: 'heading-4', heading_content: products_heading, classes: 'col-start-1 col-end-2 !pb-0', data_aid: 'predictive_search_product_heading' %}
+
+            <div class="flex absolute right-0 top-1/2 -translate-y-1/2">
+              <a href="{{ routes.search_url | append: '?type=product&options%5Bprefix%5D=last&q=' | append: predictive_search.terms }}">
+                <span class="sr-only">{{ view_all_products }}</span>
+                <div class="flex flex-row gap-xs items-center" data-armada-animation="arrow">
+                  {% render 'armament-heading' with tag: 'h5', heading_content: view_all, classes: 'text-h5 col-start-2 col-end-3', data_aid: 'predictive_search_view_all_products', attributes: 'data-armada-arrow-text' %}
+                  {% render 'armament-arrow' with icon: 'arrow-right', classes: '-translate-x-xs text-headings' %}
+                </div>
+              </a>
+
+              <div class="close-icon-results cursor-pointer z-20 flex justify-end items-center mt-0 w-11 h-11 group" {{ close_icon_attrs }}>
+                {% render 'armament-icon' with icon: 'cancel', has_link: false %}
+              </div>
+            </div>
+          </div>
+          <div data-armada-selector="product-results-container-desktop" class="hidden lg:grid grid-cols-6 gap-xs md:gap-xl">
+            {% for product in predictive_search.resources.products %}
+              {% render 'ship-product-card-simple' with card_product: product, aspect_ratio: 'square', block_order: 'image,title,price', position: 'top', disable_quick_view: true, card_price_classes: 'text-b2' %}
+            {% endfor %}
+          </div>
+          <div data-armada-selector="product-results-container-mobile">
+            <slider-engine
+              mode="horizontal"
+              arrows="false"
+              mobile-indicator="true"
+              visible-slides='{ "sm": 2 }'
+              class="block lg:hidden group relative overflow-hidden hover:overflow-visible focus-within:overflow-visible"
+              tabindex="0"
+              data-name="scrollbar-target"
+            >
+              <div class="block overflow-hidden mb-s" data-name="slider-wrap">
+                <ul
+                  data-name="slider"
+                  data-armada-animation="general"
+                  class="flex"
+                  role="list"
+                  data-armada-selector="product-results-container-mobile"
+                >
+                {% for product in predictive_search.resources.products %}
+                  <li class="theme-slider-gap-x" slide-num="{{ forloop.index }}" data-name="slide">{% render 'ship-product-card-simple' with card_product: product, aspect_ratio: 'square', block_order: 'image,title,price', position: 'top' %}</li>
+                {% endfor %}
+                </ul>
+              </div>
+
+              <template>
+                <div data-name="mobile-indicator" class="block">
+                  {% render 'armament-scroll-bar' with classes: 'lg:pb-xl', item_count: predictive_search.resources.products.size, parent: 'slider-engine', target: 'slider', indicator: 'progress' %}
+                </div>
+              </template>
+            </slider-engine>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  {% endif %}
+{% endif %}

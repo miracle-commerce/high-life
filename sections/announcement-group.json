@@ -1,0 +1,37 @@
+{
+  "type": "custom.announcement",
+  "name": "Announcement Group",
+  "sections": {
+    "announcement-bar": {
+      "type": "ship-announcement-bar",
+      "blocks": {
+        "announcement_1": {
+          "type": "announcement",
+          "settings": {
+            "announcement_text": "PROMOTE DISCOUNT SAVINGS"
+          }
+        },
+        "announcement_2": {
+          "type": "announcement",
+          "settings": {
+            "announcement_text": "PROMOTE FREE SHIPPING"
+          }
+        }
+      },
+      "block_order": [
+        "announcement_1",
+        "announcement_2"
+      ],
+      "settings": {
+        "show_announcement": false,
+        "enable_sticky_announcement": false,
+        "rotation_interval": 5,
+        "show_arrows": true,
+        "section_color_scheme": "accent-1"
+      }
+    }
+  },
+  "order": [
+    "announcement-bar"
+  ]
+}

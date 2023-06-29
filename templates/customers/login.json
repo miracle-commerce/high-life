@@ -1,0 +1,12 @@
+{
+  "sections": {
+    "main": {
+      "type": "ship-customer-login",
+      "settings": {
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

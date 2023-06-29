@@ -1,0 +1,92 @@
+{% comment %}
+    Renders a product variant 'swatch' option that displays a color or image
+    Accepts:
+    - name: {String} value of the name attribute of the input
+    - id: {String} value of the id attribute of the input
+    - value: {String} value of the value attribute of the input
+    - checked: {Boolean} adds a checked attribute to the input
+    - attributes: {String} custom attributes of the element, eg. data attribute or aria-label
+    - disabled {Boolean} Set to true to disable radio inputs (for non interactive swatches)
+    - color_dropper: {String} Hex code from a color dropper metafield selection
+    - image_upload: {String} URL to an image
+    - border_radius: {Boolean} will add a 5px border radius to the swatch if true (optional)
+    - label_classes: {String} add custom classes to the label element (optional)
+    - has_checked_state: {Boolean} If set to true, a 1.5px border will appear around the currently selected swatch.
+    - option_id: {Number} eg. product.id
+    - touch_size: {String} Size in pixels of touch target for an individual swatch
+
+    Usage:
+    {% for value in option.values %}
+      {%- liquid
+        assign id = section.id | append: '-' | append: option.name | append: '-' | append: forloop.index0
+        assign checked = false
+        if forloop.index0 == 0
+          assign checked = true
+        endif
+      -%}
+      {% render 'armament-swatch-option' with name: option.name, id: id, value: value, checked: checked %}
+    {% endfor %}
+
+    Note:
+    Requires image file names to take the handle format, eg. canyon-pink.png for 'Canyon pink' option name
+{% endcomment %}
+
+{% liquid
+  if checked == blank
+    assign checked = false
+  endif
+
+  assign touch_size = touch_size | default: 44
+  assign swatch_size = touch_size | minus: 8
+%}
+
+<style>
+  .armament-swatch-option--{{ id }} label:after {
+    {%- if color_dropper -%}
+      background-color: {{ color_dropper }};
+    {%- elsif image_upload -%}
+      background-color: {{ value | split: ' ' | last | handle }};
+      background-image: url({{ image_upload }});
+    {%- else -%}
+      background-color: {{ value | split: ' ' | last | handle }};
+      background-image: url({{ value | handle | append: '.png' | file_url }});
+    {%- endif -%}
+  }
+  .armament-swatch-option--{{ id }} label {
+    width: {{ touch_size | append: 'px'}};
+    height: {{ touch_size | append: 'px'}};
+  }
+  .armament-swatch-option--{{ id }} label:after,
+  .armament-swatch-option--{{ id }} label:before {
+    width: {{ swatch_size | append: 'px'}};
+    height: {{ swatch_size | append: 'px'}};
+  }
+</style>
+
+<div
+  class="inline-block armament-swatch-option armament-swatch-option--{{ id }}"
+  data-name="swatch-option"
+>
+  <input
+    type="radio"
+    id="{{ id }}"
+    name="{{ name }}"
+    value="{{ value | escape }}"
+    class="sr-only{% if has_checked_state %} peer{% endif %}"
+    {% if attributes %}{{ attributes }}{% endif %}
+    {% if checked %}checked{% endif %}
+    {% if disabled %}disabled role="presentation"{% endif %}
+    {% if option_id %}data-swatch-product-id="{{ option_id }}"{% endif %}
+    tabindex="-1"
+  >
+  <label
+    for="{{ id }}"
+    {% if option_id %}data-swatch-product-id="{{ option_id }}"{% endif %}
+    class="grid grid-cols-1 grid-rows-1 items-center justify-center relative text-h6 font-heading heading-font-styles text-body{% unless disabled %} cursor-pointer{% endunless %} before:relative before:m-auto before:col-start-1 before:col-end-2 before:row-start-1 before:row-end-2 before:top-0 after:relative after:border after:rounded-theme after:border-theme after:m-auto after:col-start-1 after:col-end-2 after:row-start-1 after:row-end-2 after:top-0 after:bg-center after:bg-cover after:bg-no-repeat{% if border_radius %} after:rounded-[2px] before:rounded-[2px]{% endif %}{% if label_classes %} {{ label_classes }}{% endif %}{% if has_checked_state %} peer-checked:after:border-body peer-checked:after:border-selected{% endif %}"
+    data-aid="swatch-option"
+    data-armada-animation="swatch"
+    tabindex="0"
+  >
+    <span class="sr-only">{{ value }}</span>
+  </label>
+</div>

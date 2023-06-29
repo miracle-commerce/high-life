@@ -1,0 +1,26 @@
+{% render 'flotilla-filters-topbar' with 
+  enable_filtering: section.settings.enable_filtering, 
+  enable_sorting: section.settings.enable_sorting,
+  results: collection 
+%}
+
+{% schema %}
+{
+  "class": "max-w-max collection-main-filters",
+  "name": "Collection filters",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "enable_filtering",
+      "label": "Enable filter",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_sorting",
+      "label": "Enable sort",
+      "default": true
+    }
+  ]
+}
+{% endschema %}

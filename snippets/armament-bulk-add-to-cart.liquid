@@ -1,0 +1,47 @@
+{% comment %}
+    Renders an add to cart button for multiple products.
+
+    Accepts:
+    - bulk_products: {Array} Array of product Liquid objects
+    - button_label: {String} Button label
+
+    Usage:
+    {% render 'armament-bulk-add-to-cart' with bulk_products: recommendations.products, button_label: 'Add extras' %}
+{% endcomment %}
+
+{% assign bulk_products = bulk_products | where: 'available', true %}
+{%- capture form_data -%}
+  {
+    "items": [{% for bulk_product in bulk_products %}
+      {
+          "id": "{{ bulk_product.selected_or_first_available_variant.id }}",
+          "quantity": 1
+      }{% if forloop.last != true %},{% endif %}{% endfor %}
+    ]
+  }
+{%- endcapture -%}
+
+<bulk-add-to-cart
+  data-armada-form-data="{{ form_data | escape }}"
+  class="block max-w-[200px] w-full"
+  {% if attributes %} {{ attributes }}{% endif %}
+>
+  {% render 'armament-button' with attributes: 'data-armada-selector="bulk-add-button"', content: button_label, classes: 'w-full', data_aid: 'bulk-add-button' %}
+  <template>
+    {%- liquid
+      assign addingString = 'products.product.adding_only' | t
+      assign addingToCartString = 'products.product.adding' | t
+      assign loadingAttributes = 'data-button-loading disabled aria-label="' | append: addingToCartString | append: '"'
+      render 'armament-button' with content: addingString, loading: true, attributes: loadingAttributes, classes: 'w-full', data_aid: 'button-adding', type: 'button'
+  
+      assign addedString = 'products.product.added' | t
+      assign addedToCartString = 'products.product.added_to_cart' | t
+      assign addedAttributes = 'data-button-added disabled aria-label="' | append: addedToCartString | append: '"'
+      render 'armament-button' with content: addedString, attributes: addedAttributes, classes: 'w-full opacity-20', data_aid: 'button-added', type: 'button'
+    -%}
+  </template>
+</bulk-add-to-cart>
+
+<safe-load-scripts>
+  <script src="{{ 'component-bulk-add-to-cart.min.js' | asset_url }}" defer="defer" type="module" data-armada-load-key="bulk-add-to-cart"></script>
+</safe-load-scripts>

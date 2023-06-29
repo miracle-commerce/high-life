@@ -1,0 +1,49 @@
+{
+  "type": "custom.overlay",
+  "name": "Overlay Group",
+  "sections": {
+    "store-notifications": {
+      "type": "engine-toast",
+      "settings": {
+      }
+    },
+    "product-badges": {
+      "type": "engine-badges-settings",
+      "blocks": {
+        "engine-badges-settings-0": {
+          "type": "badge_sold_out",
+          "settings": {
+            "badge_text": "Sold out",
+            "badge_color_scheme": "accent-3"
+          }
+        },
+        "engine-badges-settings-1": {
+          "type": "badge_sale",
+          "settings": {
+            "badge_text": "Sale",
+            "badge_color_scheme": "accent-1"
+          }
+        },
+        "badge_custom": {
+          "type": "badge_custom",
+          "settings": {
+            "badge_text": "myCustomBadge",
+            "badge_color_scheme": "accent-1"
+          }
+        }
+      },
+      "block_order": [
+        "engine-badges-settings-0",
+        "engine-badges-settings-1",
+        "badge_custom"
+      ],
+      "settings": {
+        "num_badges": 1
+      }
+    }
+  },
+  "order": [
+    "store-notifications",
+    "product-badges"
+  ]
+}

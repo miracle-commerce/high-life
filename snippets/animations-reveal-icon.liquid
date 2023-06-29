@@ -1,0 +1,77 @@
+{% comment %}
+    Reveals an icon on hover.
+
+    Accepts:
+    - selector {String} The CSS selector (required)
+    - sub_selector {String} The selector of the element relative to the icon (required)
+    - is_nav_item {Boolean} set to true if we're referencing a nav item and not a button
+
+    Usage:
+    {% render 'animations-reveal-icon' with selector: '[data-armada-animation="on-page-navigation"]', sub_selector: '[data-unstyled-button-text]', transition: general_transition %}
+{% endcomment %}
+
+{% capture iconsvg %}
+  {% render 'armament-icon' with icon: 'arrow-right-static' %}
+{% endcapture %}
+
+{% capture icon %}data:image/svg+xml;charset=UTF-8,{{ iconsvg | strip_newlines | strip }}{% endcapture %}
+
+<style>
+  @media (prefers-reduced-motion: no-preference) {
+    {{ selector }} {
+      transition: {{ transition }};
+    }
+
+    {{ selector }}:not(:disabled) {{ sub_selector }} {
+      transition: {{ transition }};
+      transform: translateX(-10px);
+    }
+
+    {{ selector }}:not(:disabled):hover {{ sub_selector }},
+    {{ selector }}:not(:disabled):focus {{ sub_selector }} {
+      transform: translateX(-2px);
+    }
+
+    {{ selector }}:not(:disabled) {{ sub_selector }}:before {
+      display: inline-block;
+      content: "";
+      -webkit-mask: url('{{ icon }}') no-repeat 50% 50%;
+      mask: url('{{ icon }}') no-repeat 50% 50%;
+      -webkit-mask-size: cover;
+      mask-size: cover;
+      width: 16px;
+      height: var(--font-size-h6);
+      background-color: var(--colors-background);
+      margin-right: 0.3rem;
+      transform: translateX(-16px);
+      transition: all .25s ease;
+    }
+
+    {{ selector }}:not(:disabled):hover {{ sub_selector }}:before,
+    {{ selector }}:not(:disabled):focus {{ sub_selector }}:before {
+      transform: translateX(0);
+    }
+
+    {{ selector }}[data-armada-animation$="button-secondary"]:not(:disabled) {{ sub_selector }}:before {
+      background-color: var(--colors-body-text);
+    }
+
+    {% if is_nav_item %}
+      {{ selector }} {{ sub_selector }}:before {
+        background-color: var(--colors-headings) !important;
+      }
+
+      {{ selector }}[data-active-nav-item="true"] {{ sub_selector }}:before,
+      {{ selector }}[data-active-nav-item="true"]:not(:disabled) {{ sub_selector }} {
+        transform: translateX(0);
+      }
+    {% endif %}
+  }
+
+  {{ selector }} {{ sub_selector }} {
+    display: block;
+    overflow: hidden;
+    width: fit-content;
+    margin: 0 auto;
+  }
+</style>

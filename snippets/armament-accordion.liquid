@@ -1,0 +1,109 @@
+{% comment %}
+    Renders an accordion
+
+    Accepts:
+    - summary_header {String} This acts as the accordion item header
+    - summary_header_style {String} Accepts 'heading' to apply heading styles (default), or 'body' to apply body text styles.
+    - summary_content {String} This will be the content that displays when the accordion is open
+    - prose {Boolean} Set to true if summary content is rich text (to ensure .prose styles are applied)
+    - summary_is_object (optional) {Boolean} Set to true if we want to populate the summary with values from an object (see collection filters as example)
+    - summary_object (optional) {Object} The object we want to get values from
+    - details_class {String} (Optional) Use if you need to apply a custom class to the details element
+    - summary_class {String} (Optional) Use if you need to apply a custom class to the summary element
+    - content_classes {String} classes to add to the accordion content
+    - border_classes {String} these classes will affect the '<hr>' element which acts as the border between accordion elements
+    - textarea_id {String} (Optional) Value of the id attribute if accordion is a textarea
+    - textarea_name {String} (Optional) Value of the name attribute if accordion is a textarea
+    - textarea_content {String} (Optional) Text content if accordion is a textarea
+    - data_aid: {String} this will apply to the input element (will have a default value if left blank)
+    - attributes: {String} attributes to add to the details element
+    - shopify_attributes: {Object} required for the theme preview inspector (required)
+    - block_id: {Object} required for theme editor events (block select/deselect) (optional)
+    - show_icons: {Boolean} Show or hide the "plus/minus" icons (shows by default)
+
+    Usage:
+    <div class="accordion-wrapper">
+      {% for block in section.blocks %}
+        {% render 'armament-accordion' with summary_header: block.title, summary_content: block.description, details_class: "p-s" %}
+      {% endfor %}
+    </div>
+    {% render 'armament-accordion' with summary_header: 'Add note', textarea_id: 'cart-note', textarea_name: 'note', textarea_content: cart.note %}
+{% endcomment %}
+
+{% if show_icons == false %}
+  {% assign show_icons = false %}
+{% else %}
+  {% assign show_icons = true %}
+{% endif %}
+
+{% capture plus_icon %}
+  {% render 'armament-icon' with icon: 'plus', classes: 'plus-icon' %}
+{% endcapture %}
+
+{% capture minus_icon %}
+  {% render 'armament-icon' with icon: 'minus', classes: 'minus-icon' %}
+{% endcapture %}
+
+{%-liquid
+  assign summary_styles = 'font-heading heading-font-styles'
+  if summary_header_style == 'body'
+    assign summary_styles = 'text-b1 text-body font-body-weight font-body font-body-style'
+  endif
+-%}
+
+<details
+  is="details-accordion"
+  {% unless request.design_mode %}onmouseover="loadAccordionScript()"{% endunless %}
+  class="bg-page text-body armament-details-element max-w-full {{ details_class }}{% if textarea_id %} armament-details-element--textarea{% endif %}{% if has_top_border %} first-of-type:border-t border-theme stroke-body text-body{% endif %}"
+  data-armada-animation="general"
+  {% if data_aid %}data-aid="{{ data_aid }}"{% else %}data-aid="armament-accordion"{% endif %}
+  {% if attributes %}{{ attributes }}{% endif %}
+  {% if shopify_attributes %}{{ shopify_attributes }}{% endif %}
+  {% if block_id %}block-id="{{ block_id }}"{% endif %}
+>
+  {% if summary_is_object %}
+    <summary data-armada-animation="icon" class="list-none {{ summary_styles }} leading-none cursor-pointer flex justify-between items-center outline-offset-[-3px] py-l md:py-xl group {{ summary_class }}" role="button" aria-expanded="false">
+      {{ summary_header }}
+      {% if show_icons %}<span class="pl-[20px]">{{ plus_icon }}{{ minus_icon }}</span>{% endif %}
+    </summary>
+    <div data-armada-selector="accordion-details-content" data-armada-animation="fade"{% if content_classes %} class="{{ content_classes }}"{% endif %}>
+      {{ summary_object }}
+    </div>
+  {% else %}
+    <summary data-armada-animation="icon" class="list-none {{ summary_styles }} leading-none cursor-pointer flex justify-between items-center outline-offset-[-3px] py-l md:py-xl group {{ summary_class }}" role="button" aria-expanded="false">
+      {% if textarea_id %}
+        <label for="{{ textarea_id }}" class="pointer-events-none text-h6 {{ summary_styles }}">{{ summary_header }}</label>
+      {% else %}
+        {{ summary_header }}
+      {% endif %}
+      {% if show_icons %}<span class="pl-[20px]">{{ plus_icon }}{{ minus_icon }}</span>{% endif %}
+    </summary>
+    <div data-armada-selector="accordion-details-content" data-armada-animation="fade"{% if content_classes %} class="{{ content_classes }}"{% endif %}>
+      {% if textarea_id %}
+        {% if textarea_id contains 'cart' %}
+          {% render 'armament-textarea' with id: textarea_id, name: textarea_name, content: textarea_content, classes: 'w-full pb-l md:pb-xl', rows: 5, cart_form_id: 'cart' %}
+        {% else %}
+          {% render 'armament-textarea' with id: textarea_id, name: textarea_name, content: textarea_content, classes: 'w-full pb-l md:pb-xl', rows: 5 %}
+        {% endif %}
+      {% elsif prose %}
+        <div class="pb-l md:pb-xl prose prose-h1:text-headings prose-h2:text-headings prose-h3:text-headings prose-h4:text-headings prose-figcaption:text-body prose-blockquote:text-body prose-ol:block prose-ul:block !max-w-full">{{ summary_content }}</div>
+      {% else %}
+        <div class="pb-l md:pb-xl">{{ summary_content }}</div>
+      {% endif %}
+    </div>
+  {% endif %}
+</details>
+<hr class="stroke-body text-body border-theme {{ border_classes }}">
+
+<script>
+  function loadAccordionScript() {
+    import("{{ 'component-accordion-accessibility.min.js' | asset_url }}");
+  }
+</script>
+
+{% comment %} Required for theme editor events {% endcomment %}
+{% if request.design_mode %}
+  <safe-load-scripts>
+    <script src="{{ 'component-accordion-accessibility.min.js' | asset_url }}" defer="defer" type="module" data-armada-load-key="accordion-accessibility"></script>
+  </safe-load-scripts>
+{% endif %}

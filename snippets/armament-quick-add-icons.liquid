@@ -1,0 +1,42 @@
+{% comment %}
+    Renders quick add show/hide icons.
+
+    Accepts:
+    - quick_product {Object} Shopify product object
+    - icon_wrapper_classes {String} Custom wrapper classes
+    - scope_id {String} limits variant change interaction to components with a matching scope id, eg. section.id (optional)
+
+    Usage:
+    {% render 'armament-quantity-add-icons' with x: y %}
+{% endcomment %}
+
+<div data-name="quick-add-icons-{{ quick_product.id }}-{{ scope_id }}">
+  {% if quick_product.has_only_default_variant %}
+    {% assign aria_add = 'products.card.add' | t: thisProduct: quick_product.title %}
+    <button
+      class="{{ icon_wrapper_classes }} min-w-[44px] flex justify-end"
+      data-aid="quick-add-add-to-cart-icon"
+      data-name="quick-add-add-to-cart-icon"
+      aria-label="{{ aria_add }}"
+      data-armada-animation="icon"
+    >
+      {% render 'armament-icon' with icon: 'add-to-cart', width: '18px', height: '18px' %}
+    </button>
+  {% else %}
+    <div
+      class="{{ icon_wrapper_classes }} min-w-[44px] flex justify-end"
+      data-name="quick-add-show-hide-trigger"
+      data-aid="quick-add-show-hide-trigger"
+      data-armada-animation="icon"
+    >
+      {% assign aria_show = 'products.card.open' | t: thisProduct: quick_product.title %}
+      <button data-name="show-label" data-aid="quick-add-show-icon" aria-label="{{ aria_show }}">
+        {% render 'armament-icon' with icon: 'add-to-cart', attributes: attr, width: '18px', height: '18px' %}
+      </button>
+      {% assign aria_hide = 'products.card.close' | t: thisProduct: quick_product.title %}
+      <button data-name="hide-label" class="hidden" data-aid="quick-add-hide-icon" aria-label="{{ aria_hide }}">
+        {% render 'armament-icon' with icon: 'cancel', width: '18px', height: '18px' %}
+      </button>
+    </div>
+  {% endif %}
+</div>

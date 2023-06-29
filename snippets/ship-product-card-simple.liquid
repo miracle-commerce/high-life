@@ -1,0 +1,147 @@
+{% comment %}
+    Renders a product card without needing to pass section.blocks
+
+    Accepts:
+    - card_product {Object} Shopify product object.
+    - block_order {String} Comma separated list denoting which order blocks are printed and in which order.
+    - align: {String} alignment of content under the image. One of: 'left', 'center', 'right'. Defaults to 'left' if blank.
+    - classes: {String} Additional classes for the element.
+    - enable_quick_view: {Boolean} Show 'quick view' button over gallery or image.
+    - aspect_ratio: {Int} Optional. Normalise all images to a set aspect ratio
+    - position: {String} Optional. If the image is cropped via aspect ratio. See case switch below.
+    - card_scope: {String} eg. block/section
+    - card_font_size: {String} font size classes (optional)
+    - card_price_classes {String} classes for the price (optional)
+
+    Usage:
+    {% render 'ship-product-card-simple' with card_product: product, block_order: 'image, title, price, quick-add' %}
+{% endcomment %}
+
+{% liquid
+  if card_scope == 'block' and block_id != blank
+    assign card_scope_id = block_id 
+  else 
+    assign card_scope_id = section.id
+  endif
+
+  if align == blank
+    assign align = 'left'
+  endif
+
+  if block_order == blank
+    assign block_order = 'image,title,price'
+  endif
+
+  assign block_names = block_order | split: ','
+
+  case position
+    when 'center'
+      assign pclass = 'object-center'
+    when 'left'
+      assign pclass = 'object-left'
+    when 'left-top'
+      assign pclass = 'object-left-top'
+    when 'left-bottom'
+      assign pclass = 'object-left-bottom'
+    when 'right'
+      assign pclass = 'object-right'
+    when 'right-top'
+      assign pclass = 'object-right-top'
+    when 'right-bottom'
+      assign pclass = 'object-right-bottom'
+    when 'top'
+      assign pclass = 'object-top'
+    when 'bottom'
+      assign pclass = 'object-bottom'
+    else
+      assign pclass = 'object-center'
+  endcase
+
+  if gallery == 'show_second_image' and card_product.media.size > 1
+    assign hide_main_img = 'group-hover:hidden '
+  endif
+
+  if aspect_ratio == blank or aspect_ratio == 'natural'
+    assign img_classes = 'relative product-card-img ' | append: hide_main_img
+    assign second_img_classes = 'relative hidden group-hover:block'
+    assign natural_img_aspect_ratio = true
+  else
+    assign img_classes = 'absolute w-full h-full z-0 object-cover product-card-img ' | append: hide_main_img | append: pclass
+    assign second_img_classes = 'hidden absolute w-full h-full z-0 object-cover group-hover:block ' | append: pclass
+  endif
+%}
+{% if settings.custom_badges %}
+  {% capture badges %}
+    <div class="absolute top-s left-0 z-50 pointer-events-none">
+      {% render 'engine-badges' with badges_product: card_product %}
+    </div>
+  {% endcapture %}
+{% endif %}
+
+<product-card
+  class="max-w-full block no-js-hidden{% if classes %} {{ classes }}{% endif %}"
+  block-order="{{ block_order }}"
+  data-aid="product-card"
+>
+  {% for block_name in block_names %}
+    {% if block_name == 'image' %}
+      <div
+        data-name="image"
+        class="pb-s md:pb-m last:pb-0 relative"
+        {{ block.shopify_attributes }}
+      >
+        {{ badges }}
+        {% render 'ship-product-card-image-variant-switcher' with section_id: section.id, card_image_product: card_product, aspect_ratio: aspect_ratio, img_classes: img_classes, second_img_classes: second_img_classes, image_hover_effect: gallery, scope_id: section.id %}
+      </div>
+    {% endif %}
+    {% if block_name == 'title' %}
+      <div
+        data-name="title"
+        class="text-{{ align }} text-body pb-s{% if card_font_size %} {{ card_font_size }}{% else %} text-b2{% endif %}"
+        {{ block_attr_title }}
+      >
+        <a href="{{ card_product.url }}" title="{{ card_product.title | escape }}">
+          {{ card_product.title }}
+        </a>
+      </div>
+    {% endif %}
+    {% if block_name == 'price' %}
+      <div
+        data-name="price"
+        class="text-{{ align }} text-body pb-s{% if card_font_size %} {{ card_font_size }}{% else %} text-b2{% endif %}"
+        {{ block_attr_price }}
+      >
+        {% render 'armament-price', price_product: card_product, align: align, discount_type: settings.show_discount_savings, regular_price_classes: card_price_classes %}
+      </div>
+    {% endif %}
+    {% if block_name == 'swatch' %}
+      <div
+        data-name="swatch"
+        class="text-{{ align }} px-2 md:px-3"
+        {{ block_attr_swatch }}
+      >
+        {%- liquid
+          if settings.collection_hover_effect == 'show_slider'
+            assign change_on_hover = true
+          else
+            assign disable_swatches = true
+          endif
+        -%}
+        {% render 'armament-color-swatch' with swatch_product: card_product, identifiers: 'color,colour,couleur,colore,farbe,색,色,färg,farve', change_on_hover: change_on_hover, natural_img_aspect_ratio: natural_img_aspect_ratio, disabled: disable_swatches, scope_id: card_scope_id %}
+      </div>
+    {% endif %}
+    {% if block_name == 'quick-add' %}
+      <div
+        data-name="quick-add"
+        class="text-{{ align }} px-2 md:px-3"
+        {{ block_attr_quick_add }}
+      >
+        {% render 'ship-quick-add' with quick_product: card_product, scope_id: card_scope_id %}
+      </div>
+    {% endif %}
+  {% endfor %}
+</product-card>
+
+<safe-load-scripts class="hidden">
+  <script src="{{ 'component-product-card.min.js' | asset_url }}" defer="defer" type="module" data-armada-load-key="product-card"></script>
+</safe-load-scripts>

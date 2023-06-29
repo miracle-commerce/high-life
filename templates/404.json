@@ -1,0 +1,13 @@
+{
+  "sections": {
+    "main": {
+      "type": "ship-404",
+      "settings": {
+        "section_color_scheme": "accent-2"
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "sections": {
+    "page-header": {
+      "type": "ship-page-main-header",
+      "settings": {
+        "show_page_title": true,
+        "section_color_scheme": "general"
+      }
+    },
+    "page-content": {
+      "type": "armament-page-main-content",
+      "settings": {
+      }
+    }
+  },
+  "order": [
+    "page-header",
+    "page-content"
+  ]
+}

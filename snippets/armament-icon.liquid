@@ -1,0 +1,44 @@
+{% comment %}
+    Renders an SVG icon.
+
+    Accepts:
+    - icon {String} Which icon you'd like to render.
+    - classes: {String} custom classes to apply to the icon.
+    - width {Int} Optional specify a width.
+    - height {Int} Optional specify a height.
+    - fill {String} Optional specify a fill color.
+    - attributes: {String} custom attributes for the svg element
+    - has_link: {Boolean} use this if we want to add a link around the icon
+    - link_attributes: {String} custom attributes for the svg wrapper element
+    - link_href: {Object} the link href
+    - link_label: {String} the link's aria-label for accessiblity purposes
+    - link_classes: {String} classes to add to the link
+
+    Usage:
+    {% render 'armament-icon' with icon: 'arrow-left' %}
+
+    Specify fill color:
+    {% render 'armament-icon' with icon: 'arrow-left', fill: '#FFFFFF' %}
+
+    Specify size and any margins:
+    {% render 'armament-icon' with icon: 'cancel', width: 10, height: 10, margin: '0 0 0 10px' %}
+
+    Include hover animation:
+    {% render 'armament-icon' with icon: 'play', link_attributes: 'data-armada-animation="icon"' %}
+{% endcomment %}
+
+{% liquid
+  if fill == blank
+    assign fill = 'currentColor'
+    assign opposite_fill = 'white'
+  else
+    assign brightness = fill | color_brightness
+    if brightness < 128
+      assign opposite_fill = fill | color_lighten: 100
+    else
+      assign opposite_fill = fill | color_darken: 100
+    endif
+  endif
+%}
+
+{% render 'icon-renders' with icon: icon, classes: classes, width: width, height: height, fill: fill, attributes: attributes, hide_tail: hide_tail, has_link: has_link, link_attributes: link_attributes, link_href: link_href, link_label: link_label, link_classes: link_classes %}

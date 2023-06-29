@@ -1,0 +1,222 @@
+{
+  "wrapper": "div.product-template-wrapper",
+  "sections": {
+    "gallery": {
+      "type": "flotilla-product-main-gallery",
+      "settings": {
+        "gallery_style": "thumbnails",
+        "enable_zoom": true,
+        "enable_video_looping": true
+      }
+    },
+    "main": {
+      "type": "flotilla-product-main-form",
+      "blocks": {
+        "title": {
+          "type": "title",
+          "settings": {
+            "show_vendor": false,
+            "show_sku": false
+          }
+        },
+        "price": {
+          "type": "price",
+          "settings": {
+            "show_tax_included_text": false,
+            "show_shipping_policy": false
+          }
+        },
+        "highlight": {
+          "type": "highlight",
+          "disabled": true,
+          "settings": {
+          }
+        },
+        "options": {
+          "type": "options",
+          "settings": {
+            "options_type": "buttons",
+            "preselect_variant": true,
+            "color_swatch_identifier": "color,colour,couleur,colore,farbe,색,色,färg,farve"
+          }
+        },
+        "quantity": {
+          "type": "quantity",
+          "settings": {
+          }
+        },
+        "f67976f0-4aa5-4662-848a-fffb2e4f9396": {
+          "type": "shopify:\/\/apps\/hulk-form-builder\/blocks\/form-block\/b6b8dd14-356b-4725-a4ed-77232212b3c3",
+          "settings": {
+            "form_uuid": "LPWRfHraTFSg1s20CZYVDQ",
+            "form_settings": false,
+            "font_color": "#000000",
+            "size": 14,
+            "input_background_color": "#FFF",
+            "input_background_color_focus": "#F4DADA",
+            "input_border_radius": 1,
+            "input_border_color": "#ebe9e9",
+            "input_border_color_focus": "#2D2727",
+            "input_font_color": "#3D3131",
+            "input_size": 14,
+            "border_color": "#121212",
+            "border_radius": 2,
+            "border": 1,
+            "fill_color": "#EBE9E9",
+            "padding": 35,
+            "form_width": 600,
+            "btn_text": "Submit",
+            "sub_btn_txt_color": "#F3F3F3",
+            "sub_btn_bg_color": "#3F3333",
+            "sub_btn_font_size": 14,
+            "sub_btn_bdr_color": "#FFFFFF",
+            "sub_btn_bdr_rad": 3,
+            "sub_btn_bdr_width": 1,
+            "fonts": "Times New Roman"
+          }
+        },
+        "0f5eac91-1b29-4280-b751-a236ad68e72b": {
+          "type": "shopify:\/\/apps\/hulk-form-builder\/blocks\/form-block\/b6b8dd14-356b-4725-a4ed-77232212b3c3",
+          "disabled": true,
+          "settings": {
+            "form_uuid": "MMmSnxkmHoBis5_DM7-2QQ",
+            "form_settings": false,
+            "font_color": "#000000",
+            "size": 14,
+            "input_background_color": "#FFF",
+            "input_background_color_focus": "#F4DADA",
+            "input_border_radius": 1,
+            "input_border_color": "#ebe9e9",
+            "input_border_color_focus": "#2D2727",
+            "input_font_color": "#3D3131",
+            "input_size": 14,
+            "border_color": "#121212",
+            "border_radius": 2,
+            "border": 1,
+            "fill_color": "#EBE9E9",
+            "padding": 35,
+            "form_width": 600,
+            "btn_text": "Submit",
+            "sub_btn_txt_color": "#F3F3F3",
+            "sub_btn_bg_color": "#3F3333",
+            "sub_btn_font_size": 14,
+            "sub_btn_bdr_color": "#FFFFFF",
+            "sub_btn_bdr_rad": 3,
+            "sub_btn_bdr_width": 1,
+            "fonts": "Times New Roman"
+          }
+        },
+        "stock_warning": {
+          "type": "stock-level-indicator",
+          "settings": {
+            "stock_range": 5,
+            "show_stock_count": false,
+            "in_stock_message": "Ready to ship",
+            "low_stock_message": "Selling fast",
+            "out_of_stock_message": "Back in soon",
+            "preorder_message": "Coming soon!"
+          }
+        },
+        "payment-buttons": {
+          "type": "payment-buttons",
+          "settings": {
+            "preorder": false
+          }
+        },
+        "description": {
+          "type": "description",
+          "settings": {
+            "enable_accordion": true,
+            "description_heading": "Details"
+          }
+        },
+        "share-buttons": {
+          "type": "social-sharing",
+          "settings": {
+          }
+        }
+      },
+      "block_order": [
+        "title",
+        "price",
+        "highlight",
+        "options",
+        "quantity",
+        "f67976f0-4aa5-4662-848a-fffb2e4f9396",
+        "0f5eac91-1b29-4280-b751-a236ad68e72b",
+        "stock_warning",
+        "payment-buttons",
+        "description",
+        "share-buttons"
+      ],
+      "settings": {
+      }
+    },
+    "product-specifications": {
+      "type": "flotilla-product-specifications",
+      "settings": {
+        "keys": "",
+        "subheading": "",
+        "heading": "",
+        "heading_alignment": "text-left",
+        "data_alignment": "text-left",
+        "desktop_image_height": "original",
+        "desktop_image_position": "above",
+        "bg_color_scheme": "general",
+        "card_color_scheme": "general"
+      }
+    },
+    "full-width-cross-sells": {
+      "type": "flotilla-full-width-cross-sells",
+      "blocks": {
+        "full-width-cross-sells-00": {
+          "type": "image",
+          "settings": {
+            "product_cards_aspect_ratio": "natural",
+            "product_cards_crop_position": "object-center",
+            "collection_hover_effect": "show_second_image"
+          }
+        },
+        "full-width-cross-sells-01": {
+          "type": "title",
+          "settings": {
+          }
+        },
+        "full-width-cross-sells-02": {
+          "type": "price",
+          "settings": {
+          }
+        },
+        "full-width-cross-sells-03": {
+          "type": "swatch",
+          "settings": {
+            "touch_size": "36"
+          }
+        }
+      },
+      "block_order": [
+        "full-width-cross-sells-00",
+        "full-width-cross-sells-01",
+        "full-width-cross-sells-02",
+        "full-width-cross-sells-03"
+      ],
+      "settings": {
+        "products_to_show": 3,
+        "subheading": "Promote the whole package",
+        "heading": "Cross-sells",
+        "text": "<p>Use this text to explain details of your products, or highlight cross-sell promotions.<\/p>",
+        "text_alignment": "left",
+        "product_display": "grid",
+        "enable_add_all_button": true,
+        "product_card_alignment": "left",
+        "color_scheme": "general"
+      }
+    }
+  },
+  "order": [
+    "gallery",
+    "main",
+    "product-specifications",
+    "full-width-cross-sells"
+  ]
+}

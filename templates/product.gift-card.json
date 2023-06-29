@@ -1,0 +1,169 @@
+{
+  "wrapper": "div.product-template-wrapper",
+  "sections": {
+    "gallery": {
+      "type": "flotilla-product-main-gallery",
+      "settings": {
+        "gallery_style": "thumbnails",
+        "enable_zoom": true,
+        "enable_video_looping": true
+      }
+    },
+    "main": {
+      "type": "flotilla-product-main-form",
+      "blocks": {
+        "title": {
+          "type": "title",
+          "settings": {
+            "show_vendor": false,
+            "show_sku": false
+          }
+        },
+        "price": {
+          "type": "price",
+          "settings": {
+            "show_tax_included_text": false,
+            "show_shipping_policy": false
+          }
+        },
+        "options": {
+          "type": "options",
+          "settings": {
+            "options_type": "buttons",
+            "preselect_variant": true,
+            "color_swatch_identifier": "value"
+          }
+        },
+        "quantity": {
+          "type": "quantity",
+          "settings": {
+          }
+        },
+        "payment-buttons": {
+          "type": "payment-buttons",
+          "settings": {
+            "preorder": false
+          }
+        },
+        "share-buttons": {
+          "type": "social-sharing",
+          "settings": {
+          }
+        },
+        "trust-content": {
+          "type": "trust-content",
+          "settings": {
+          }
+        },
+        "description": {
+          "type": "description",
+          "settings": {
+            "enable_accordion": false,
+            "description_heading": "Details"
+          }
+        }
+      },
+      "block_order": [
+        "title",
+        "price",
+        "options",
+        "quantity",
+        "payment-buttons",
+        "share-buttons",
+        "trust-content",
+        "description"
+      ],
+      "settings": {
+      }
+    },
+    "testimonials": {
+      "type": "ship-testimonials",
+      "blocks": {
+        "testimonials-00": {
+          "type": "testimonial",
+          "settings": {
+          }
+        }
+      },
+      "block_order": [
+        "testimonials-00"
+      ],
+      "settings": {
+        "section_color_scheme": "accent-1"
+      }
+    },
+    "apps_product-reviews_reviews": {
+      "type": "apps",
+      "settings": {
+      }
+    },
+    "icons-with-text": {
+      "type": "flotilla-icons-with-text",
+      "blocks": {
+        "icon_with_text-00": {
+          "type": "icon_with_text",
+          "settings": {
+          }
+        },
+        "icon_with_text-01": {
+          "type": "icon_with_text",
+          "settings": {
+          }
+        },
+        "icon_with_text-02": {
+          "type": "icon_with_text",
+          "settings": {
+          }
+        }
+      },
+      "block_order": [
+        "icon_with_text-00",
+        "icon_with_text-01",
+        "icon_with_text-02"
+      ],
+      "settings": {
+        "text_alignment": "center",
+        "section_width": "full-with-padding",
+        "section_color_scheme": "accent-1"
+      }
+    },
+    "accordion": {
+      "type": "ship-accordion-section",
+      "blocks": {
+        "accordion-00": {
+          "type": "tab_item",
+          "settings": {
+          }
+        },
+        "accordion-01": {
+          "type": "tab_item",
+          "settings": {
+          }
+        },
+        "accordion-02": {
+          "type": "tab_item",
+          "settings": {
+          }
+        }
+      },
+      "block_order": [
+        "accordion-00",
+        "accordion-01",
+        "accordion-02"
+      ],
+      "settings": {
+        "bg_color_scheme": "accent-2",
+        "subheading": "",
+        "heading": ""
+      }
+    }
+  },
+  "order": [
+    "gallery",
+    "main",
+    "testimonials",
+    "apps_product-reviews_reviews",
+    "icons-with-text",
+    "accordion"
+  ]
+}

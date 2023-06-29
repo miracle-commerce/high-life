@@ -1,0 +1,122 @@
+{% if settings.enable_animations %}
+  <armada-animation
+  class="hidden"
+  data-armada-animation-delay="{{ animation_delay | default: 100 }}"
+  >
+    <!-- General - misc. transforms (eg. modal) -->
+    {%- liquid
+      case settings.general_animation
+        when 'bounce'
+          render 'animations-bounce' with selector: '[data-armada-animation="general"]'
+          assign general_transition = 'all .9s cubic-bezier(.67,1.79,.14,.74)'
+        when 'ease'
+          render 'animations-ease' with selector: '[data-armada-animation="general"]'
+          assign general_transition = 'all .5s ease'
+        else
+          assign general_transition = 'all .5s ease'
+      endcase
+    -%}
+
+    <!-- Grid and block (eg. product cards) -->
+    {%- liquid
+      case settings.grid_animation
+        when 'slide_up'
+          render 'animations-slide-up' with selector: '[data-armada-animation="grid-item"]', fast: false
+          render 'animations-slide-up' with selector: '[data-armada-animation="grid-item-fast"]', fast: true
+        when 'eased_slide_up'
+          render 'animations-eased-slide-up' with selector: '[data-armada-animation="grid-item"]', fast: false
+          render 'animations-eased-slide-up' with selector: '[data-armada-animation="grid-item-fast"]', fast: true
+      endcase
+    -%}
+    <style>
+      [data-armada-animation^="grid"] {
+        overflow: hidden;
+      }
+    </style>
+
+    <!-- Button, on-page navigation (eg. blog navigation) and text links -->
+    {%- liquid
+      case settings.misc_animation
+        when 'style_1'
+          render 'animations-shutter-in' with selector: '[data-armada-animation^="button"]'
+          render 'animations-grow-underline' with selector: '[data-armada-animation="on-page-navigation"][data-active-nav-item="true"]'
+          render 'animations-opacity-fade-in' with selector: '[data-armada-animation="on-page-navigation"]', opacity_from: 'inherit'
+          render 'animations-remove-underline' with selector: '[data-armada-animation="text"]'
+          render 'animations-remove-underline' with selector: '.prose a'
+        when 'style_2'
+          render 'animations-reveal-icon' with selector: '[data-armada-animation^="button"]', sub_selector: '[data-armada-button-text]' transition: general_transition
+          render 'animations-reveal-icon' with selector: '[data-armada-animation="on-page-navigation"]', sub_selector: '[data-on-page-nav-text]', transition: general_transition, is_nav_item: true
+          render 'animations-remove-underline' with selector: '[data-armada-animation="text"]'
+          render 'animations-remove-underline' with selector: '.prose a'
+        when 'simple'
+          render 'animations-fade' with selector: '[data-armada-animation^="button"]'
+          render 'animations-opacity-fade-in' with selector: '[data-armada-animation="on-page-navigation"]', opacity_from: 'inherit'
+          render 'animations-fade' with selector: '[data-armada-animation="text"]'
+          render 'animations-fade' with selector: '.prose a'
+      endcase
+
+      unless settings.misc_animation == 'style_1'
+        render 'animations-fade' with selector: '.shopify-payment-button__button--unbranded:not(:disabled)'
+      endunless
+    -%}
+
+    <!-- Image on load (eg. image with text overlay) and image with link (eg. collection card) -->
+    {%- liquid
+      case settings.image_animation
+        when 'zoom'
+          render 'animations-zoom-load' with selector: '[data-armada-animation^="image-load"]'
+          render 'animations-zoom-link' with selector: '[data-armada-animation="image-link"]'
+        when 'bouncy_zoom'
+          render 'animations-bouncy-zoom-load' with selector: '[data-armada-animation^="image-load"]'
+          render 'animations-bouncy-zoom-link' with selector: '[data-armada-animation="image-link"]'
+      endcase
+    -%}
+
+    <!-- Arrow (eg. slider naviation) -->
+    {%- liquid
+      case settings.arrow_animation
+        when 'fade'
+          render 'animations-fade' with selector: '[data-armada-animation="arrow"]', sub_selector: '[data-armada-arrow-icon]'
+          render 'animations-fade' with selector: '[data-armada-animation="arrow"]', sub_selector: '[data-armada-arrow-text]'
+        when 'scroll'
+          render 'animations-scroll' with selector: '[data-armada-animation="arrow"]'
+        when 'shift'
+          render 'animations-shift' with selector: '[data-armada-animation="arrow"]', sub_selector: '[data-armada-arrow-icon]'
+        when 'tail'
+          render 'animations-tail' with selector: '[data-armada-animation="arrow"]', sub_selector: '[data-armada-arrow-icon]'
+      endcase
+    -%}
+
+    <!-- Interactive icons (eg. search icon) -->
+    {% render 'animations-fade' with selector: '[data-armada-animation="icon"]' %}
+
+    <!-- Menu links (eg. mega menu links) -->
+    {% render 'animations-fade' with selector: '[data-armada-animation="menu-link"]' %}
+
+    <!-- Fades (eg. slider navigation buttons) -->
+    <style>
+      [data-armada-animation="fade"] {
+        transition: opacity .3s ease-in-out, visibility .3s ease-in-out;
+      }
+    </style>
+
+    <!-- Pulses (eg. hotspots) -->
+    {% render 'animations-pulse' with selector: '[data-armada-animation="pulse"]' %}
+
+    <!-- Variant selects -->
+    <style>
+      [data-armada-animation="swatch"],
+      [data-armada-animation="swatch"]:before,
+      [data-armada-animation="swatch"]:after {
+        transition: border-color .3s ease-in-out;
+      }
+      [data-armada-animation="swatch"]:hover,
+      [data-armada-animation="swatch"]:hover:before,
+      [data-armada-animation="swatch"]:hover:after  {
+        border-color: var(--colors-body-text);
+      }
+    </style>
+
+  </armada-animation>
+  <script src="{{ 'engine-animation.min.js' | asset_url }}" defer="defer" type="module"></script>
+{% endif %}

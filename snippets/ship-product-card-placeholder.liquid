@@ -1,0 +1,88 @@
+{% comment %}
+    Renders a placeholder product card without needing to pass section.blocks or product object
+
+    Accepts:
+    - index: {Number} forloop index used for placeholder image, eg. forloop.index. Default value: 1 (optional)
+    - simple_title: {String} Produt title, eg. 'Banana'. Default value: Example product title (optional)
+    - simple_price: {Number} Product price, eg. 1000. Default value: 1999 (optional)
+    - align: {String} alignment of content. One of: 'left', 'center', 'right'. Defaults to 'left' if blank (optional)
+    - classes: {String} Additional classes for the element (optional)
+    - aspect_ratio: {Int} Optional. Normalise all images to a set aspect ratio (optional)
+    - position: {String} Optional. If the image is cropped via aspect ratio. See case switch below (optional)
+
+    Usage:
+    {% render 'ship-product-card-placeholder' with index: forloop.index, simple_title: 'Banana', simple_price: 1000, align: 'left' %}
+{% endcomment %}
+
+{% liquid
+  if index == blank
+    assign index = 1
+  else
+    assign index = index | modulo: 6 | plus: 1 
+  endif
+  if simple_title == blank
+    assign simple_title = 'Example product title'
+  endif
+  if simple_price == blank
+    assign simple_price = 1999
+  endif
+  if align == blank
+    assign align = 'left'
+  endif
+
+  assign block_order = 'image,title,price'
+
+  assign block_names = block_order | split: ','
+
+  case position
+    when 'center'
+      assign pclass = 'object-center'
+    when 'left'
+      assign pclass = 'object-left'
+    when 'left-top'
+      assign pclass = 'object-left-top'
+    when 'left-bottom'
+      assign pclass = 'object-left-bottom'
+    when 'right'
+      assign pclass = 'object-right'
+    when 'right-top'
+      assign pclass = 'object-right-top'
+    when 'right-bottom'
+      assign pclass = 'object-right-bottom'
+    when 'top'
+      assign pclass = 'object-top'
+    when 'bottom'
+      assign pclass = 'object-bottom'
+    else
+      assign pclass = 'object-center'
+  endcase
+
+  if aspect_ratio == blank or aspect_ratio == 'natural'
+    assign img_classes = 'relative product-card-img ' | append: hide_main_img
+  else
+    assign img_classes = 'absolute w-full h-full z-0 object-cover product-card-img ' | append: hide_main_img | append: pclass
+  endif
+%}
+  
+<product-card
+  class="max-w-full block no-js-hidden{% if classes %} {{ classes }}{% endif %}"
+  block-order="image,title,price"
+  data-aid="product-card"
+>
+  <div data-name="image" class="pb-s md:pb-m last:pb-0 relative">
+    {% assign placeholder = 'product-' | append: index %}
+    {% render 'armament-placeholder' with name: placeholder %}
+  </div>
+
+  <div data-name="title" class="text-{{ align }} text-body text-b2 pb-s">
+    <a href="#" title="{{ simple_title }}">{{ simple_title }}</a>
+  </div>
+
+  <div data-name="price" class="text-{{ align }} text-body text-b2 pb-s">
+    {% render 'armament-price', manual_price: simple_price, price_only: true %}
+  </div>
+</product-card>
+
+<safe-load-scripts class="hidden">
+  <script src="{{ 'component-product-card.min.js' | asset_url }}" defer="defer" type="module" data-armada-load-key="product-card"></script>
+</safe-load-scripts>

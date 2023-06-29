@@ -1,0 +1,18 @@
+<navigation-toggle
+  role="button"
+  data-armada-selector="navigation-toggle"
+  data-aid="mobile-navigation-toggle"
+  aria-expanded="false"
+  aria-controls="main-navigation"
+  aria-label="{{ 'general.navigation.open' | t }}"
+  tabindex="0"
+  class="lg:hidden w-11 h-11 flex items-center justify-start navigation-toggle" 
+  data-armada-animation="icon"
+>
+  {% render 'armament-icon' with icon: 'menu', attributes: 'data-armada-selector="mobile-menu-open-icon"' %}
+  {% render 'armament-icon' with icon: 'cancel', classes: 'hidden', attributes: 'data-armada-selector="mobile-menu-close-icon"' %}
+</navigation-toggle>
+
+<safe-load-scripts>
+  <script src="{{ 'component-navigation-toggle.min.js' | asset_url }}" defer="defer" type="module" data-armada-load-key="navigation-toggle"></script>
+</safe-load-scripts>

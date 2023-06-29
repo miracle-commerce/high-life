@@ -1,0 +1,64 @@
+{% comment %}
+
+  Renders an icon and text.
+
+  Accepts:
+  - icon: {Object} Shopify Image object
+  - label: {String} Text label
+  - classes: {String} Custom classes to be applied to the wrapper element if needed
+  - align: {String} Defines alignment of the armament. Accepts 'left', 'center' and 'right'. Defaults to 'left' if not passed (optional)
+  - icon_width: {String} icon width "small", "large" or px value (optional)
+
+  Usage:
+  <div class="icon-and-text-item{% if border %} border_enabled{% endif %}">
+    {% render 'armament-icon-and-text' with 
+      icon: icon,
+      label: text
+    %}
+  </div>
+
+{% endcomment %}
+
+{%- liquid
+  unless icon == blank 
+    assign label_margin_left = 'ml-s'
+    assign label_margin_right = ' mr-s'
+  endunless
+  
+  case align
+    when 'center'
+      assign justify_flex = 'justify-center'
+      assign text_alignment = 'text-center ' | append: label_margin_left | append: label_margin_right
+      assign flex_wrap = 'flex-wrap'
+      assign image_alignment = 'self-center'
+      assign icon_classes = 'inline-block my-[3px] ' | append: image_alignment 
+    when 'right'
+      assign justify_flex = 'justify-end'
+      assign text_alignment = 'text-right ' | append: label_margin_left
+      assign flex_wrap = 'flex-wrap'
+      assign image_alignment = 'self-end'
+      assign icon_classes = 'inline-block my-[3px] ' | append: image_alignment 
+    else
+      assign justify_flex = 'justify-start'
+      assign text_alignment = 'text-left ' | append: label_margin_left
+      assign flex_wrap = 'flex-nowrap'
+      assign image_alignment = 'self-start'
+      assign icon_classes = 'inline-block mt-[3px] ' | append: image_alignment 
+  endcase
+
+  if icon_width == blank 
+    assign img_width = 'width: 24px;'
+  else 
+    assign img_width = 'width:' | append: icon_width | append: ';'
+  endif
+-%}
+
+
+<div class="flex items-center {{ flex_wrap }} {{ justify_flex }}{% if classes != blank %} {{ classes }}{% endif %}">
+  {% unless icon == blank %}
+    {% render 'armament-image' with image: icon, classes: icon_classes, styles: img_width %}
+  {% endunless %}
+  {% unless label == blank %}
+    <span class="inline-block text-b2 pb-0{% if text_classes != blank %} {{ text_classes }}{% endif %} {{ text_alignment }}">{{ label }}</span>
+  {% endunless %}
+</div>

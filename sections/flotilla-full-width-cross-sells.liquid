@@ -1,0 +1,772 @@
+{% liquid 
+  for block in section.blocks 
+    case block.settings.icon_size 
+      when 'small'
+        assign icon_px_width = '18px'
+      when 'large'
+        assign icon_px_width = '24px'
+    endcase
+  endfor
+%}
+
+{% if product.metafields.cross_sell.products or product.metafields.cross-sell.products or product.metafields.cross_sells.products or product.metafields.cross-sells.products %}
+  {%- liquid
+    assign metafield_values = product.metafields.cross_sell.products.value | default: product.metafields.cross-sell.products.value | default: product.metafields.cross_sells.products.value | default: product.metafields.cross-sells.products.value
+    assign cs_products = metafield_values | where: 'available', true
+    assign metafield_count = cs_products | size
+    if section.settings.products_to_show < metafield_count
+      assign product_count = section.settings.products_to_show
+      assign cs_products = cs_products | slice: 1, product_count
+    else
+      assign product_count = metafield_count
+    endif
+    if product_count > 0
+      assign show_section = true
+    endif
+  -%}
+{% endif %}
+
+{% unless show_section %}
+  {% capture metafieldMessage %}
+    <p class="text-left md:text-center !mt-0">Assign cross-sell products based on the main product by creating <a target="_blank" href="/admin/metafields/product/create">product metafields</a> with a namespace of “cross_sell” and a key of “products”. This needs to be a ‘product’ content type with the ‘List of products’ setting. <a target="_blank" href="https://support.eightthemes.com/hc/en-us/articles/7808895339921#heading-5">Learn more.</a></p>
+  {% endcapture %}
+  <div class="theme-section-margin">
+    {% render 'armament-metafield-theme-editor-message' with is_full_width_editor_message: true, editor_message_metafield_type: 'cross-sell', metafield_message: metafieldMessage %}
+  </div>
+{% endunless %}
+
+{% if show_section %}
+  {%- liquid
+    unless section.settings.subheading == blank and section.settings.heading == blank and section.settings.text == blank and section.settings.enable_add_all_button == false
+      assign show_cta = true
+    endunless
+    if section.settings.product_display == 'slider' and product_count > 3
+      assign show_slider = true
+    endif
+    if show_slider
+      assign container_classes = 'grid grid-cols-1 gap-y-xl md:gap-y-2xl'
+      if show_cta
+        assign container_classes = container_classes | append: ' md:grid-cols-4'
+      else
+        assign container_classes = container_classes | append: ' md:grid-cols-3'
+      endif
+    else
+      assign grid_item_count = product_count
+      if show_cta
+        assign grid_item_count = product_count | plus: 1
+      endif
+      case grid_item_count
+        when 1
+          assign grid_cols = 'md:grid-cols-1'
+        when 2
+          assign grid_cols = 'md:grid-cols-2'
+        when 3 or 6
+          assign grid_cols = 'md:grid-cols-3'
+        when 4 or 7 or 8
+          assign grid_cols = 'md:grid-cols-4'
+        else
+          assign grid_cols = 'md:grid-cols-5'
+      endcase
+      assign container_classes = 'grid grid-cols-1 theme-grid-gap ' | append: grid_cols
+      if grid_item_count == 7 or grid_item_count == 9
+        assign cta_classes = 'md:col-span-2'
+      endif
+    endif
+    case section.settings.text_alignment
+      when 'center'
+        assign cta_classes = cta_classes | append: ' items-center'
+      when 'right'
+        assign cta_classes = cta_classes | append: ' items-end'
+    endcase
+  -%}
+  <section data-color-scheme="{{ section.settings.color_scheme }}" class="bg-page text-body theme-section-padding" data-armada-animation="grid-on-scroll" data-armada-animation-threshold="0">
+    <div class="max-w-content {{ container_classes }}">
+      {% if show_cta %}
+        <div class="flex flex-col justify-center {{ cta_classes }}">
+          {% render 'ship-heading-with-text-and-cta' with
+            block_subheading_content: section.settings.subheading,
+            block_subheading_tag: 'h4',
+            block_subheading_type: 'heading-4',
+            block_heading_content: section.settings.heading,
+            block_heading_tag: 'h2',
+            block_heading_type: 'heading-2',
+            block_text_content: section.settings.text,
+            body_text_size: 'text-b1',
+            block_text_alignment: section.settings.text_alignment
+          %}
+          {% if section.settings.enable_add_all_button %}
+            {% assign button_label = 'products.product.add_extras' | t: product_count: product_count %}
+            {% render 'armament-bulk-add-to-cart' with bulk_products: cs_products, button_label: button_label, attributes: 'data-armada-animation="grid-item"' %}
+          {% endif %}
+        </div>
+      {% endif %}
+
+      {% if show_slider %}
+
+        <slider-engine
+          mode="horizontal"
+          arrows="true"
+          mobile-indicator="true"
+          visible-slides='{ "sm": 1, "md": 3 }'
+          class="block relative md:col-span-3"
+          tabindex="0"
+          data-name="scrollbar-target"
+        >
+          <div
+            class="relative overflow-hidden"
+            data-name="slider-wrap"
+          >
+            <ul
+              data-name="slider"
+              data-armada-animation="general"
+              class="flex"
+              role="list"
+            >
+              {% for cs_product in cs_products %}
+                <li class="theme-slider-gap-x" data-name="slide" class="relative flex place-content-center" data-armada-animation="grid-item" slide-num="{{ forloop.index }}">
+                  <div class="w-full">
+                    {% render 'ship-product-card' with
+                      card_product: cs_product,
+                      section_blocks: section.blocks,
+                      classes: 'w-full',
+                      align: section.settings.product_card_alignment,
+                      enable_quick_view: false,
+                      card_icon_size: icon_px_width
+                    %}
+                  </div>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+
+          <template>
+            {% render 'armament-slider-arrows-condensed' with classes: '!absolute' %}
+          </template>
+        </slider-engine>
+        <safe-load-scripts>
+          <script src="{{ 'engine-slider.min.js' | asset_url }}" defer="defer" type="module" data-armada-load-key="slider-engine"></script>
+        </safe-load-scripts>
+
+      {% else %}
+
+        {% for cs_product in cs_products %}
+          <div data-armada-animation="grid-item">
+            {% render 'ship-product-card' with
+              card_product: cs_product,
+              section_blocks: section.blocks,
+              classes: 'w-full',
+              align: section.settings.product_card_alignment,
+              enable_quick_view: false,
+              view_details_open: section.settings.view_details_open,
+              card_icon_size: icon_px_width
+            %}
+          </div>
+        {% endfor %}
+
+        {% if section.settings.enable_add_all_button and product_count > 1 %}
+          <div class="md:hidden flex flex-col {{ cta_classes }}">
+          {% render 'armament-bulk-add-to-cart' with bulk_products: cs_products, button_label: button_label %}
+        {% endif %}
+
+      {% endif %}
+    </div>
+  </section>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Cross-sells",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Assign cross-sell products based on the main product by creating [product metafields](/admin/metafields/product/create) with a namespace of “cross_sell” and a key of “products”. This needs to be a ‘product’ content type with the ‘List of products’ setting. [Learn more](https://support.eightthemes.com/hc/en-us/articles/7808895339921#heading-5)"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "label": "Products to show",
+      "min": 2,
+      "max": 8,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Promote the whole package"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Cross-sells"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>Use this text to explain details of your products, or highlight cross-sell promotions.</p>"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "select",
+      "id": "product_display",
+      "label": "Product display",
+      "options": [
+        {
+          "value": "grid",
+          "label": "Grid"
+        },
+        {
+          "value": "slider",
+          "label": "Slideshow"
+        }
+      ],
+      "default": "grid"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_add_all_button",
+      "label": "Enable 'Add all to cart' button",
+      "default": true,
+      "info": "We recommend only enabling for grid view and products with no variants. [Learn more](https://support.eightthemes.com/hc/en-us)"
+    },
+    {
+      "type": "header",
+      "content": "Product cards"
+    },
+    {
+      "type": "select",
+      "id": "product_card_alignment",
+      "label": "Alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "header",
+      "content": "Color scheme"
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "options": [
+        {
+          "value": "general",
+          "label": "General"
+        },
+        {
+          "value": "accent-1",
+          "label": "Accent 1"
+        },
+        {
+          "value": "accent-2",
+          "label": "Accent 2"
+        },
+        {
+          "value": "accent-3",
+          "label": "Accent 3"
+        }
+      ],
+      "default": "general"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "@app"
+    },
+    {
+      "type": "view_details_quick_add",
+      "name": "View details/Quick add",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "header",
+          "content": "View details"
+        },
+        {
+          "type": "checkbox",
+          "id": "enable_view_details",
+          "label": "Enable \'View details\'",
+          "default": true,
+          "info": "Move this block above blocks you would like to show under \'View details\'"
+        },
+        {
+          "type": "checkbox",
+          "id": "view_details_open",
+          "label": "Expand \'View details\' by default",
+          "info": "This will decide the default view when the page first loads",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "view_details_open_all",
+          "label": "Link all 'View details' buttons",
+          "info": "Clicking 'View details'/'Hide details' will show/hide details for all products",
+          "default": true
+        },
+        {
+          "type": "header",
+          "content": "Quick add"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_quick_add",
+          "label": "Show \'Quick add\' button",
+          "default": false
+        }
+      ]
+    },
+    {
+      "type": "image",
+      "name": "Image",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "select",
+          "id": "product_cards_aspect_ratio",
+          "label": "Aspect ratio",
+          "default": "tall",
+          "options": [
+            {
+              "value": "natural",
+              "label": {
+                "en": "Natural",
+                "fr": "Naturel",
+                "de": "Natürlich",
+                "es": "Natural",
+                "pt-PT": "Natural"
+              }
+            },
+            {
+              "value": "square",
+              "label": {
+                "en": "Square (1:1)",
+                "fr": "Carré (1: 1)",
+                "de": "Quadrat (1:1)",
+                "es": "Cuadrado (1:1)",
+                "pt-PT": "Quadrado (1:1)"
+              }
+            },
+            {
+              "value": "tall",
+              "label": {
+                "en": "Tall (2:3)",
+                "fr": "Grand (2: 3)",
+                "de": "Groß (2:3)",
+                "es": "Vertical (2:3)",
+                "pt-PT": "Estreito (2:3)"
+              }
+            },
+            {
+              "value": "wide",
+              "label": {
+                "en": "Wide (4:3)",
+                "fr": "Large (4: 3)",
+                "de": "Weit (4:3)",
+                "es": "Ancho (4:3)",
+                "pt-PT": "Largo (4:3)"
+              }
+            }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "product_cards_crop_position",
+          "label": "Crop position",
+          "info": "Applies to all aspect ratios apart from 'Natural'",
+          "options": [
+            {
+              "value": "object-center",
+              "label": "Center"
+            },
+            {
+              "value": "object-left",
+              "label": "Left"
+            },
+            {
+              "value": "object-left-top",
+              "label": "Left top"
+            },
+            {
+              "value": "object-left-bottom",
+              "label": "Left bottom"
+            },
+            {
+              "value": "object-right",
+              "label": "Right"
+            },
+            {
+              "value": "object-right-top",
+              "label": "Right top"
+            },
+            {
+              "value": "object-right-bottom",
+              "label": "Right bottom"
+            },
+            {
+              "value": "object-top",
+              "label": "Top"
+            },
+            {
+              "value": "object-bottom",
+              "label": "Bottom"
+            }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "collection_hover_effect",
+          "label": "Image hover effect",
+          "options": [
+            {
+              "value": "show_second_image",
+              "label": "Show second image"
+            },
+            {
+              "value": "none",
+              "label": "None"
+            }
+          ],
+          "default": "show_second_image",
+          "info": "For an image slideshow, please use the 'Gallery' block instead of 'Image'"
+        }
+      ]
+    },
+    {
+      "type": "title",
+      "name": "Title",
+      "limit": 1
+    },
+    {
+      "type": "price",
+      "name": "Price",
+      "limit": 1,
+      "settings": [
+        
+      ]
+    },
+    {
+      "type": "gallery",
+      "name": "Gallery",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "select",
+          "id": "product_cards_aspect_ratio",
+          "label": "Aspect ratio",
+          "default": "tall",
+          "options": [
+            {
+              "value": "natural",
+              "label": {
+                "en": "Natural",
+                "fr": "Naturel",
+                "de": "Natürlich",
+                "es": "Natural",
+                "pt-PT": "Natural"
+              }
+            },
+            {
+              "value": "square",
+              "label": {
+                "en": "Square (1:1)",
+                "fr": "Carré (1: 1)",
+                "de": "Quadrat (1:1)",
+                "es": "Cuadrado (1:1)",
+                "pt-PT": "Quadrado (1:1)"
+              }
+            },
+            {
+              "value": "tall",
+              "label": {
+                "en": "Tall (2:3)",
+                "fr": "Grand (2: 3)",
+                "de": "Groß (2:3)",
+                "es": "Vertical (2:3)",
+                "pt-PT": "Estreito (2:3)"
+              }
+            },
+            {
+              "value": "wide",
+              "label": {
+                "en": "Wide (4:3)",
+                "fr": "Large (4: 3)",
+                "de": "Weit (4:3)",
+                "es": "Ancho (4:3)",
+                "pt-PT": "Largo (4:3)"
+              }
+            }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "product_cards_crop_position",
+          "label": "Crop position",
+          "info": "Applies to all aspect ratios apart from 'Natural'",
+          "options": [
+            {
+              "value": "object-center",
+              "label": "Center"
+            },
+            {
+              "value": "object-left",
+              "label": "Left"
+            },
+            {
+              "value": "object-left-top",
+              "label": "Left top"
+            },
+            {
+              "value": "object-left-bottom",
+              "label": "Left bottom"
+            },
+            {
+              "value": "object-right",
+              "label": "Right"
+            },
+            {
+              "value": "object-right-top",
+              "label": "Right top"
+            },
+            {
+              "value": "object-right-bottom",
+              "label": "Right bottom"
+            },
+            {
+              "value": "object-top",
+              "label": "Top"
+            },
+            {
+              "value": "object-bottom",
+              "label": "Bottom"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "swatch",
+      "name": "Swatches",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "radio",
+          "id": "touch_size",
+          "label": "Swatch size",
+          "options": [
+            {
+              "value": "36",
+              "label": "Small"
+            },
+            {
+              "value": "44",
+              "label": "Large"
+            }
+          ],
+          "default": "36"
+        }
+      ]
+    },
+    {
+      "type": "vendor",
+      "name": "Vendor",
+      "limit": 1
+    },
+    {
+      "type": "sku",
+      "name": "SKU",
+      "limit": 1
+    },
+    {
+      "type": "specifications",
+      "name": "Specifications",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "To use this section create [product metafields](/admin/metafields/product/create) with a namespace of “specifications”. Use any name for the key, this will be used for your label. We support all ‘Measurement’, ‘Text’ and ‘Rating’ content types. [Learn more](https://support.eightthemes.com/hc/en-us/articles/8283331726865)"
+        },
+        {
+          "type": "text",
+          "id": "spec-keys",
+          "label": "Metafield keys",
+          "info": "Add the specification metafield keys, separated with commas (E.g. height,width,depth)."
+        }
+      ]
+    },
+    {
+      "type": "icon-and-text",
+      "name": "Icons with text",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "To use this section create a [product metafield](/admin/metafields/product/create) with the namespace of “icons-with-text” and the key “icons-with-text”. This needs to be a \‘file\’ content type with the \‘List of files\’ setting and alt tags assigned to the image. [Learn more](https://support.eightthemes.com/hc/en-us/articles/8388599633553)"
+        },
+        {
+          "type": "select",
+          "id": "icon_size",
+          "label": "Icon size",
+          "options": [
+            {
+              "value": "small",
+              "label": "Small"
+            },
+            {
+              "value": "large",
+              "label": "Large"
+            }
+          ],
+          "default": "small"
+        }
+      ]
+    },
+    {
+      "type": "local-pickup-availability",
+      "name": "Local pickup availability",
+      "limit": 1
+    },
+    {
+      "type": "icon-list",
+      "name": "Icon list",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "To use this section create a [product metafield](/admin/metafields/product/create) with the namespace of “icon” and the key “list”. This needs to be a ‘file’ content type with the ‘List of values’ setting. [Learn more](https://support.eightthemes.com/hc/en-us/articles/10615831834641)"
+        }
+      ]
+    },
+    {
+      "type": "highlight",
+      "name": "Highlights",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "To use this section create a [product metafield](/admin/metafields/product/create) with the namespace of “highlights” and the key “list”. This needs to be a ‘single text’ content type with the ‘List of values’ setting. [Learn more](https://support.eightthemes.com/hc/en-us/articles/8283374569361)"
+        }
+      ]
+    },
+    {
+      "type": "stock-level-indicator",
+      "name": "Stock level indicator",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "range",
+          "id": "stock_range",
+          "min": 1,
+          "max": 50,
+          "step": 1,
+          "label": "Show low stock warning at",
+          "default": 5,
+          "info": "Product inventory must be tracked to use this functionality."
+        },
+        {
+          "type": "checkbox",
+          "id": "show_stock_count",
+          "label": "Show stock level count",
+          "default": true
+        },
+        {
+          "type": "text",
+          "id": "in_stock_message",
+          "label": "In stock message",
+          "default": "Ready to ship"
+        },
+        {
+          "type": "text",
+          "id": "low_stock_message",
+          "label": "Low stock message",
+          "default": "Selling fast"
+        },
+        {
+          "type": "text",
+          "id": "out_of_stock_message",
+          "label": "Out of stock message",
+          "default": "Back in soon"
+        }
+      ]
+    },
+    {
+      "type": "divider",
+      "name": "Divider"
+    },
+    {
+      "type": "text",
+      "name": "Text",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "Add some text information"
+        }
+      ]
+    },
+    {
+      "type": "reviews",
+      "name": "Reviews"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Cross-sells",
+      "blocks": [
+        {
+          "type": "image"
+        },
+        {
+          "type": "title"
+        },
+        {
+          "type": "price"
+        },
+        {
+          "type": "swatch"
+        }
+      ]
+    }
+  ],
+  "enabled_on": {
+    "templates": [
+      "product"
+    ]
+  }
+}
+{% endschema %}

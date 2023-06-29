@@ -1,0 +1,167 @@
+{% comment %}
+    Renders a collection grid.
+
+    Accepts:
+    - collection: {Object} Shopify collection
+    - section_blocks (optional) {Object} Shopify section blocks. If this parameter is not passed, the grid will be populated with placeholder cards
+    - products_per_row: (optional) {Number} Shopify setting value (number of products per row on desktop). Defaults to 2 if blank
+    - products_per_row_mobile: (optional) {Number} Shopify setting value (number of products per row on mobile). Defaults to 1 if blank
+    - has_pagination (optional): {Boolean} set to true if the grid needs pagination
+    - pagination_type (optional): {Object} Shopify setting value (paged navigation/load more)
+    - show_view_all (optional): {Boolean} Set to true to show a 'view all' button
+    - products_per_page: {Object} Shopify setting value
+    - grid_container_classes: {String} add custom classes to the grid container
+    - enable_quick_view: {Boolean} enable the 'quick view' button over the image or gallery items
+    - product_card_alignment: {String} which way the product cards are aligned
+    - grid_icon_size: {String} px value of product card icon with text icon size (option)
+
+    Usage:
+    {% render 'flotilla-collection-grid' with collection: collection, products_per_row: section.settings.products_per_row %}
+{% endcomment %}
+
+{% liquid
+
+  case products_per_row
+    when 1
+      assign desktop_grid = ' md:grid-cols-1'
+    when 2
+      assign desktop_grid = ' md:grid-cols-2'
+    when 3
+      assign desktop_grid = ' md:grid-cols-3'
+    when 4
+      assign desktop_grid = ' md:grid-cols-4'
+    when 5
+      assign desktop_grid = ' md:grid-cols-5'
+    else
+      assign desktop_grid = ' md:grid-cols-2'
+  endcase
+
+  case products_per_row_mobile
+    when '1'
+      assign mobile_grid = 'grid-cols-1'
+    when '2'
+      assign mobile_grid = 'grid-cols-2'
+    else
+      assign mobile_grid = 'grid-cols-1'
+  endcase
+
+  assign grid_class = 'grid items-start justify-items-center theme-grid-gap max-w-content ' | append: mobile_grid | append: desktop_grid
+
+  assign view_all_btn = 'templates.collection.view_all' | t
+  assign view_all_aria = 'aria-label="' | append: view_all_btn | append: '"'
+  assign sortByHeading = 'products.facets.sort_by_label' | t
+%}
+
+<script src="{{ 'engine-collection-grid.min.js' | asset_url }}" defer="defer" type="module"></script>
+
+
+<collection-grid
+  class="collection-grid-main block component-collection-grid no-js-hidden{% if grid_container_classes %} {{ grid_container_classes }}{% endif %}"
+  data-armada-selector="collection-grid-main"
+  data-section-id="{{ section.id }}"
+>
+  {% if collection != blank %}
+    {% if collection.products.size == 0 %}
+      <div class="flex flex-col items-center theme-section-padding">
+        <span class="text-body bg-page text-h5">{{ 'templates.collection.empty' | t }}</span>
+        <span class="text-body bg-page text-h5">{{ 'templates.collection.use_fewer_filters_html' | t: link: collection.url, class: "underline" }}</span>
+      </div>
+    {% else %}
+      {% if has_pagination %}
+        {% paginate collection.products by products_per_page %}
+          <div class="{{ grid_class }}" data-armada-selector="collection-card-grid" data-armada-animation="grid-on-scroll" data-armada-animation-threshold="0">
+            {% for product in collection.products %}
+            {%- liquid
+              assign gallery_mode = ''
+            -%}
+            <div class="max-w-full block w-full" data-armada-animation="grid-item">
+              <div>
+                {%
+                  render 'ship-product-card' with
+                  card_product: product,
+                  section_blocks: section_blocks,
+                  align: product_card_alignment,
+                  classes: 'w-full',
+                  gallery_mode: gallery_mode,
+                  enable_quick_view: false,
+                  card_icon_size: grid_icon_size
+                %}
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+
+          {% if show_view_all == true %}
+            <div class="w-full flex items-center justify-center pt-2xl">
+              {% render 'armament-button' with url: collection.url, content: view_all_btn, attributes: view_all_aria, classes: 'max-w-200' %}
+            </div>
+          {% endif %}
+
+          {% if paginate.pages > 1 %}
+            {% if pagination_type == 'paged' %}
+              {% render 'ship-pagination' with paginate: paginate %}
+            {% else %}
+              {% render 'ship-pagination-load-more' with paginate: paginate, product_count: products_per_page %}
+            {% endif %}
+          {% endif %}
+        {% endpaginate %}
+      {% else %}
+        <div class="{{ grid_class }}" data-armada-selector="collection-card-grid" data-armada-animation="grid-on-scroll" data-armada-animation-threshold="0">
+          {% if section_blocks != blank %}
+            {% for product in collection.products limit: products_per_page %}
+              <div class="max-w-full block w-full" data-armada-animation="grid-item">
+                <div class="max-w-full block w-full">
+                  {%
+                    render 'ship-product-card' with
+                    card_product: product,
+                    section_blocks: section_blocks,
+                    align: product_card_alignment,
+                    classes: 'w-full',
+                    gallery_mode: '',
+                    enable_quick_view: false,
+                    card_icon_size: grid_icon_size
+                  %}
+                </div>
+              </div>
+            {% endfor %}
+          {% else %}
+            {% for product in collection.products limit: products_per_page %}
+              <div class="max-w-full block w-full" data-armada-animation="grid-item">
+                <div class="max-w-full block w-full">
+                  {%
+                    render 'ship-product-card-simple' with
+                    card_product: product,
+                    align: product_card_alignment,
+                    classes: 'w-full',
+                  %}
+                </div>
+              </div>
+            {% endfor %}
+          {% endif %}
+        </div>
+
+        {% if show_view_all == true %}
+          <div class="w-full flex items-center justify-center pt-2xl">
+            {% render 'armament-button' with url: collection.url, content: view_all_btn, attributes: view_all_aria, classes: 'max-w-200', data_aid: 'collection-view-all-button' %}
+          </div>
+        {% endif %}
+      {% endif %}
+    {% endif %}
+  {% else %}
+    <div class="{{ grid_class }}" data-armada-selector="collection-card-grid" data-armada-animation="grid-on-scroll" data-armada-animation-threshold="0">
+      {% for i in (1..products_per_page) %}
+        <div class="max-w-full block w-full" data-armada-animation="grid-item">
+          <div class="max-w-full block w-full">
+            {% render 'ship-product-card-placeholder' with index: forloop.index %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    {% if show_view_all == true %}
+      <div class="w-full flex items-center justify-center pt-2xl">
+        {% render 'armament-button' with url: collection.url, content: view_all_btn, attributes: view_all_aria, classes: 'max-w-200', data_aid: 'collection-view-all-button' %}
+      </div>
+    {% endif %}
+  {% endif %}
+</collection-grid>

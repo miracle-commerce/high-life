@@ -1,0 +1,23 @@
+{% comment %}
+    Renders a list of custom icons, compatible with the metafields which namespace is “icon” and the key is “list”.
+    The metafield needs to be a “file” type with the “List of values” setting 
+    (product.metafields.icon.list of type list.file_reference)
+
+    Accepts:
+    - icons_product: {Object} product Liquid object
+    - width: {Integer} Optional width to be applied to the <li> elements
+    - classes: {String} Custom classes to be applied to the <ul> element
+
+    Usage:
+    {% render 'armament-custom-icons' with icons_product: product %}
+{% endcomment %}
+
+{% if icons_product.metafields.icon.list %}
+  <ul class="flex{% if classes %} {{ classes }}{% endif %}" data-product-card-content>
+    {% for icon in icons_product.metafields.icon.list.value %}
+      <li class="mr-s last:mr-0"{% if width %} style="width:{{ width }}px;"{% endif %}>
+        {% render 'armament-image' with image: icon %}
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}

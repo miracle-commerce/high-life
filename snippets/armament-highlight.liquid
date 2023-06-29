@@ -1,0 +1,41 @@
+{% comment %}
+    Renders a list of highlights, compatible with product metafields of type list.single_line_text_field. With 'highlights' as namespace and 'list' as key. I.e.: product.metafields.highlights.list
+
+    Accepts:
+    - highlight_product: {Object} product Liquid object
+    - classes: {String} additional classes
+    - text_size: {String} accepts 'text-b1' or 'text-b2'. Defaults to 'text-b2'
+    - items_padding: {Boolean} when true, it adds padding between list items
+    - text_alignment: {String} eg. right (defaults to left)
+
+    Usage:
+    {% render 'armament-highlight' with product: product %}
+{% endcomment %}
+
+{% liquid 
+  unless text_alignment
+    assign text_alignment = 'left'
+  endunless
+
+  case text_alignment
+    when 'left'
+      assign list_style_position = 'list-outside'
+      assign ul_position = 'left-[6px]'
+    when 'right'
+      assign list_style_position = 'list-inside'
+    when 'center'
+      assign list_style_position = 'list-inside'
+  endcase
+%}
+
+{%- if highlight_product.metafields.highlights.list.value -%}
+{% assign text_size = text_size | default: 'text-b2' %}
+
+  <div{% if classes %} class="{{ classes }}"{% endif %} data-product-card-content>
+    <ul class="!list-disc {{ list_style_position }} {{ text_size }} {{ ul_position }} relative inline-block text-{{ text_alignment }}" role="list" data-aid="highlights">
+      {% for highlight in highlight_product.metafields.highlights.list.value %}
+        <li class="ml-s{% if items_padding %}{% if forloop.last %} pb-0{% else %} pb-s{% endif %}{% endif %}">{{ highlight }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+{%- endif -%}

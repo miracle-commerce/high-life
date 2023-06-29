@@ -1,0 +1,40 @@
+{% comment %}
+    Renders the search navigation items.
+
+    Accepts:
+    - search_type {Object} eg. search.types (required)
+    - show_product_tab {Boolean} (required)
+    - has_bottom_border {Boolean} use if the link should have a border below it
+    - inactive_item_has_opacity {Boolean} use if the inactive nav items should have opacity
+
+    Usage:
+    {% render 'ship-search-navigation-items' with search_type: search_type, show_product_tab: show_product_tab, has_bottom_border: false, inactive_item_has_opacity: true %}
+{% endcomment %}
+
+{% liquid 
+  assign opacity_styles = 'opacity-30'
+  assign product_heading = 'templates.search.products' | t
+  assign collection_heading = 'templates.search.collections' | t
+  assign blog_heading = 'templates.search.blog' | t
+  assign page_heading = 'templates.search.pages' | t 
+%}
+
+<div class="flex flex-wrap justify-center text-body bg-page border-y border-y-theme">
+  {% if show_product_tab %}
+    <a href="{{ routes.search_url }}?q={{ search.terms }}&options%5Bprefix%5D=last&type=product" class="cursor-pointer py-xl mr-l lg:mr-2xl last:mr-0 relative{% if search_type == 'product' %} {% if has_bottom_border %}after:absolute after:left-0 after:right-0 after:bottom-0 after:h-xs after:bg-body{% endif %}{% endif %}{% unless search_type == 'product' %} {% if inactive_item_has_opacity %} {{ opacity_styles }}{% endif %}{% endunless %}" data-armada-animation="on-page-navigation"{% unless search_type == 'product' %} data-active-nav-item="false"{% else %} data-active-nav-item="true"{% endunless %}>
+      {% render 'armament-heading' with tag: 'h2', heading_content: product_heading, heading_type: 'heading-5', classes: '!flex items-center pointer-events-none !py-s', data_aid: 'search-navigation-heading', attributes: 'data-on-page-nav-text' %}
+    </a>
+  {% endif %}
+
+  <a href="{{ routes.search_url }}?q={{ search.terms }}&options%5Bprefix%5D=last&type=collection" class="cursor-pointer py-xl mr-l lg:mr-2xl last:mr-0 relative{% if search_type == 'collections' %} {% if has_bottom_border %}after:absolute after:left-0 after:right-0 after:bottom-0 after:h-xs after:bg-body{% endif %}{% endif %}{% unless search_type == 'collections' %} {% if inactive_item_has_opacity %} {{ opacity_styles }}{% endif %}{% endunless %}" data-armada-animation="on-page-navigation"{% unless search_type == 'collections' %} data-active-nav-item="false"{% else %} data-active-nav-item="true"{% endunless %}>
+    {% render 'armament-heading' with tag: 'h2', heading_content: collection_heading, heading_type: 'heading-5', classes: '!flex items-center pointer-events-none !py-s', data_aid: 'search-navigation-heading', attributes: 'data-on-page-nav-text' %}
+  </a>
+
+  <a href="{{ routes.search_url }}?q={{ search.terms }}&options%5Bprefix%5D=last&type=article" class="cursor-pointer py-xl mr-l lg:mr-2xl last:mr-0 relative{% if search_type == 'article' %} {% if has_bottom_border %}after:absolute after:left-0 after:right-0 after:bottom-0 after:h-xs after:bg-body{% endif %}{% endif %}{% unless search_type == 'article' %} {% if inactive_item_has_opacity %} {{ opacity_styles }}{% endif %}{% endunless %}" data-armada-animation="on-page-navigation"{% unless search_type == 'article' %} data-active-nav-item="false"{% else %} data-active-nav-item="true"{% endunless %}>
+    {% render 'armament-heading' with tag: 'h2', heading_content: blog_heading, heading_type: 'heading-5', classes: '!flex items-center pointer-events-none min-w-[44px] text-center !py-s', data_aid: 'search-navigation-heading', attributes: 'data-on-page-nav-text' %}
+  </a>
+
+  <a href="{{ routes.search_url }}?q={{ search.terms }}&options%5Bprefix%5D=last&type=page" class="cursor-pointer py-xl mr-l lg:mr-2xl last:mr-0 relative{% if search_type == 'page' %} {% if has_bottom_border %}after:absolute after:left-0 after:right-0 after:bottom-0 after:h-xs after:bg-body{% endif %}{% endif %}{% unless search_type == 'page' %} {% if inactive_item_has_opacity %} {{ opacity_styles }}{% endif %}{% endunless %}" data-armada-animation="on-page-navigation"{% unless search_type == 'page' %} data-active-nav-item="false"{% else %} data-active-nav-item="true"{% endunless %}>
+    {% render 'armament-heading' with tag: 'h2', heading_content: page_heading, heading_type: 'heading-5', classes: '!flex items-center pointer-events-none !py-s', data_aid: 'search-navigation-heading', attributes: 'data-on-page-nav-text' %}
+  </a>
+</div>

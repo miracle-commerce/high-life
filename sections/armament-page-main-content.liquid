@@ -1,0 +1,17 @@
+{% if page.content != blank %}
+    <section class="bg-page text-body flex theme-section-padding">
+        <div class="max-w-content">
+            <div class="prose prose-h1:text-headings prose-h2:text-headings prose-h3:text-headings prose-h4:text-headings prose-figcaption:text-body prose-blockquote:text-body prose-ol:block prose-ul:block">
+                {{ page.content }}
+            </div>
+        </div>
+    </section>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Page content",
+  "settings": [
+  ]
+}
+{% endschema %}

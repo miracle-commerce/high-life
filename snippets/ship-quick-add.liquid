@@ -1,0 +1,84 @@
+{% comment %}
+    Renders a given product as a basic form with dropdown options.
+
+    Accepts:
+    - quick_product: {Object} Shopify product object.
+    - show_hide_button: {Boolean} Show the 'add to cart' icon rather than a 'choose' or 'add to cart' button.
+    - separate_icons: {Boolean} For styling reasons you may want to use the quick-add-icons armement separately.
+    - icon_wrapper_classes: {String} Additional classes for the show/hide wrapper div.
+    - scope_id {String} limits variant change interaction to components with a matching scope id, eg. section.id (optional)
+
+    Usage:
+    {% render 'ship-quick-add' with quick_product: product %}
+    {% render 'ship-quick-add' with quick_product: product, scope_id: section.id, show_hide_button: true %}
+{% endcomment %}
+
+{% liquid
+  if show_hide_button == blank
+    assign show_hide_button = false
+  endif
+
+  if separate_icons == blank
+    assign separate_icons = false
+  endif
+%}
+
+<quick-add
+  product="{{ quick_product | json | escape }}"
+  section-id="{{ section.id | default: '1' }}"
+  {% if scope_id %}scope-id="{{ scope_id }}"{% endif %}
+  {% if show_hide_button %}show-hide="true"
+  open="false"{% endif %}
+>
+  {% if show_hide_button %}
+    {% if separate_icons == false %}
+      {% render 'armament-quick-add-icons' with quick_product: quick_product, icon_wrapper_classes: icon_wrapper_classes, scope_id: scope_id %}
+    {% endif %}
+
+    <div
+      data-name="quick-add-show-hide"
+      class="hidden {{ classes }}"
+    >
+  {% endif %}
+
+  {% render 'armament-basic-product-form' with form_product: quick_product, current_variant: current_variant, show_buttons: true, dynamic_buttons: false, hide_select: true %}
+
+  {% if show_hide_button %}
+    </div>
+  {% endif %}
+
+  <template
+    id="quick-add-{{ section.id | default: '1' }}-{{ quick_product.id }}"
+  >
+    {% comment %} Content that is not useful unless JS is available. {% endcomment %}
+    {% unless quick_product.has_only_default_variant %}
+      <div
+        data-name="quick-add-options"
+        class="block"
+      >
+        {% for option in quick_product.options_with_values %}
+          {% assign id = section.id | append: '-product-' | append: quick_product.id | append: '-option-' | append: option.position %}
+          {% render 'armament-dropdown' with id: id, object: option.values, label_as_option: true, label_text: option.name, label_classes: 'heading-case', select_classes: 'w-full', wrapper_classes: 'mb-2 w-full' %}
+        {% endfor %}
+      </div>
+    {% endunless %}
+
+    {% assign addingString = 'products.product.adding_only' | t %}
+    {% render 'armament-button' with content: addingString, loading: true, attributes: 'data-button-loading disabled', classes: 'min-w-full', data_aid: 'button-adding', type: 'button' %}
+    <div class="flex justify-center items-center " data-icon-loading aria-label="{{ addingString }}">
+      <span data-armada-button-load-icon class="border-2 border-headings animate-spin inline-block rounded-full !m-0" style="width: 18px; height: 18px;"></span>
+    </div>
+
+    {% comment %} Keep a button for a record of the classes. Used in quick-add on the cart cross sells. {% endcomment %}
+    {% render 'armament-button' with type: 'submit', content: 'clone', attributes: 'data-aid="product-form-submit-button" data-name="product-submit"', classes: 'w-full', style: 'outline' %}
+
+    <div data-name="quick-add-add-to-cart-icon">
+      {% render 'armament-icon' with icon: 'add-to-cart', width: '18px', height: '18px' %}
+    </div>
+
+  </template>
+</quick-add>
+
+<safe-load-scripts>
+  <script src="{{ 'component-quick-add.min.js' | asset_url }}" defer="defer" type="module" data-armada-load-key='quick-add'></script>
+</safe-load-scripts>

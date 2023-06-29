@@ -1,0 +1,54 @@
+{% comment %}
+    Renders a trust content block, of up to four trust content items (icon, heading and link).
+    Accepts:
+    - block {Object} Shopify block object, with settings for four headings, icons and links, in the format heading_1, icon_1, link_1, etc
+    - heading_classes: {String} classes for the heading
+
+    Usage:
+    {% render 'ship-trust-content' with block: block %}
+{% endcomment %}
+
+{%- liquid
+  assign border_class_1 = 'border-t border-b md:border-0'
+  assign border_class_2 = 'border-b md:border-l md:border-b-0'
+  assign border_class_3 = 'border-b md:border-t md:border-b-0'
+  assign border_class_4 = 'border-b md:border-l md:border-t md:border-b-0'
+-%}
+
+<ul class="flex flex-col md:flex-row flex-wrap pb-l lg:pb-xl text-body bg-page border-theme trust-content">
+  {% for i in (1..4) %}
+    {%- liquid
+      assign icon_image = 'icon_' | append: i
+      assign heading = 'heading_' | append: i
+      assign link = 'link_' | append: i
+
+      assign thumbnail_classes = 'inline-block mr-s md:mr-0 object-contain'
+      if block.settings[heading] != blank
+        assign thumbnail_classes = thumbnail_classes | append: ' md:mb-s'
+      endif
+    -%}
+    {% if block.settings[icon_image] or block.settings[heading] != blank %}
+      <li class="flex md:flex-col md:items-center md:justify-center py-l md:py-xl md:px-xl text-center md:w-1/2 grow border-theme {% cycle border_class_1, border_class_2, border_class_3, border_class_4 %}">
+
+        {% if block.settings[link] %}
+          <a href="{{ block.settings[link] }}" class="flex md:flex-col md:items-center md:justify-center">
+        {% endif %}
+
+          {% if block.settings[icon_image] %}
+            <div class="flex-shrink-0">
+              {% render 'armament-thumbnail' with url: block.settings[icon_image], class: thumbnail_classes %}
+            </div>
+          {% endif %}
+
+          {% if block.settings[heading] != blank %}
+            {% render 'armament-heading' with tag: 'h3', heading_type: 'heading-b1', heading_content: block.settings[heading], data_aid: 'trust-content-heading', classes: heading_classes %}
+          {% endif %}
+
+        {% if block.settings[link] %}
+          </a>
+        {% endif %}
+
+      </li>
+    {% endif %}
+  {% endfor %}
+</ul>

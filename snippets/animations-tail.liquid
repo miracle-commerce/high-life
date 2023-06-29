@@ -1,0 +1,29 @@
+<style>
+  @media (prefers-reduced-motion: no-preference) {
+    {{ selector }}{% if sub_selector %} {{ sub_selector }}{% endif %} {
+      transform: translateX(-3px);
+      transition: transform .5s cubic-bezier(.81,2.11,.24,1.67);
+    }
+
+    {{ selector }}:hover{% if sub_selector %} {{ sub_selector }}{% endif %},
+    {{ selector }}:focus-visible{% if sub_selector %} {{ sub_selector }}{% endif %} {
+      transform: translateX(-1px);
+    }
+
+    {{ selector }} [data-armada-arrow-chevron] {
+      transform: translateX(0px);
+    }
+
+    {{ selector }} [data-armada-arrow-tail] {
+      transform: scaleX(0);
+      transform-origin: right;
+      transition: transform .5s ease;
+    }
+
+    {{ selector }}:hover [data-armada-arrow-tail],
+    {{ selector }}:focus-visible [data-armada-arrow-tail] {
+      transition: transform .5s cubic-bezier(.67,1.79,.14,.74);
+      transform: scaleX(1);
+    }
+  }
+</style>

@@ -1,0 +1,29 @@
+{% assign search_type = search.types | join: '' %}
+  {% if search_type == 'page' %}
+    {% if search.results.size > 0 %}
+      <section class="grid grid-cols-1 md:grid-cols-4 gap-x-l gap-y-xl md:gap-x-xl md:gap-y-2xl grid-flow-row text-body p-xl !pt-0 md:p-2xl relative" data-armada-animation="grid-on-scroll" data-armada-animation-threshold="0">
+        {% for result in search.results %}
+          <div class="p-l md:p-xl border border-theme rounded-theme" data-armada-animation="grid-item">
+            {% assign text = result.content | strip_html | truncate: 150 %}
+            {% render 'armament-heading' with tag: 'h3', heading_type: 'heading-4', heading_content: result.title, data_aid: 'page-result-heading' %}
+            <div class="mb-l md:mb-xl prose">{{ text }}</div>
+            <div class="text-h6 font-heading heading-font-styles">
+              <a href="{{ result.url }}" class="flex items-center group" aria-label="{{ 'blogs.article.read_more_title' | t: title: result.title | escape }}">
+                <span>{{ 'blogs.article.read_more' | t }}</span>
+                {% render 'armament-icon' with icon: 'arrow-right', classes: 'pl-s' %}
+              </a>
+            </div>
+          </div>
+        {% endfor %}
+      </section>
+    {% else %}
+      {% render 'ship-search-no-results' with type: 'page' %}
+    {% endif %}
+  {% endif %}
+
+{% schema %}
+{
+  "name": "Page results",
+  "class": "bg-page w-full"
+}
+{% endschema %}

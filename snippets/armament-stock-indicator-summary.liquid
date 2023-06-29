@@ -1,0 +1,73 @@
+{%- comment -%}
+    Renders a stock level summary (product level) including an icon and message
+
+    Accepts:
+    - stock_product: {Object} product Liquid object
+    - stock_amt: {Number} the number at which to display a low stock warning
+    - show_stock_count: {Boolean} Display stock count or not
+    - in_stock_message: {String} Custom message displayed after 'In stock'
+    - in_stock_icon: {String} In stock icon name
+    - low_stock_message: {String} Custom message displayed after 'Low stock'
+    - low_stock_icon: {String} In stock icon name
+    - out_of_stock_message: {String} Custom message displayed after 'Out of stock'
+    - out_of_stock_icon: {String} In stock icon name
+    - classes: {String} custom classes to be applied to the container div
+
+    Usage:
+    {% render 'armament-stock-indicator-summary' with
+      stock_product: card_product,
+      stock_amt: block.settings.stock_range,
+      in_stock_message: block.settings.in_stock_message,
+      in_stock_icon: "success",
+      low_stock_message: block.settings.low_stock_message,
+      low_stock_icon: "warning",
+      out_of_stock_message: block.settings.out_of_stock_message,
+      out_of_stock_icon: "warning"
+    %}
+{%- endcomment -%}
+
+{%- liquid
+  for stock_variant in stock_product.variants
+    if stock_variant.inventory_management != blank and stock_variant.inventory_policy != 'continue'
+      if stock_variant.available
+        assign in_stock = true
+        assign product_quantity = product_quantity | plus: stock_variant.inventory_quantity
+      endif
+      assign display_indicator = true
+    else
+      assign untracked_inventory = true
+    endif
+  endfor
+  if product_quantity <= stock_amt
+    assign low_stock = true
+    assign display_indicator = true
+  endif
+
+  assign low_stock_string = 'products.product.low_stock' | t
+  assign in_stock_string = 'products.product.in_stock' | t
+  assign out_of_stock_string = 'products.product.out_of_stock' | t
+-%}
+
+{%- if display_indicator -%}
+  <div{% if classes %} class="{{ classes }}"{% endif %} data-product-card-content>
+    {% if low_stock %}
+      <span class="flex items-center">{% render 'armament-icon' with icon: out_of_stock_icon, classes: 'mr-xs', width: 18, height: 18 %}
+        {{ low_stock_message | default: low_stock_string }}
+        {% if show_stock_count %}
+          <span class="mx-xs">-</span> <span class="mr-xs">{{ product_quantity }}</span> {{ 'products.product.stock_left' | t }}
+        {% endif %}
+      </span>
+    {% elsif in_stock %}
+      <span class="flex items-center">{% render 'armament-icon' with icon: in_stock_icon, classes: 'mr-s', width: 18, height: 18 %}
+        {{ in_stock_message | default: in_stock_string }}
+        {% if show_stock_count %}
+          <span class="mx-xs">-</span> <span class="mr-xs">{{ product_quantity }}</span> {{ 'products.product.stock_left' | t }}
+        {% endif %}
+      </span>
+    {% elsif untracked_inventory != true %}
+      <span class="flex items-center">{% render 'armament-icon' with icon: low_stock_icon, classes: 'mr-xs', width: 18, height: 18 %}
+        {{ out_of_stock_message | default: out_of_stock_string }}
+      </span>
+    {% endif %}
+  </div>
+{%- endif -%}

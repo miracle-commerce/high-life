@@ -1,0 +1,130 @@
+{% comment %}
+    Renders a cart summary (subtotal, checkout buttons, cart notes).
+
+    Accepts:
+    - show_tax_shipping: {Boolean} Displays tax and shipping message.
+    - show_note: {Boolean} Displays cart notes input.
+    - show_sticky_summary: {Boolean} Displays sticky summary at top of cart list.
+    - show_divider: {Boolean} Displays a border divider when summary and main cart color schemes are the same.
+
+    Usage:
+    {% render 'ship-cart-summary' with show_tax_shipping: section.settings.show_tax_shipping, show_note: section.settings.enable_notes, show_sticky_summary: section.settings.sticky_summary %}
+{% endcomment %}
+
+{% if show_tax_shipping %}
+  {%- liquid
+    if cart.taxes_included and shop.shipping_policy.body != blank
+      assign taxes_shipping = 'sections.cart.taxes_included_and_shipping_policy_html' | t: link: shop.shipping_policy.url
+    elsif cart.taxes_included
+      assign taxes_shipping = 'sections.cart.taxes_included_but_shipping_at_checkout' | t
+    elsif shop.shipping_policy.body != blank
+      assign taxes_shipping = 'sections.cart.taxes_and_shipping_policy_at_checkout_html' | t: link: shop.shipping_policy.url
+    else
+      assign taxes_shipping = 'sections.cart.taxes_and_shipping_at_checkout' | t
+    endif
+  -%}
+{% endif %}
+
+<safe-load-scripts>
+  <script src="{{ 'component-cart-summary.min.js' | asset_url }}" defer="defer" type="module" data-armada-load-key="component-cart-summary"></script>
+  <script src="{{ 'component-cart-note.min.js' | asset_url }}" defer="defer" type="module" data-armada-load-key="component-cart-note"></script>
+</safe-load-scripts>
+
+<cart-summary
+  data-cart-summary-container
+  class="transition-all w-full"
+  data-aid="cart-summary"
+  data-sticky-summary="{{ show_sticky_summary }}"
+>
+  {% if cart.items.size > 0 and show_sticky_summary %}
+    <div data-armada-selector="cart-summary-sticky" class="z-[100] hidden{% if show_divider %} border-b border-b-theme{% endif %}">
+      <div class="justify-between py-l text-body bg-page md:flex">
+        <div class="flex justify-between items-center w-full mx-2xl max-w-full" data-aid="cart-summary-sticky-desktop" data-armada-selector="cart-summary-info-sticky-desktop">
+          <div class="flex justify-between items-center">
+            {% assign subtotal_string = 'sections.cart.subtotal' | t %}
+            {% render 'armament-heading' with tag: 'h3', heading_type: 'heading-4', classes: 'mr-30 !pb-0', heading_content: subtotal_string, data_aid: 'cart-summary-heading' %}
+            {% render 'armament-price' with manual_price: cart.total_price, price_only: true, price_class: 'text-[1.2rem] font-heading heading-font-styles', discount_type: 'hide' %}
+          </div>
+
+          <div class="md:flex" data-armada-selector="checkout-button">
+            <noscript class="block mb-l md:w-1/2 md:mb-0 md:mr-s">
+              {% assign update_string = 'sections.cart.update' | t %}
+              {% render 'armament-button' with content: update_string, classes: 'w-full', style: 'outline', data_aid: "update-cart-button" %}
+            </noscript>
+            {% assign checkout_string = 'sections.cart.checkout' | t %}
+            {% render 'armament-button' with content: checkout_string, classes: 'w-full checkout-btn min-w-[250px]', attributes: 'id="checkout" name="checkout" form="cart"', data_aid: "checkout-button" %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      data-armada-selector="cart-summary-sticky-mobile"
+      class="hidden z-[100]{% if show_divider %} border-b border-b-theme{% endif %}"
+    >
+      <div class="flex justify-between py-l text-body bg-page md:hidden">
+        <div class="flex items-center w-full mx-xl md:mx-3xl max-w-full" data-aid="cart-summary-sticky-info-mobile">
+            <noscript class="block mb-l md:w-1/2 md:mb-0 md:mr-s">
+              {% assign update_string = 'sections.cart.update' | t %}
+              {% render 'armament-button' with content: update_string, classes: 'w-full', style: 'outline', data_aid: "update-cart-button" %}
+            </noscript>
+            {% assign checkout_string = 'sections.cart.checkout' | t %}
+            {% assign price_string = cart.total_price | money %}
+            {% assign final_string = checkout_string | append: ' | ' | append: price_string %}
+            {% render 'armament-button' with content: final_string, classes: 'w-full checkout-btn min-w-full', attributes: 'id="checkout" name="checkout" form="cart"', data_aid: "checkout-button" %}
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  <div class="md:flex md:justify-between text-body pt-xl md:pt-2xl bg-page{% if show_divider %} border-t border-t-theme{% endif %}" data-armada-selector="cart-summary-static-bottom">
+    <div class="flex flex-col md:w-1/2 md:max-w-[350px]" data-armada-selector="cart-note-container">
+      {% if show_note %}
+        {% assign note_string = 'sections.cart.note' | t %}
+        <cart-note class="pb-l md:mr-xl">
+          {% render 'armament-accordion' with summary_header: note_string, textarea_id: 'cart-note', textarea_name: 'note', textarea_content: cart.note, summary_class: 'pt-0 md:pt-0' %}
+        </cart-note>
+      {% endif %}
+    </div>
+    <div class="md:w-1/2 md:ml-xl md:max-w-[350px]" data-aid="cart-summary-info" data-armada-selector="cart-summary-info-container">
+      <div class="flex justify-between items-center">
+        {% assign subtotal_string = 'sections.cart.subtotal' | t %}
+        {% render 'armament-heading' with tag: 'h3', heading_type: 'heading-4', classes: '!pb-0', heading_content: subtotal_string, data_aid: 'cart-summary-heading' %}
+        {% render 'armament-price' with manual_price: cart.total_price, price_only: true, price_class: 'text-h4 font-heading heading-font-styles', discount_type: 'hide' %}
+      </div>
+
+      {% if cart.cart_level_discount_applications.size > 0 %}
+        <ul role="list" aria-label="{{ 'customer.order.discount' | t }}">
+          {% for discount in cart.cart_level_discount_applications %}
+            <li class="flex py-xs items-center pl-s pr-[12px] my-s max-w-max{% assign bg_brightness = color_scheme | color_brightness %}{% if bg_brightness < 230 %} bg-body text-page{% else %} bg-body-opacity-10{% endif %}">
+              {% render 'armament-icon' with icon: 'sale-tag' %}
+              <span class="pl-xs">{{ discount.title }} (-{{ discount.total_allocated_amount | money }})</span>
+            </li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+
+      {% if show_tax_shipping %}
+        <p class="prose prose-strong:text-body prose-blockquote:text-body prose-figcaption:text-body" data-aid="tax-shipping-msg-cart" data-armada-selector="tax-message-cart">{{ taxes_shipping }}</p>
+      {% endif %}
+
+      <div
+        class="md:flex mt-s md:mt-l"
+        data-armada-selector="checkout-button"
+      >
+        <noscript class="block mb-l md:w-1/2 md:mb-0 md:mr-s">
+          {% assign update_string = 'sections.cart.update' | t %}
+          {% render 'armament-button' with content: update_string, classes: 'w-full', style: 'outline', attributes: 'form="cart"', data_aid: "update-cart-button" %}
+        </noscript>
+        {% assign checkout_string = 'sections.cart.checkout' | t %}
+        {% render 'armament-button' with content: checkout_string, classes: 'w-full checkout-btn', attributes: 'id="checkout" name="checkout" form="cart"', data_aid: "checkout-button" %}
+      </div>
+
+      {% if additional_checkout_buttons %}
+        <div class="dynamic-checkout-buttons additional-checkout-buttons additional-checkout-buttons--vertical mt-s" data-aid="dynamic-checkout-buttons-cart" data-armada-selector="cart-dynamic-checkout">
+          {{ content_for_additional_checkout_buttons }}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</cart-summary>

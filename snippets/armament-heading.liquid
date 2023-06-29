@@ -1,0 +1,71 @@
+{% comment %}
+    Renders a heading type.
+
+    Accepts:
+    - tag: {String} HTML tag name
+    - attributes: {String} any custom attributes to add to the heading
+    - data_aid: {String} data aid for cypress (required)
+    - classes: {String} any custom classes you'd like to pass in for the heading
+    - heading_content: {String} the heading text to be displayed
+    - heading_type: {String} Specifies the heading type/size. Accepts the following:
+      - 'callout-heading'
+      - 'section-heading'
+      - 'section-subheading'
+      - 'heading-1'
+      - 'heading-2'
+      - 'heading-3'
+      - 'heading-4'
+      - 'heading-5'
+      - 'heading-6'
+    - heading_line_height: {String} eg. leading-normal (optional) - applies to section-subheading, heading-4, heading-5, heading-6 or heading-b1
+
+    Usage:
+    // SECTION HEADING
+    {% render 'armament-heading' with tag: 'h2', classes: 'custom-class', heading_content: section.settings.title, heading_type: 'section-heading' %}
+
+    // SECTION SUBHEADING
+    {% render 'armament-heading' with tag: 'h4', heading_content: section.settings.subheading_title, heading_type: 'section-subheading' %}
+
+    // CALLOUT (OVERSIZED) HEADING
+    {% render 'armament-heading' with tag: 'h2', heading_content: section.settings.title, heading_type: 'callout-heading' %}
+
+    // PRODUCT TITLE/ARTICLE HEADING/OTHER
+    {% render 'armament-heading' with tag: 'h5', classes: 'mt-xl', heading_type: 'heading-3', heading_content: product.title %}
+{% endcomment %}
+
+{%- liquid
+  unless tag
+    assign tag = "h3"
+  endunless
+
+  assign default_classes = "font-heading heading-font-styles text-headings break-anywhere "
+
+  if heading_line_height == blank
+    assign line_height = 'leading-none'
+  else 
+    assign line_height = heading_line_height
+  endif
+
+  case heading_type
+    when 'heading-1' or 'callout-heading'
+      assign type_classes = "text-h1 leading-heading pb-l md:pb-xl"
+    when 'heading-2' or 'section-heading'
+      assign type_classes = "text-h2 leading-heading pb-l md:pb-xl"
+    when 'heading-3'
+      assign type_classes = "text-h3 leading-heading pb-l md:pb-xl"
+    when 'heading-4' or 'section-subheading'
+      assign type_classes = "text-h4 pb-s " | append: line_height
+    when 'heading-5'
+      assign type_classes = "text-h5 pb-s " | append: line_height
+    when 'heading-6'
+      assign type_classes = "text-h6 pb-s " | append: line_height
+    when 'heading-b1' 
+      assign type_classes = "text-b1 text-body font-body-weight font-body font-body-style pb-s break-anywhere " | append: line_height
+  endcase
+
+  unless heading_type == 'heading-b1'
+   assign type_classes = type_classes | prepend: default_classes
+  endunless
+-%}
+
+<{{ tag }} class="{{ type_classes }}{% if classes %} {{ classes }}{% endif %}" {% if attributes %} {{ attributes }}{% endif %}{% if data_aid %} data-aid="{{ data_aid }}"{% endif %}>{{ heading_content }}</{{ tag }}>

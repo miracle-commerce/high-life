@@ -1,0 +1,630 @@
+{% comment %}
+    Renders a cart upsells section.
+
+    Self-contained as this is only used on the cart page. Doesn't need any params.
+
+    Accepts:
+    - none
+
+    Usage:
+    {% render 'flotilla-cart-cross-sells' %}
+{% endcomment %}
+
+
+{%- capture get_blocks -%}
+  {%- for block in section.blocks -%}
+    {{ block.type | lstrip }}{%- unless forloop.last -%},{%- endunless -%}
+  {%- endfor -%}
+{%- endcapture -%}
+
+{%- liquid
+  assign block_order = get_blocks | join: ',' | lstrip | strip
+  assign desktop_width_float = section.settings.products_per_row | times: 1.0
+  assign mobile_width_float = 1 | times: 1.0
+  assign fallback_card_width_desktop = 100 | divided_by: desktop_width_float | append: '%'
+  assign fallback_card_width_mobile = 100 | divided_by: mobile_width_float | append: '%'
+
+  for block in section.blocks
+    case block.type
+      when 'image'
+        assign img_block_attr = block.shopify_attributes
+      when 'title'
+        assign title_block_attr = block.shopify_attributes
+      when 'price'
+        assign price_block_attr = block.shopify_attributes
+      when 'swatch'
+        assign swatch_block_attr = block.shopify_attributes
+    endcase
+
+    case block.settings.icon_size 
+      when 'small'
+        assign icon_px_width = '18px'
+      when 'large'
+        assign icon_px_width = '24px'
+    endcase
+  endfor
+-%}
+
+<cart-cross-sells
+  class="hidden flex-col w-full bg-page theme-section-padding"
+  data-section-id="{{ section.id }}"
+  data-num-products="{{ section.settings.products_total }}"
+  data-visible="{{ section.settings.products_per_row }}"
+  data-color-scheme="{{ section.settings.section_color_scheme }}"
+  data-cart-position="bottom"
+>
+  <div>
+    {% if section.settings.heading != blank %}
+      {% render 'armament-heading' with tag: 'h3', heading_type: 'heading-3', heading_content: section.settings.heading, classes: 'text-body invisible', data_aid: 'cart-cross-sells-heading', attributes: 'data-armada-selector="cart-cross-sells-heading"' %}
+    {% endif %}
+
+    <div
+      data-armada-selector="cart-cross-sell-recommendations"
+    >
+      {%- assign product_card_classes = 'block pb-l' -%}
+      <slider-engine
+        load="false"
+        mode="horizontal"
+        visible-slides='{ "sm": 1, "md": {{ section.settings.products_per_row }} }'
+        mobile-indicator="true"
+        arrows="true"
+        class="block relative"
+        data-aid="cart-cross-sells-grid"
+        data-name="scrollbar-target"
+        tabindex="0"
+      >
+        <div
+          data-name="slider-wrap"
+          class="relative overflow-hidden mb-s"
+        >
+          <ul
+            data-name="slider"
+            data-armada-animation="general"
+            data-aid="cart-cross-sells-grid"
+            class="relative flex"
+            role="list"
+          >
+            {% if recommendations.performed and recommendations.products_count > 0 %}
+              {% if recommendations.products_count > section.settings.products_per_row %}
+                {% assign arrow_classes = '!absolute' %}
+              {% else %}
+                {% assign arrow_classes = '!absolute lg:hidden' %}
+              {% endif %}
+
+              {% comment %} Recommendations based on most expensive cart item. {% endcomment %}
+              {% for recommendation in recommendations.products %}
+                <li
+                  data-name="slide"
+                  slide-num="{{ forloop.index }}"
+                  class="block relative place-content-center cart-cross-sell-slide theme-slider-gap-x"
+                  data-aid="product-recommendations-item"
+                >
+                  {%
+                    render 'ship-product-card' with
+                    card_product: recommendation,
+                    section_blocks: section.blocks,
+                    align: section.settings.product_card_alignment,
+                    classes: product_card_classes,
+                    enable_quick_view: false,
+                    card_icon_size: icon_px_width
+                  %}
+                </li>
+              {% endfor %}
+
+            {% elsif section.settings.fallback_collection != blank %}
+              {% if section.settings.fallback_collection.products_count > section.settings.products_per_row %}
+                {% assign arrow_classes = '!absolute' %}
+              {% else %}
+                {% assign arrow_classes = '!absolute lg:hidden' %}
+              {% endif %}
+
+              {% comment %} Recommendations using a fallback collection specified by the merchant. {% endcomment %}
+              {% for fallback_product in section.settings.fallback_collection.products limit: section.settings.products_total %}
+                <li
+                  data-name="slide"
+                  slide-num="{{ forloop.index }}"
+                  class="block relative cart-cross-sell-fallback-slide js-invisible theme-slider-gap-x"
+                  data-aid="product-recommendations-fallback-item"
+                >
+                  {%
+                    render 'ship-product-card' with
+                    card_product: fallback_product,
+                    section_blocks: section.blocks,
+                    align: section.settings.product_card_alignment,
+                    classes: product_card_classes,
+                    enable_quick_view: false,
+                    card_icon_size: icon_px_width
+                  %}
+                </li>
+              {% endfor %}
+
+            {% else %}
+
+              {% comment %} 'Random' products. {% endcomment %}
+              {% assign arrow_classes = '!absolute' %}
+              {% for random_product in collections.all.products limit: section.settings.products_total %}
+                <li
+                  data-name="slide"
+                  slide-num="{{ forloop.index }}"
+                  class="block relative cart-cross-sell-fallback-slide js-invisible theme-slider-gap-x"
+                  data-aid="product-recommendations-fallback-item"
+                >
+                  {%
+                    render 'ship-product-card' with
+                    card_product: random_product,
+                    section_blocks: section.blocks,
+                    align: section.settings.product_card_alignment,
+                    classes: product_card_classes,
+                    enable_quick_view: false,
+                    card_icon_size: icon_px_width
+                  %}
+                </li>
+              {% endfor %}
+
+            {% endif %}
+          </ul>
+        </div>
+
+        <template>
+          {% if recommendations.performed and recommendations.products_count > 0 %}
+            {% assign item_count = recommendations.products_count %}
+          {% else %}
+            {% assign item_count = section.settings.products_total %}
+          {% endif %}
+
+          {% render 'armament-slider-arrows-condensed' with classes: arrow_classes %}
+          <div data-name="mobile-indicator" class="block md:hidden bg-white">
+            {% render 'armament-scroll-bar' with item_count: item_count, parent: 'slider-engine', target: 'slider-wrap', indicator: 'progress' %}
+          </div>
+        </template>
+      </slider-engine>
+    </div>
+  </div>
+</cart-cross-sells>
+
+<safe-load-scripts>
+  <script src="{{ 'engine-cart-cross-sells.min.js' | asset_url }}" defer="defer" type="module" data-armada-load-key="engine-cart-cross-sells"></script>
+  <script src="{{ 'engine-slider.min.js' | asset_url }}" defer="defer" type="module" data-armada-load-key="engine-slider"></script>
+</safe-load-scripts>
+
+{% style %}
+  :root {
+    --fallback-slide-min-width: {{ fallback_card_width_desktop }};
+    --fallback-slide-min-width-mobile: {{ fallback_card_width_mobile }};
+  }
+{% endstyle %}
+
+{% schema %}
+{
+  "name": "Cart cross sells",
+  "class": "cart-cross-sells flex-col",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Cart cross sell products are based on the most expensive item in the cart."
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Don't forget these..."
+    },
+    {
+      "type": "range",
+      "id": "products_total",
+      "min": 4,
+      "max": 12,
+      "step": 2,
+      "label": "Products to recommend",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "products_per_row",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "label": "Products per row (desktop)",
+      "default": 3
+    },
+    {
+      "type": "collection",
+      "id": "fallback_collection",
+      "label": "Fallback collection",
+      "info": "If cart is empty, use this collection for recommendations."
+    },
+    {
+      "type": "header",
+      "content": "Color scheme"
+    },
+    {
+      "type": "select",
+      "id": "section_color_scheme",
+      "label": "Color scheme",
+      "options": [
+        {
+          "value": "general",
+          "label": "General"
+        },
+        {
+          "value": "accent-1",
+          "label": "Accent 1"
+        },
+        {
+          "value": "accent-2",
+          "label": "Accent 2"
+        },
+        {
+          "value": "accent-3",
+          "label": "Accent 3"
+        }
+      ],
+      "default": "accent-3"
+    },
+    {
+      "type": "header",
+      "content": "Product cards"
+    },
+    {
+      "type": "select",
+      "id": "product_card_alignment",
+      "label": "Alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "left"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "@app"
+    },
+    {
+      "type": "view_details_quick_add",
+      "name": "View details/Quick add",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "header",
+          "content": "View details"
+        },
+        {
+          "type": "checkbox",
+          "id": "enable_view_details",
+          "label": "Enable 'View details'",
+          "default": true,
+          "info": "Move this block above blocks you would like to show under 'View details'"
+        },
+        {
+          "type": "checkbox",
+          "id": "view_details_open",
+          "label": "Expand 'View details' by default",
+          "info": "This will decide the default view when the page first loads",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "view_details_open_all",
+          "label": "Link all 'View details' buttons",
+          "info": "Clicking 'View details'/'Hide details' will show/hide details for all products",
+          "default": true
+        },
+        {
+          "type": "header",
+          "content": "Quick add"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_quick_add",
+          "label": "Show \'Quick add\' button",
+          "default": false
+        }
+      ]
+    },
+    {
+      "type": "image",
+      "name": "Image",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "select",
+          "id": "product_cards_aspect_ratio",
+          "label": "Aspect ratio",
+          "default": "tall",
+          "options": [
+            {
+              "value": "natural",
+              "label": {
+                "en": "Natural",
+                "fr": "Naturel",
+                "de": "Natürlich",
+                "es": "Natural",
+                "pt-PT": "Natural"
+              }
+            },
+            {
+              "value": "square",
+              "label": {
+                "en": "Square (1:1)",
+                "fr": "Carré (1: 1)",
+                "de": "Quadrat (1:1)",
+                "es": "Cuadrado (1:1)",
+                "pt-PT": "Quadrado (1:1)"
+              }
+            },
+            {
+              "value": "tall",
+              "label": {
+                "en": "Tall (2:3)",
+                "fr": "Grand (2: 3)",
+                "de": "Groß (2:3)",
+                "es": "Vertical (2:3)",
+                "pt-PT": "Estreito (2:3)"
+              }
+            },
+            {
+              "value": "wide",
+              "label": {
+                "en": "Wide (4:3)",
+                "fr": "Large (4: 3)",
+                "de": "Weit (4:3)",
+                "es": "Ancho (4:3)",
+                "pt-PT": "Largo (4:3)"
+              }
+            }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "product_cards_crop_position",
+          "label": "Crop position",
+          "info": "Applies to all aspect ratios apart from 'Natural'",
+          "options": [
+            {
+              "value": "object-center",
+              "label": "Center"
+            },
+            {
+              "value": "object-left",
+              "label": "Left"
+            },
+            {
+              "value": "object-left-top",
+              "label": "Left top"
+            },
+            {
+              "value": "object-left-bottom",
+              "label": "Left bottom"
+            },
+            {
+              "value": "object-right",
+              "label": "Right"
+            },
+            {
+              "value": "object-right-top",
+              "label": "Right top"
+            },
+            {
+              "value": "object-right-bottom",
+              "label": "Right bottom"
+            },
+            {
+              "value": "object-top",
+              "label": "Top"
+            },
+            {
+              "value": "object-bottom",
+              "label": "Bottom"
+            }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "collection_hover_effect",
+          "label": "Image hover effect",
+          "options": [
+            {
+              "value": "show_second_image",
+              "label": "Show second image"
+            },
+            {
+              "value": "none",
+              "label": "None"
+            }
+          ],
+          "default": "show_second_image"
+        }
+      ]
+    },
+    {
+      "type": "title",
+      "name": "Title",
+      "limit": 1
+    },
+    {
+      "type": "price",
+      "name": "Price",
+      "limit": 1,
+      "settings": [
+        
+      ]
+    },
+    {
+      "type": "swatch",
+      "name": "Swatches",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "radio",
+          "id": "touch_size",
+          "label": "Swatch size",
+          "options": [
+            {
+              "value": "36",
+              "label": "Small"
+            },
+            {
+              "value": "44",
+              "label": "Large"
+            }
+          ],
+          "default": "36"
+        }
+      ]
+    },
+    {
+      "type": "vendor",
+      "name": "Vendor",
+      "limit": 1
+    },
+    {
+      "type": "sku",
+      "name": "SKU",
+      "limit": 1
+    },
+    {
+      "type": "specifications",
+      "name": "Specifications",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "To use this section create [product metafields](/admin/metafields/product/create) with a namespace of “specifications”. Use any name for the key, this will be used for your label. We support all ‘Measurement’, ‘Text’ and ‘Rating’ content types. [Learn more](https://support.eightthemes.com/hc/en-us/articles/8283331726865)"
+        },
+        {
+          "type": "text",
+          "id": "spec-keys",
+          "label": "Metafield keys",
+          "info": "Add the specification metafield keys, separated with commas (E.g. height,width,depth)."
+        }
+      ]
+    },
+    {
+      "type": "icon-and-text",
+      "name": "Icons with text",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "To use this section create a [product metafield](/admin/metafields/product/create) with the namespace of “icons-with-text” and the key “icons-with-text”. This needs to be a \‘file\’ content type with the \‘List of files\’ setting and alt tags assigned to the image. [Learn more](https://support.eightthemes.com/hc/en-us/articles/8388599633553)"
+        },
+        {
+          "type": "select",
+          "id": "icon_size",
+          "label": "Icon size",
+          "options": [
+            {
+              "value": "small",
+              "label": "Small"
+            },
+            {
+              "value": "large",
+              "label": "Large"
+            }
+          ],
+          "default": "large"
+        }
+      ]
+    },
+    {
+      "type": "local-pickup-availability",
+      "name": "Local pickup availability",
+      "limit": 1
+    },
+    {
+      "type": "icon-list",
+      "name": "Icon list",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "To use this section create a [product metafield](/admin/metafields/product/create) with the namespace of “icon” and the key “list”. This needs to be a ‘file’ content type with the ‘List of values’ setting. [Learn more](https://support.eightthemes.com/hc/en-us/articles/10615831834641)"
+        }
+      ]
+    },
+    {
+      "type": "highlight",
+      "name": "Highlights",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "To use this section create a [product metafield](/admin/metafields/product/create) with the namespace of “highlights” and the key “list”. This needs to be a ‘single text’ content type with the ‘List of values’ setting. [Learn more](https://support.eightthemes.com/hc/en-us/articles/8283374569361)"
+        }
+      ]
+    },
+    {
+      "type": "stock-level-indicator",
+      "name": "Stock level indicator",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "range",
+          "id": "stock_range",
+          "min": 1,
+          "max": 50,
+          "step": 1,
+          "label": "Show low stock warning at",
+          "default": 5,
+          "info": "Product inventory must be tracked to use this functionality."
+        },
+        {
+          "type": "checkbox",
+          "id": "show_stock_count",
+          "label": "Show stock level count",
+          "default": true
+        },
+        {
+          "type": "text",
+          "id": "in_stock_message",
+          "label": "In stock message",
+          "default": "Ready to ship"
+        },
+        {
+          "type": "text",
+          "id": "low_stock_message",
+          "label": "Low stock message",
+          "default": "Selling fast"
+        },
+        {
+          "type": "text",
+          "id": "out_of_stock_message",
+          "label": "Out of stock message",
+          "default": "Back in soon"
+        }
+      ]
+    },
+    {
+      "type": "divider",
+      "name": "Divider"
+    },
+    {
+      "type": "text",
+      "name": "Text",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "Add some text information"
+        }
+      ]
+    },
+    {
+      "type": "reviews",
+      "name": "Reviews"
+    }
+  ]
+}
+{% endschema %}

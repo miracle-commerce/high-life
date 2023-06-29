@@ -1,0 +1,109 @@
+{% comment %}
+  Renders a "complementary products" block that displays complementary products based on Shopify's Search & Discovery app.
+
+  Accepts:
+  - color_scheme {Object} eg. block.settings.block_color_scheme
+  - block_settings: {Object} eg. block.settings
+
+  Usage:
+    {% render 'flotilla-complementary-products-block' with block_settings: block.settings, color_scheme: block.settings.complementary_products_color_scheme %}
+{% endcomment %}
+
+<div data-aid="complementary-products-block" data-color-scheme="{{ color_scheme }}" class="bg-page text-body{% unless color_scheme == 'general' %} p-l md:p-xl {% endunless %}{% if container_classes %} {{ container_classes }}{% endif %}">
+  {% if block_settings.title != blank %}
+    {% render 'armament-heading' with tag: 'h3', heading_content: block_settings.title, heading_type: 'heading-b1', data_aid: 'complementary-products-heading', classes: 'upto-md:pb-l md:pb-l' %}
+  {% endif %}
+
+  <complementary-products
+    class="block bg-page"
+    data-aid="complementary-product-recommendations"
+    data-url="{{ routes.product_recommendations_url }}?section_id={{ section.id }}&product_id={{ product.id }}&limit={{ block_settings.products_to_show }}&intent=complementary"
+    data-color-scheme="{{ color_scheme }}"
+  >
+    {% if recommendations.performed %}
+      {% if recommendations.products_count > 2 %}
+        <slider-engine
+          load="false"
+          mode="horizontal"
+          visible-slides='{ "sm": 1, "md": 2 }'
+          mobile-indicator="true"
+          arrows="true"
+          class="block relative"
+          data-aid="complementary-products-grid"
+          data-name="scrollbar-target"
+          tabindex="0"
+        >
+          <div
+            data-name="slider-wrap"
+            class="relative overflow-hidden mb-s"
+          >
+            <ul
+              data-name="slider"
+              data-armada-animation="general"
+              data-aid="complementary-products-grid"
+              class="relative flex"
+              role="list"
+            >
+              {% for recommendation in recommendations.products %}
+                {% assign crop_position = block_settings.comp_product_cards_crop_position | replace: 'object-', '' %}
+                <li
+                  data-name="slide"
+                  slide-num="{{ forloop.index }}"
+                  class="block relative place-content-center theme-slider-gap-x"
+                  data-aid="product-recommendations-item"
+                >
+                  {%
+                    render 'ship-product-card-simple' with
+                    card_product: recommendation,
+                    align: block_settings.comp_product_card_alignment,
+                    aspect_ratio: block_settings.comp_product_aspect_ratio,
+                    position: crop_position,
+                    classes: 'w-full',
+                    card_font_size: 'text-b1 pb-s'
+                  %}
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+
+          <template>
+            {% render 'armament-slider-arrows-condensed' with hide_on_mobile: true, classes: '!absolute' %}
+            <div data-name="mobile-indicator" class="block md:hidden">
+              {% render 'armament-scroll-bar' with classes: 'py-xl', item_count: recommendations.products_count, parent: 'slider-engine', target: 'slider', indicator: 'progress' %}
+            </div>
+          </template>
+
+        </slider-engine>
+      {% elsif recommendations.products_count > 0 %}
+        <ul
+          data-aid="complementary-products-grid"
+          class="relative flex"
+          role="list"
+        >
+          {% for recommendation in recommendations.products %}
+            {% assign crop_position = block_settings.comp_product_cards_crop_position | replace: 'object-', '' %}
+            <li
+              class="block relative place-content-center w-full theme-slider-gap-x last:mr-0"
+              data-aid="product-recommendations-item"
+            >
+              {%
+                render 'ship-product-card-simple' with
+                card_product: recommendation,
+                align: block_settings.comp_product_card_alignment,
+                aspect_ratio: block_settings.comp_product_aspect_ratio,
+                position: crop_position,
+                classes: 'w-full',
+                card_font_size: 'text-b1 pb-s'
+              %}
+            </li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endif %}
+  </complementary-products>
+</div>
+
+<safe-load-scripts>
+  <script src="{{ 'component-complementary-products.min.js' | asset_url }}" defer="defer" type="module" data-armada-load-key="complementary-products"></script>
+  <script src="{{ 'engine-slider.min.js' | asset_url }}" defer="defer" type="module" data-armada-load-key="engine-slider"></script>
+</safe-load-scripts>

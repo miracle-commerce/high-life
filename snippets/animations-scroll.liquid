@@ -1,0 +1,26 @@
+<style>
+  @media (prefers-reduced-motion: no-preference) {
+    {{ selector }} [data-armada-scroll-first] {
+      animation: scroll 300ms ease;
+    }
+    {{ selector }}:hover [data-armada-scroll-first] {
+      animation: scrollSecond 300ms ease;
+    }
+    @keyframes scroll {
+      0% {
+        margin-left: -44px;
+      }
+      100% {
+        margin-right: 0px;
+      }
+    }
+    @keyframes scrollSecond {
+      0% {
+        margin-left: -44px;
+      }
+      100% {
+        margin-right: 0px;
+      }
+    }
+  }
+</style>

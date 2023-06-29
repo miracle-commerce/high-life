@@ -1,0 +1,42 @@
+{% comment %}
+    Renders a cart summary (subtotal, checkout buttons when the sticky cart summary is enabled).
+
+    Accepts:
+    - show_divider: {Boolean} Displays a border divider when summary and main cart color schemes are the same.
+{% endcomment %}
+
+<div data-armada-selector="cart-summary-static-top" class="hidden md:flex{% if show_divider %} border-b border-b-theme{% endif %}">
+  <div class="justify-between py-l text-body bg-page w-full">
+    <div class="flex justify-between items-center max-w-full" data-aid="cart-summary-info-top" data-armada-selector="cart-summary-info-container-top">
+      <div class="flex justify-between items-center">
+        {% assign subtotal_string = 'sections.cart.subtotal' | t %}
+        {% render 'armament-heading' with tag: 'h3', heading_type: 'heading-4', classes: 'mr-30 !pb-0', heading_content: subtotal_string, data_aid: 'cart-summary-heading' %}
+        {% render 'armament-price' with manual_price: cart.total_price, price_only: true, price_class: 'text-[1.2rem] font-heading heading-font-styles', discount_type: 'hide' %}
+      </div>
+
+      <div class="md:flex">
+        <noscript class="block mb-l md:w-1/2 md:mb-0 md:mr-s">
+          {% assign update_string = 'sections.cart.update' | t %}
+          {% render 'armament-button' with content: update_string, classes: 'w-full', style: 'outline', data_aid: "update-cart-button" %}
+        </noscript>
+        {% assign checkout_string = 'sections.cart.checkout' | t %}
+        {% render 'armament-button' with content: checkout_string, classes: 'w-full checkout-btn min-w-[250px]', attributes: 'id="checkout" name="checkout" form="cart"', data_aid: "checkout-button" %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div data-armada-selector="cart-summary-sticky-mobile-top" class="flex md:hidden z-80{% if show_divider %} border-b border-b-theme{% endif %}">
+  <div class="justify-between py-l text-body bg-page w-full">
+    <div class="flex items-center mx-xl md:mx-2xl max-w-full" data-aid="cart-summary-sticky-info-mobile">
+        <noscript class="block mb-l md:w-1/2 md:mb-0 md:mr-s">
+          {% assign update_string = 'sections.cart.update' | t %}
+          {% render 'armament-button' with content: update_string, classes: 'w-full', style: 'outline', data_aid: "update-cart-button" %}
+        </noscript>
+        {% assign checkout_string = 'sections.cart.checkout' | t %}
+        {% assign price_string = cart.total_price | money %}
+        {% assign final_string = checkout_string | append: ' | ' | append: price_string %}
+        {% render 'armament-button' with content: final_string, classes: 'w-full checkout-btn min-w-full', attributes: 'id="checkout" name="checkout" form="cart"', data_aid: "checkout-button" %}
+    </div>
+  </div>
+</div>

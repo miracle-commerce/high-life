@@ -1,0 +1,621 @@
+{% liquid 
+  assign text_align = section.settings.section_alignment
+  assign content_block_text_align = 'text-' | append: text_align
+
+if section.settings.desktop_image_alignement == 'left'
+  assign content_grid_position = 'md:col-start-2 md:col-end-3 md:row-start-1 md:row-end-2 '
+  assign image_grid_position = 'md:col-start-1 md:col-end-2 md:row-start-1 md:row-end-2'
+else 
+  assign content_grid_position = 'md:col-start-1 md:col-end-2 md:row-start-1 md:row-end-2 '
+  assign image_grid_position = 'md:col-start-2 md:col-end-3 md:row-start-1 md:row-end-2'
+endif
+
+if section.settings.bg_color_scheme != section.settings.content_color_scheme
+  assign wrapper_padding_y = 'theme-section-padding'
+else 
+  assign wrapper_padding_y = 'p-0 md:p-0'
+endif
+
+assign content_wrapper_classes = 'col-start-1 col-end-2 row-start-1 row-end-2 ' | append: content_grid_position | append: content_block_text_align
+%}
+
+<section class="w-full flex items-center justify-center bg-page text-body" data-color-scheme="{{ section.settings.bg_color_scheme }}">
+<div class="max-w-content {{ wrapper_padding_y }} theme-section-margin bg-page text-body w-full grid gap-y-xl md:gap-x-2xl grid-cols-1 grid-rows-1 md:grid-cols-2 md:grid-rows-1" data-color-scheme="{{ section.settings.content_color_scheme }}"  data-armada-animation="grid-on-scroll">
+  <div class="{{ content_wrapper_classes }}">
+    {% for block in section.blocks %}
+      {% case block.type %}
+        {% when 'subheading' %}
+          <div data-armada-animation="grid-item" {{ block.shopify_attributes }}>
+            {% render 'armament-heading' with tag: 'h4', heading_content: block.settings.subheading, heading_type: 'section-subheading' %}
+          </div>
+        {% when 'heading' %}
+          <div data-armada-animation="grid-item" {{ block.shopify_attributes }}>
+            {% render 'armament-heading' with tag: 'h2', heading_content: block.settings.heading, heading_type: 'section-heading' %}
+          </div>
+        {% when 'rich_text' %}
+          <div class="pb-l md:pb-xl" data-armada-animation="grid-item" {{ block.shopify_attributes }}>
+            {% render 'armament-rich-text' with content: block.settings.rich_text, align: content_block_text_align %}
+          </div>
+        {% when 'icon-and-text' %}
+          {% unless block.settings.icon == blank and block.settings.text == blank %}
+            <div
+              data-name="icon-and-text"
+              {{ block.shopify_attributes }}
+              class="icon-and-text-item"
+              data-armada-animation="grid-item"
+            >
+              {%
+                render 'armament-icon-and-text-content' with
+                icon_and_text_img: block.settings.icon,
+                icon_and_text_text: block.settings.text,
+                border: false,
+                text_style: block.settings.text_style,
+                align: section.settings.section_alignment,
+                content_icon_size: block.settings.icon_size
+              %}
+            </div>
+          {% endunless %}
+        {% when 'button' %}
+          {% if block.settings.label != blank and block.settings.link != blank %}
+            <div data-armada-animation="grid-item" {{ block.shopify_attributes }}>
+              {% render 'armament-button' with 
+                url: block.settings.link,
+                content: block.settings.label,
+                style: block.settings.style,
+                classes: 'mb-xl'
+              %}
+            </div>
+          {% endif %}
+
+        {% when 'secondary_image' %}
+          <div {{ block.shopify_attributes }} class="w-full pb-xl" data-armada-animation="grid-item">
+
+            {% if block.settings.link != blank %}
+              <div data-armada-animation="image-link">
+                <a href="{{ block.settings.link }}" aria-label="{{ block.settings.link | split: '/' | last | replace: '-', ' ' | capitalize }}">
+            {% endif %}
+
+            {% if block.settings.image != blank %}
+              {% render 'armament-image' with image: block.settings.image, classes: 'm-auto' %}
+            {% else %}
+              {% render 'armament-placeholder' with name: 'product-1' %}
+            {% endif %}
+
+            {% if block.settings.link != blank %}
+                </a>
+              </div>
+            {% endif %}
+
+          </div>
+
+        {% when 'video' %}
+          {% if block.settings.video_url != blank %}
+            {% assign extra_vars = 'modestbranding=1&rel=0' %}
+            {% if block.settings.video_url contains '?' %}
+              {% assign url = block.settings.video_url | append: '&' | append: extra_vars %}
+            {% else %}
+              {% assign url = block.settings.video_url | append: '?' | append: extra_vars %}
+            {% endif %}
+            {% assign image_classes = 'object-cover w-full' %}
+            <div class="w-full pb-xl" data-armada-animation="grid-item" {{ block.shopify_attributes }}>
+              {% render 'armament-video' with url: url, poster: block.settings.fallback_image, autoplay: true, loop: false, is_hero: false, attributes: 'data-aid="video"', classes: 'h-full', image_classes: image_classes %}
+            </div>
+          {% endif %}
+        {% when 'collection' %}
+          {% assign position = block.settings.product_cards_crop_position | replace: 'object-', '' %}
+          <div {{ block.shopify_attributes }}>
+            {% if block.settings.display_type == "grid" or block.settings.collection.products.size == 1 %}
+              {% liquid
+                assign grid_class = 'grid lg:grid-cols-[repeat(2,minmax(0,auto))] lg:grid-rows-[repeat(2,minmax(0,auto))] justify-items-center theme-grid-gap md:grid-cols-2 grid-cols-1'
+                assign products_to_show = block.settings.products_to_show
+              %}
+              
+              <script src="{{ 'engine-collection-grid.min.js' | asset_url }}" defer="defer" type="module"></script>
+              
+              <collection-grid
+                class="collection-grid-main block no-js-hidden"
+                data-armada-selector="collection-grid-main"
+              >
+                {%liquid
+                  assign collection_grid_container_classes = 'flex justify-between flex-1 flex-wrap flex-row'
+                  assign flex_item_classes = 'md:flex w-full md:basis-[48%] md:flex-row'
+                    case text_align
+                      when 'right'
+                        assign flex_item_alignment_classes = ' md:m-auto md:mr-0'
+                      when 'center'
+                        assign flex_item_alignment_classes = ' md:m-auto'
+                      else
+                        assign flex_item_alignment_classes = ''
+                    endcase
+                  assign mod = products_to_show | modulo: 2
+                  if mod == 0
+                    assign products_to_show_is_odd = false
+                  else
+                    assign products_to_show_is_odd = true
+                  endif
+                %}
+                {% if block.settings.collection != blank %}
+                  {% if block.settings.collection.products.size == 0 %}
+                    <div class="flex flex-col items-center theme-section-padding">
+                      <span class="text-body bg-page text-h5" data-armada-animation="grid-item">{{ 'templates.collection.empty' | t }}</span>
+                      <span class="text-body bg-page text-h5" data-armada-animation="grid-item">{{ 'templates.collection.use_fewer_filters_html' | t: link: block.settings.collection.url, class: "underline" }}</span>
+                    </div>
+                  {% else %}
+                    <div class="{{ collection_grid_container_classes }}" data-armada-selector="collection-card-grid">
+                      {% for product in block.settings.collection.products limit: products_to_show %}
+                        <div
+                          class="{{ flex_item_classes }}{% if forloop.last and products_to_show_is_odd %} {{ flex_item_alignment_classes }}{% endif %}{% if block.settings.collection.products.size == 1 %} {{ flex_item_alignment_classes }}{% endif %} upto-lg:pb-xl last:pb-0"
+                          data-armada-animation="grid-item"
+                        >
+                          {%
+                            render 'ship-product-card-simple' with
+                            card_product: product,
+                            align: 'left',
+                            classes: 'w-full',
+                            aspect_ratio: block.settings.product_cards_aspect_ratio,
+                            position: position
+                          %}
+                        </div>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                {% else %}
+                  <div class="{{ collection_grid_container_classes }}" data-armada-selector="collection-card-grid">
+                    {% for i in (1..products_to_show) %}
+                      <div
+                        class="{{ flex_item_classes }}{% if forloop.last and products_to_show_is_odd %} {{ flex_item_alignment_classes }}{% endif %} upto-lg:pb-xl last:pb-0"
+                        data-armada-animation="grid-item"
+                      >
+                        {% render 'ship-product-card-placeholder' with index: forloop.index %}
+                      </div>
+                    {% endfor %}
+                  </div>
+                {% endif %}
+              </collection-grid>
+                
+            {% else %}
+              <div data-armada-selector="collection-slider-container" class="grid grid-cols-1 grid-rows-1" data-aid="collection-slider">
+                <div data-block-id="{{ block.settings.collection.id }}" data-block-visible="true" class="row-start-1 col-start-1 overflow-visible">
+                  {% 
+                    render 'flotilla-product-card-slider' with
+                    slider_collection: block.settings.collection,
+                    visible_slides: 2,
+                    product_limit: block.settings.products_to_show,
+                    view_all_slide: false,
+                    block_index: forloop.index,
+                    product_card_alignment: 'left',
+                    aspect_ratio: block.settings.product_cards_aspect_ratio,
+                    position: position,
+                    slides_classes: 'theme-slider-gap-x'
+                  %}
+                </div>
+              </div>
+            {% endif %}
+          </div>
+      {% endcase %}
+    {% endfor %}
+  </div>
+  <div class="w-full h-full	overflow-hidden md:self-center grid grid-cols-1 grid-rows-1 bg-page text-body col-start-1 col-end-2 row-start-2 row-end-3 upto-md:pb-s {{ image_grid_position }}" data-armada-animation="grid-item">
+    {% if section.settings.main_image != blank %}
+      {% render 'armament-image' with image: section.settings.main_image, classes: 'col-start-1 col-end-2 row-start-1 row-end-2 m-auto' %}
+    {% else %}
+      {% render 'armament-placeholder' with name: 'product-1', classes: 'col-start-1 col-end-2 row-start-1 row-end-2 m-auto' %}
+    {% endif %}
+  </div>
+</div>
+</section>
+
+
+{% schema %}
+{
+"name": "Image with content",
+"settings": [
+  {
+    "type": "select",
+    "id": "section_alignment",
+    "label": "Section alignment",
+    "options": [
+      {
+        "value": "left",
+        "label": "Left"
+      },
+      {
+        "value": "center",
+        "label": "Center"
+      },
+      {
+        "value": "right",
+        "label": "Right"
+      }
+    ],
+    "default": "center"
+  },
+  {
+    "type": "image_picker",
+    "id": "main_image",
+    "label": "Image",
+    "info": "Recommended size: 1000x1000px"
+  },
+  {
+    "type": "select",
+    "id": "desktop_image_alignement",
+    "label": "Image position (desktop)",
+    "options": [
+      {
+        "value": "left",
+        "label": "Left"
+      },
+      {
+        "value": "right",
+        "label": "Right"
+      }
+    ],
+    "default": "right"
+  },
+  {
+    "type": "header",
+    "content": "Color scheme"
+  },
+  {
+    "type": "select",
+    "id": "bg_color_scheme",
+    "label": "Background color scheme",
+    "options": [
+      {
+        "value": "general",
+        "label": "General"
+      },
+      {
+        "value": "accent-1",
+        "label": "Accent 1"
+      },
+      {
+        "value": "accent-2",
+        "label": "Accent 2"
+      },
+      {
+        "value": "accent-3",
+        "label": "Accent 3"
+      }
+    ],
+    "default": "general"
+  },
+  {
+    "type": "select",
+    "id": "content_color_scheme",
+    "label": "Card color scheme",
+    "options": [
+      {
+        "value": "general",
+        "label": "General"
+      },
+      {
+        "value": "accent-1",
+        "label": "Accent 1"
+      },
+      {
+        "value": "accent-2",
+        "label": "Accent 2"
+      },
+      {
+        "value": "accent-3",
+        "label": "Accent 3"
+      }
+    ],
+    "default": "general"
+  }
+],
+"blocks": [
+  {
+    "type": "subheading",
+    "name": "Subheading",
+    "settings": [
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Show off your products"
+    }
+    ]
+  },
+  {
+    "type": "heading",
+    "name": "Heading",
+    "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Detailed collection"
+    }
+    ]
+  },
+  {
+    "type": "rich_text",
+    "name": "Rich text",
+    "settings": [
+    {
+      "type": "richtext",
+      "id": "rich_text",
+      "label": "Text",
+      "default": "<p>Use this text to give a short description of your collection. Explain different product features or highlight collection promotions.</p>"
+    }
+    ]
+  },
+  {
+    "type": "icon-and-text",
+    "name": "Icon with text",
+    "settings": [
+    {
+      "type": "image_picker",
+      "id": "icon",
+      "label": "Add icon image"
+    },
+    {
+      "type": "select",
+      "id": "icon_size",
+      "label": "Icon size",
+      "options": [
+        {
+          "value": "small",
+          "label": "Small"
+        },
+        {
+          "value": "large",
+          "label": "Large"
+        }
+      ],
+      "default": "small"
+    },
+    {
+      "type": "text",
+      "id": "text",
+      "label": "Text",
+      "default": "Add up to four highlights"
+    }
+    ],
+    "limit": 4
+  },
+  {
+    "type": "secondary_image",
+    "name": "Image",
+    "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "url",
+      "id": "link",
+      "label": "Link"
+    }
+    ]
+  },
+  {
+    "type": "video",
+    "name": "Video",
+    "settings": [
+    {
+      "type": "text",
+      "id": "video_url",
+      "label": "Video link",
+      "info": "Accepts YouTube, Vimeo and MP4",
+      "default": "https://www.youtube.com/watch?v=_9VUPq3SxOc"
+    },
+    {
+      "type": "image_picker",
+      "id": "fallback_image",
+      "label": "Poster image",
+      "info": "Displays before the video is loaded"
+    }
+    ]
+  },
+  {
+    "type": "button",
+    "name": "Button",
+    "settings": [
+    {
+      "type": "url",
+      "id": "link",
+      "label": "Button link",
+      "default": "/collections/all"
+    },
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Label",
+      "default": "Shop now"
+    },
+    {
+      "type": "radio",
+      "id": "style",
+      "label": "Button style",
+      "options": [
+        {
+          "value": "filled",
+          "label": "Primary"
+        },
+        {
+          "value": "outline",
+          "label": "Secondary"
+        }
+      ],
+      "default": "filled"
+    }
+    ]
+  },
+  {
+    "type": "collection",
+    "name": "Collection",
+    "settings": [
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "label": "Products to show",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "radio",
+      "id": "display_type",
+      "label": "Display as:",
+      "options": [
+        {
+          "value": "grid",
+          "label": "Grid"
+        },
+        {
+          "value": "slider",
+          "label": "Slider"
+        }
+      ],
+      "default": "grid"
+    },
+    {
+      "type": "select",
+      "id": "product_cards_aspect_ratio",
+      "label": "Aspect ratio",
+      "default": "natural",
+      "options": [
+        {
+          "value": "natural",
+          "label": {
+            "en": "Natural",
+            "fr": "Naturel",
+            "de": "Natürlich",
+            "es": "Natural",
+            "pt-PT": "Natural"
+          }
+        },
+        {
+          "value": "square",
+          "label": {
+            "en": "Square (1:1)",
+            "fr": "Carré (1: 1)",
+            "de": "Quadrat (1:1)",
+            "es": "Cuadrado (1:1)",
+            "pt-PT": "Quadrado (1:1)"
+          }
+        },
+        {
+          "value": "tall",
+          "label": {
+            "en": "Tall (2:3)",
+            "fr": "Grand (2: 3)",
+            "de": "Groß (2:3)",
+            "es": "Vertical (2:3)",
+            "pt-PT": "Estreito (2:3)"
+          }
+        },
+        {
+          "value": "wide",
+          "label": {
+            "en": "Wide (4:3)",
+            "fr": "Large (4: 3)",
+            "de": "Weit (4:3)",
+            "es": "Ancho (4:3)",
+            "pt-PT": "Largo (4:3)"
+          }
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "product_cards_crop_position",
+      "label": "Crop position",
+      "info": "Applies to all aspect ratios apart from 'Natural'",
+      "options": [
+        {
+          "value": "object-center",
+          "label": "Center"
+        },
+        {
+          "value": "object-left",
+          "label": "Left"
+        },
+        {
+          "value": "object-left-top",
+          "label": "Left top"
+        },
+        {
+          "value": "object-left-bottom",
+          "label": "Left bottom"
+        },
+        {
+          "value": "object-right",
+          "label": "Right"
+        },
+        {
+          "value": "object-right-top",
+          "label": "Right top"
+        },
+        {
+          "value": "object-right-bottom",
+          "label": "Right bottom"
+        },
+        {
+          "value": "object-top",
+          "label": "Top"
+        },
+        {
+          "value": "object-bottom",
+          "label": "Bottom"
+        }
+      ]
+    }
+    ]
+  }
+],
+"presets": [
+  {
+    "name": "Image with content",
+    "settings": {},
+    "blocks": [
+      {
+        "type": "subheading"
+      },
+      {
+        "type": "heading"
+      },
+      {
+        "type": "rich_text"
+      },
+      {
+        "type": "icon-and-text"
+      },
+      {
+        "type": "icon-and-text"
+      },
+      {
+        "type": "icon-and-text"
+      },
+      {
+        "type": "icon-and-text"
+      },
+      {
+        "type": "button"
+      },
+      {
+        "type": "collection"
+      }
+    ]
+  }
+],
+"disabled_on": {
+  "groups": [
+    "header",
+    "footer",
+    "custom.overlay",
+    "custom.announcement"
+  ]
+}
+}
+{% endschema %}

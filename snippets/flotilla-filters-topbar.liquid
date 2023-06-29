@@ -1,0 +1,44 @@
+
+{%- comment -%}
+    Renders filters component in topbar position
+
+    Accepts:
+    - enable_filtering: {Boolean} Set to true if filtering feature is enabled
+    - enable_sorting: {Boolean} Set to true if sorting feature is enabled
+    - results: {Object} search or collection object (required)
+    - custom_classes: {String} custom classes for the modal triggers
+
+
+    Usage:
+    {% render 'flotilla-filters-topbar' with enable_filtering: section.settings.enable_filtering, enable_sorting: section.settings.enable_sorting, results: collection %}
+    {% render 'flotilla-filters-topbar' with enable_filtering: true, enable_sorting: true, results: search %}
+
+{%- endcomment -%}
+
+{% liquid
+  assign active_facet_classes = 'hidden lg:block lg:px-2xl lg:mb-0'
+
+  if custom_classes
+    assign filter_classes = custom_classes
+  endif
+%}
+
+<section
+  class="bg-page text-body relative w-screen h-full no-js-hidden flex flex-col lg:w-screen"
+  data-armada-selector="{% if results == collection %}section-collection-filters{% else %}section-search-filters{% endif%}"
+  data-section-id="{{ section.id }}"
+>
+  <div class="filter-topbar-container flex lg:hidden justify-center w-full order-2 lg:order-none lg:flex-wrap" style="display:flex;">
+    {% render 'ship-filter-dropdown-trigger' with show_filter: true, enable_filtering: enable_filtering, show_sort: true, enable_sorting: enable_sorting, results: results, filtering_position: 'topbar', classes: custom_classes %}
+  </div>
+</section>
+
+<noscript>
+  <section
+    class="bg-page text-body relative w-screen h-full no-js-hidden flex flex-col lg:w-screen"
+  >
+    <div class="filter-topbar-container flex lg:hidden justify-center w-full order-2 lg:order-none lg:flex-wrap" style="display:flex;">
+      {% render 'ship-filter-dropdown-trigger' with show_filter: true, enable_filtering: enable_filtering, show_sort: true, enable_sorting: enable_sorting, results: results, filtering_position: 'topbar', classes: custom_classes %}
+    </div>
+  </section>
+</noscript>

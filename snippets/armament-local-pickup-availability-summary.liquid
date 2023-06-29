@@ -1,0 +1,30 @@
+{%- comment -%}
+    Renders a pickup available message if the first available variant of a given product has local pickup availability.
+    Accepts:
+    - pickup_product: {Object} product Liquid object
+    - classes: {String} custom classes to be applied to the container div
+
+    Usage:
+    {% render 'armament-local-pickup-availability-summary' with pickup_product: product %}
+{%- endcomment -%}
+
+{%- liquid
+  assign pick_up_availabilities = pickup_product.selected_or_first_available_variant.store_availabilities
+  for availability in pick_up_availabilities
+    if availability.available
+      assign pick_up_available = true
+    endif
+  endfor
+-%}
+
+{%- if pick_up_available -%}
+  <div class="flex items-center{% if classes %} {{ classes }}{% endif %}">
+    {% render 'armament-icon' with icon: 'success', classes: 'mr-s', width: 18, height: 18 %}
+    <p>{{ 'products.product.pickup_availability.pick_up_available' | t }}</p>
+  </div>
+{% else %}
+  <div class="flex items-center{% if classes %} {{ classes }}{% endif %}">
+    {% render 'armament-icon' with icon: 'warning', classes: 'mr-s', width: 18, height: 18 %}
+    <p>{{ 'products.product.pickup_availability.pick_up_unavailable' | t }}</p>
+  </div>
+{%- endif -%}

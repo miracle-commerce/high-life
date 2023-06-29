@@ -1,0 +1,99 @@
+{% liquid 
+  if settings.enable_predictive_search 
+    assign custom_classes = '!pb-0 upto-lg:!pt-0 upto-lg:!px-l upto-lg:border-b upto-lg:border-b-body-opacity-25'
+  endif
+
+  unless template.name contains 'search'
+    assign input_border_styles = '!border-0 lg:!border-l !border-l-body-opacity-25 !rounded-none'
+    assign has_border_bottom = true
+    assign overlays_header = true
+  else 
+    assign input_border_styles = ''
+    assign has_border_bottom = false
+    assign overlays_header = false
+  endunless
+%}
+
+<section>
+{% render 'ship-search-bar' with section: section, result_container_classes: 'lg:mx-2xl xl:mx-3xl lg:!px-2xl', predictive_search_form_classes: custom_classes, switch_button_colors_on_hover: false, input_border_classes: input_border_styles, has_bottom_border: has_border_bottom, search_overlays_header: overlays_header %}
+</section>
+
+{% schema %}
+{
+  "name": "Quick search",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Predictive search must be enabled to use this functionality."
+    }
+  ],
+  "blocks": [
+    {
+      "name": "Search menu",
+      "type": "search_navigation",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Show a navigation list before the predictive search results are displayed."
+        },
+        {
+          "type": "text",
+          "id": "navigation_header",
+          "label": "Heading",
+          "default": "Trending"
+        },
+        {
+          "type": "link_list",
+          "id": "search_menu",
+          "label": "Menu",
+          "info": "Add a navigation with no more than 6 items."
+        }
+      ]
+    },
+    {
+      "name": "Featured collection",
+      "type": "search_collection",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Show a featured collection before the predictive search results are displayed."
+        },
+        {
+          "type": "header",
+          "content": "Featured collection"
+        },
+        {
+          "type": "text",
+          "id": "featured_collection_header",
+          "label": "Heading",
+          "default": "Best sellers"
+        },
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection"
+        }
+      ]
+    }
+  ],
+  "default": {
+    "blocks": [
+      {
+        "type": "search_navigation",
+        "settings": {
+          "navigation_header": "Navigation menu",
+          "search_menu": "main-menu"
+        }
+      },
+      {
+        "type": "search_collection",
+        "settings": {
+          "featured_collection_header": "Featured collection"
+        }
+      }
+    ]
+  }
+}
+{% endschema %}

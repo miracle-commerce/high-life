@@ -1,0 +1,86 @@
+{% comment %}
+    Renders a product specification table that will display metafield content.
+    Accepts:
+    - spec_product: {Object} liquid product object (required)
+    - keys: {String} Comma separated list of metafield keys in the 'specifications' namespace
+    - type: {String} the options are 'section' or 'product-card' - defaults to product-card
+    - spec_aid: {String}
+    - classes: {String} Wrapper classes.
+
+    Usage:
+      STAND-ALONE SECTION:
+        {% render 'ship-spec-table' with spec_product: all_products['a-line-mid-length-skirt'], type: 'section' %}
+      PRODUCT CARD:
+        {% render 'ship-spec-table' with spec_product: all_products['a-line-mid-length-skirt'], type: 'product-card' %}
+
+    Metafield setup:
+      1. For each specification, create a metafield definition for 'Products'
+      2. Set the namespace to "specifications"
+      3. Set the key to the specification name, eg "weight"
+      4. Navigate to a product in the Shopify Admin
+      5. In "Metafields > [Specification name]" enter the spec information eg. 10kg
+{% endcomment %}
+
+{% liquid
+  assign key_list = keys | remove: ' ' | split: ','
+
+  assign text_color = settings.color_body_general | color_modify: 'alpha', 0.1
+  assign text_font_size = 'text-b2'
+
+  unless type
+    assign type = 'product-card'
+  endunless
+
+  if type == 'section'
+    assign bg_styles = " group-even:bg-body-opacity-03 group-last:border-b group-last:border-b-theme"
+    assign container_classes = 'grid grid-cols-[minmax(0,30%),minmax(0,70%)] relative group'
+    assign inner_classes = 'py-l lg:py-xl px-s lg:px-l border-t border-t-theme even:ml-s lg:even:ml-l relative '
+    assign text_classes = inner_classes | append: text_font_size | append: bg_styles
+    assign heading_font_size = 'text-h5'
+    assign heading_classes = inner_classes | append: heading_font_size | append: bg_styles
+  elsif type == 'product-card'
+    assign container_classes = 'grid grid-cols-[minmax(0,auto),minmax(0,100%)] even:bg-body-opacity-03 relative py-s first:pt-0 group border-b border-b-theme last:border-b-0'
+    assign inner_classes = 'relative pl-s '
+    assign heading_font_size = 'text-b2 !pb-0'
+    assign heading_classes = inner_classes | append: heading_font_size
+  endif
+
+  unless spec_aid
+    assign spec_aid = 'product-spec-table'
+  endunless
+%}
+
+{% if key_list.size > 0 %}
+  <a id="specifications--{{ spec_product.id }}" class="block relative top-[-200px]"></a>
+  <div class="w-full text-body {{ classes }}" data-aid="{{ spec_aid }}">
+    {% for key in key_list %}
+      {%- liquid
+        assign heading = key | capitalize | replace: '_', ' '
+        assign spec_metafield = spec_product.metafields.specifications[key] | default: spec_product.metafields.specification[key]
+      -%}
+      {% if spec_metafield != blank %}
+        <div data-armada-spec-table-item data-product-card-content class="{{ container_classes }}">
+          {% unless type == 'product-card' %}
+            {% render 'armament-heading' with tag: 'h5', heading_content: heading, classes: heading_classes %}
+            <span class="{{ text_classes }}">
+              {% if spec_metafield.type == 'rating' %}
+                {% render 'armament-star-rating' with rating: spec_metafield.value.rating, rating_max: spec_metafield.value.scale_max, show_rating_value: true %}
+              {% else %}
+                {{ spec_metafield | metafield_tag }}
+              {% endif %}
+            </span>
+          {% else %}
+            {% assign heading = heading | append: ':' %}
+            <span class="{{ heading_classes }}">{{ heading }}</span>
+            {% if spec_metafield.type == 'rating' %}
+              {% render 'armament-star-rating' with rating: spec_metafield.value.rating, rating_max: spec_metafield.value.scale_max, show_rating_value: true, classes: heading_classes %}
+            {% else %}
+              {% assign value = spec_metafield | metafield_tag %}
+              <span class="{{ heading_classes }}">{{ value }}</span>
+            {% endif %}
+          {% endunless %}
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+{% endif %}

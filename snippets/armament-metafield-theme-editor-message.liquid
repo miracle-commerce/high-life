@@ -1,0 +1,51 @@
+{% comment %}
+    Renders an editor only message when the section has no metafield keys assigned.
+
+    Accepts:
+    - is_full_width_editor_message: {Boolean} if set to true the editor message will have an 'h4' heading and 'b1' text with 40px padding
+      otherwise the editor message will have an 'h5' heading and 'b2' text with 8px padding
+    - editor_message_metafield_type: {String} eg. 'highlight' the type of metafield (required)
+    - metafield_message: {String} the message to display in the editor (required)
+    - full_width_editor_message_wrapper_classes: {String} override the default wrapper classes for section-level message
+    - block_level_editor_message_wrapper_classes: {String} override the default wrapper classes for block-level message
+
+    Usage:
+    {% render 'armament-metafield-theme-editor-message' with is_full_width: true %}
+{% endcomment %}
+
+{% liquid 
+  assign no_metafield_heading = 'No ' | append: editor_message_metafield_type | append: ' metafields assigned'
+  assign default_text = 'Please note, this message will only display in the editor.'
+%}
+
+{% if request.design_mode %}
+  {% if is_full_width_editor_message %}
+  <div class="flex flex-col border border-dashed p-s md:p-2xl max-w-content items-start md:items-center {% if full_width_editor_message_wrapper_classes %}{{ full_width_editor_message_wrapper_classes }}{% endif %}">
+    <div class="flex flex-row items-center mb-s">
+      {% render 'armament-icon' with icon: 'warning', classes: 'mr-s md:hidden' %}
+      {% render 'armament-heading' with tag: 'h5', heading_content: no_metafield_heading, classes: '!pb-0 italic md:hidden', heading_type: 'heading-5' %}
+      {% render 'armament-icon' with icon: 'warning', classes: 'mr-s hidden md:inline-block' %}
+      {% render 'armament-heading' with tag: 'h4', heading_content: no_metafield_heading, classes: '!pb-0 italic hidden md:inline-block', heading_type: 'heading-4' %}
+    </div>
+    <div class="md:hidden prose !pb-0 italic text-b2">
+      <p class="!mb-0 !mt-s">{{ default_text }}</p>
+      {{ metafield_message }}
+    </div>
+    <div class="upto-md:hidden prose !pb-0 italic text-b1">
+      <p class="!mb-0 !mt-s text-center">{{ default_text }}</p>
+      {{ metafield_message }}
+    </div>
+  </div>
+  {% else %}
+    <div data-product-card-content class="flex flex-col border border-dashed p-s my-2xl {% if block_level_editor_message_wrapper_classes %}{{ block_level_editor_message_wrapper_classes }}{% endif %}">
+      <div class="flex flex-row items-center mb-s">
+        {% render 'armament-icon' with icon: 'warning', classes: 'mr-s', width: 20, height: 20 %}
+        {% render 'armament-heading' with tag: 'h5', heading_content: no_metafield_heading, classes: '!pb-0 italic', heading_type: 'heading-5' %}
+      </div>
+      <div class="prose !pb-0 italic text-b2">
+        <p class="!mb-0 !mt-s">{{ default_text }}</p>
+        {{ metafield_message }}
+      </div>
+    </div>
+  {% endif %}
+{% endif %}

@@ -1,0 +1,93 @@
+{% comment %}
+    Renders the image of a product variant which will update when clicking through the product swatches.
+
+
+    Accepts:
+    - section_id: {Object} eg. section.id
+    - card_image_product: {Object} product liquid object
+    - image_hover_effect: {Object} eg. section.settings.hover_effect - 'show_second_image'
+    - classes: {String} custom classes (optional)
+    - aspect_ratio: {Object} eg. section.settings.image_aspect_ratio
+    - scope_id {String} limits variant change interaction to components with a matching scope id, eg. section.id (optional)
+    - img_classes: {String} Override the default classes passed into the image armament
+    - second_img_classes: {String} Override the default classes passed into the second image armament
+
+    Usage:
+    {% render 'ship-product-card-image-variants' with section_id: section.id, card_image_product: product %}
+{% endcomment %}
+
+{% liquid
+  if aspect_ratio == blank or aspect_ratio == 'natural'
+    assign heading_classes = 'relative !py-3xl px-m'
+    if img_classes == blank
+      assign img_classes = 'relative product-card-img '
+    endif
+    if second_img_classes == blank
+      assign second_img_classes = 'relative '
+    endif
+  else
+    assign heading_classes = 'absolute top-1/2'
+    if img_classes == blank
+      assign img_classes = 'absolute w-full h-full z-0 top-0 object-cover product-card-img '
+    endif
+    if second_img_classes == blank
+      assign second_img_classes = 'absolute w-full h-full top-0 z-0 object-cover '
+    endif
+  endif
+
+  case aspect_ratio
+    when 'square'
+      assign img_aspect_ratio = 'aspect-square'
+    when 'tall'
+      assign img_aspect_ratio = 'aspect-tall'
+    when 'wide'
+      assign img_aspect_ratio = 'aspect-wide'
+  endcase
+
+  if card_image_product.featured_media
+    if card_image_product.selected_or_first_available_variant.featured_media != nil
+      assign first_to_show_media = card_image_product.selected_or_first_available_variant.featured_media
+    else
+      assign first_to_show_media = card_image_product.featured_media
+    endif
+  endif
+%}
+
+<simple-product-card-image
+  class="block relative overflow-hidden{% if classes %} {{ classes }}{% endif %}"
+  {% if card_image_product %}data-armada-product="{{ card_image_product | json | escape }}"{% endif %}
+  {% if scope_id %}scope-id="{{ scope_id }}"{% endif %}
+>
+  {% if card_image_product.featured_media %}
+    <div class="grid grid-cols-1 grid-rows-1 group">
+      <a href="{{ card_image_product.url }}" title="{{ card_image_product.title | escape }}" class="block">
+        {% assign second_img = card_image_product.media[1].preview_image %}
+
+        {% for media in card_image_product.media %}
+        <div data-armada-media-id="{{ media.id }}" data-armada-product-card-images class="relative w-full h-auto col-start-1 col-end-2 row-start-1 row-end-2 {{ img_aspect_ratio }}{% unless first_to_show_media == media %} hidden{% endunless %}{% if image_hover_effect == 'show_second_image' and second_img != blank %} group-hover:hidden{% endif %}">
+            {% render 'armament-image' with image: media.preview_image, alt: media.preview_image.alt, classes: img_classes %}
+          </div>
+        {% endfor %}
+
+        {% if second_img != blank %}
+          <div class="relative w-full h-auto col-start-1 col-end-2 row-start-1 row-end-2 hidden {{ img_aspect_ratio }} {% if image_hover_effect == 'show_second_image' %} group-hover:block{% endif %}">
+            {% if image_hover_effect == 'show_second_image' and card_image_product.media.size > 1 %}
+              {% render 'armament-image' with image: second_img, alt: second_img.alt, classes: second_img_classes %}
+            {% endif %}
+          </div>
+        {% endif %}
+      </a>
+    </div>
+  {% else %}
+    <a href="{{ card_image_product.url }}" title="{{ card_image_product.title | escape }}" class="block">
+      <div class="{{ img_aspect_ratio }} relative group flex items-center justify-center bg-body-opacity-10">
+        {% render 'armament-heading' with heading_type: 'heading-5', heading_content: card_image_product.title, data_aid: 'product-heading-no-image', classes: heading_classes %}
+      </div>
+    </a>
+  {% endif %}
+</simple-product-card-image>
+
+<safe-load-scripts>
+  <script src="{{ 'component-product-card-image-variant-switcher.min.js' | asset_url }}" defer="defer" type="module" data-armada-load-key="simple-product-card-image"></script>
+</safe-load-scripts>
+

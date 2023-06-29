@@ -1,0 +1,210 @@
+{% comment %}
+    Renders a navigation list item (dropdown or standalone link)
+
+    Accepts:
+    - heading: {String} The navigation heading
+    - heading_link: {String} Url if the heading is a link
+    - navigation: {Array} Shopify array of link objects, if the navigation is a dropdown
+    - classes: {String} custom classes for <li> element
+    - link_only_classes: {String} custom classes when link only
+    - visual: {Boolean} Is this a visual nav?
+    - active: {Boolean} Is the current link active? E.g. are we on that page
+    - icon: {String} One of 'plus', 'chevron', 'none'. Defaults to 'plus'.
+    - image_1, image_2, image_3, image_4: {Object} Shopify image object
+    - block_attributes: {Object} shopify block attributes
+    - item_index: {Object} eg. forloop.index (required for accessibility purposes)
+
+    Usage:
+    {% render 'armament-navigation-list-item' with heading: block.settings.heading, heading_link: block.settings.heading_link, navigation: block.settings.menu.links, image_1: block.settings.image_1, image_2: block.settings.image_2, image_3: block.settings.image_3, image_4: block.settings.image_4 %}
+{% endcomment %}
+
+{%- liquid
+  case overlay_color
+  when 'light'
+    assign overlay_bg = 'bg-white'
+  when 'dark'
+    assign overlay_bg = 'bg-black'
+  endcase
+
+  assign image_text_color = 'text-page'
+  case text_color
+  when 'light'
+    assign image_text_color = 'text-white'
+  when 'dark'
+    assign image_text_color = 'text-black'
+  endcase
+
+  if icon == blank
+    assign icon = 'chevron-right'
+  endif
+
+  assign opacity_value = overlay_opacity | divided_by: 100.0
+  assign bg_opacity = 'style="opacity:' | append: opacity_value | append: ';"'
+-%}
+
+<li class="lg:flex lg:items-center lg:mr-2xl{% if classes %} {{ classes }}{% endif %}" data-aid="navigation-list-item">
+  {% if navigation != blank or visual == true %}
+    <navigation-item class="block lg:h-full" {{ block_attributes }}>
+      <details data-armada-selector="navigation-item-details" class="lg:h-full navigation-item-details border-b border-b-theme lg:border-b-0">
+        <summary 
+          data-armada-selector="navigation-item-summary"
+          {% unless heading_link %}data-armada-no-link="true"{% endunless %}
+          data-name="{{ heading | handle }}"
+          data-block-id="{{ item_index }}"
+          data-armada-animation="menu-link"
+          class="list-none lg:h-full lg:flex lg:items-center lg:relative">
+          <div class="flex items-center h-full w-full">
+            <span class="relative flex justify-between items-center py-l lg:py-s cursor-pointer text-headings w-full">
+              {%- liquid
+                if show_desktop_icons
+                  assign icon_classes = 'absolute right-0 top-1/2 -translate-y-1/2 lg:translate-y-0 lg:static lg:ml-xs lg:rotate-90'
+                else
+                  assign icon_classes = 'absolute right-0 top-1/2 -translate-y-1/2 lg:hidden'
+                endif
+              -%}
+              {% if heading_link %}
+                {% assign heading_link_icons_classes = icon_classes | append: ' no-js-hidden' %}
+                <a class="hidden lg:flex" href="{{ heading_link }}">
+                  {% render 'armament-heading' with heading_content: heading, tag: 'h5', heading_type: 'heading-5', classes: 'lg:leading-[24px] !pb-0' %}
+                  {% render 'armament-icon' with icon: icon, classes: heading_link_icons_classes %}
+                </a>
+                <noscript>
+                  {% render 'armament-icon' with icon: icon, classes: 'absolute right-0 top-1/2 -translate-y-1/2 lg:translate-y-0 lg:static lg:ml-xs lg:rotate-90' %}
+                </noscript>
+                <span class="lg:hidden">
+                  {% render 'armament-heading' with heading_content: heading, tag: 'h5', heading_type: 'heading-5', classes: '!pb-0' %}
+                  {% render 'armament-icon' with icon: icon, classes: icon_classes %}
+                </span>
+              {% else %}
+                <span>{% render 'armament-heading' with heading_content: heading, tag: 'h5', heading_type: 'heading-5', classes: 'lg:leading-[24px] !pb-0' %}</span>
+                {% render 'armament-icon' with icon: icon, classes: icon_classes %}
+              {% endif %}
+            </span>
+          </div>
+        </summary>
+        <div
+          data-armada-selector="navigation-item-dropdown"
+          data-armada-animation="fade"
+          class="hidden lg:block absolute bg-page shadow-lg left-0 right-0 bottom-0 translate-y-full translate-x-0 opacity-0 z-[101] navigation-item-content py-xl{% if visual %} px-[28px]{% else %} px-2xl{% endif %}"
+        >
+          {% if visual %}
+            <div data-armada-selector="navigation-item-visual" class="flex flex-wrap justify-center lg:overflow-hidden">
+              {% assign no_images = true %}
+              {% if image_1 or image_2 or image_3 or image_4 %}
+                {% assign no_images = false %}
+              {% endif %}
+              {% if image_1 %}
+                <div class="w-1/2 lg:w-1/4 grow lg:grow-0 lg:px-m">
+                  {% render 'armament-navigation-image' with image: image_1, image_heading: image_heading_1, image_link: image_link_1, overlay_bg: overlay_bg, bg_opacity: bg_opacity, aspect: aspect, text_color: image_text_color %}
+                </div>
+              {% endif %}
+              {% if image_2 %}
+                <div class="w-1/2 lg:w-1/4 grow lg:grow-0 lg:px-m">
+                  {% render 'armament-navigation-image' with image: image_2, image_heading: image_heading_2, image_link: image_link_2, overlay_bg: overlay_bg, bg_opacity: bg_opacity, aspect: aspect, text_color: image_text_color %}
+                </div>
+              {% endif %}
+              {% if image_3 %}
+                <div class="w-1/2 lg:w-1/4 grow lg:grow-0 lg:px-m">
+                  {% render 'armament-navigation-image' with image: image_3, image_heading: image_heading_3, image_link: image_link_3, overlay_bg: overlay_bg, bg_opacity: bg_opacity, aspect: aspect, text_color: image_text_color %}
+                </div>
+              {% endif %}
+              {% if image_4 %}
+                <div class="w-1/2 lg:w-1/4 grow lg:grow-0 lg:px-m">
+                  {% render 'armament-navigation-image' with image: image_4, image_heading: image_heading_4, image_link: image_link_4, overlay_bg: overlay_bg, bg_opacity: bg_opacity, aspect: aspect, text_color: image_text_color %}
+                </div>
+              {% endif %}
+              {% if no_images %}
+                {% for i in (1..4) %}
+                  <div class="w-1/2 lg:w-1/4 grow lg:grow-0 lg:px-m overflow-hidden">
+                    <div data-armada-animation="image-load" class="border border-theme">
+                      {% render 'armament-placeholder' with name: 'image', classes: '!border-0' %}
+                    </div>
+                  </div>
+                {% endfor %}
+              {% endif %}
+            </div>
+          {% else %}
+            <div class="grid grid-cols-5 gap-xl focus-within:overflow-visible" data-armada-animation="grid">
+              {% for link in navigation %}
+                <div data-armada-selector="navigation-item-link" data-has-child-links="{% if link.links != blank %}true{% else %}false{% endif %}" class="lg:flex lg:flex-col focus-within:overflow-visible" data-armada-animation="grid-item-fast" data-armada-animation-disable-mobile="true">
+                  <div {% if link.links != blank %}class="lg:mb-m lg:border-b lg:border-b-theme"{% endif %}>
+                    <a data-armada-selector="navigation-item-parent" data-name="{{ link.title | handle }}" data-block-id="{{ forloop.index | handle }}" data-armada-animation="menu-link" class="relative flex items-center justify-between lg:inline-block w-full py-l lg:py-0 text-headings lg:text-body navigation-item-parent{% if link.links != blank %} lg:pb-l lg:focus-visible:outline-offset-[-1px]{% endif %}" href="{{ link.url | escape }}">
+                      {% render 'armament-heading' with heading_content: link.title, tag: 'h5', heading_type: 'heading-5', classes: '!pb-0' %}
+                      {% if link.links != blank %}
+                        {% render 'armament-icon' with icon: icon, classes: 'absolute right-0 lg:hidden' %}
+                      {% endif %}
+                    </a>
+                  </div>
+                  {% if link.links != blank %}
+                    <ul data-armada-selector="navigation-item-children" class="navigation-item-children--top-level">
+                      {% for child_link in link.links %}
+                        <li data-armada-selector="navigation-item-child-link" data-has-child-links="{% if child_link.links != blank %}true{% else %}false{% endif %}">
+                          <a data-armada-selector="navigation-item-parent" data-name="{{ child_link.title | handle }}" data-block-id="{{ forloop.index | handle }}" data-armada-animation="menu-link" class="relative flex items-center justify-between lg:inline-block w-full py-l lg:py-xs text-h5 font-heading heading-font-styles text-headings upto-lg:leading-none lg:text-b2 lg:font-body lg:font-body-style lg:font-body-weight lg:text-body lg:normal-case navigation-item-parent" href="{{ child_link.url | escape }}">
+                            <span>{{ child_link.title }}</span>
+                            {% if child_link.links != blank %}
+                              {% render 'armament-icon' with icon: icon, classes: 'absolute right-0 lg:hidden' %}
+                            {% endif %}
+                          </a>
+                          {% if child_link.links != blank %}
+                            <ul data-armada-selector="navigation-item-children" class="pl-xl">
+                              {% for grandchild_link in child_link.links %}
+                                <li>
+                                  <a data-armada-animation="menu-link" class="inline-block w-full py-[12px] lg:py-xs text-h5 font-heading heading-font-styles text-headings upto-lg:leading-none lg:text-b2 lg:font-body lg:font-body-style lg:font-body-weight lg:text-body lg:normal-case" href="{{ grandchild_link.url | escape }}">{{ grandchild_link.title }}</a>
+                                </li>
+                              {% endfor %}
+                            </ul>
+                          {% endif %}
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  {% endif %}
+                </div>
+              {% endfor %}
+              {% if image_1 %}
+                {%- liquid
+                  if image_2 and image_3
+                    assign grid_class = 'row-end-4 col-end-4'
+                  elsif image_2 or image_3
+                    assign grid_class = 'row-end-4 col-end-5'
+                  else
+                    assign grid_class = 'row-end-4 col-end-6'
+                  endif
+                -%}
+                {% render 'armament-navigation-image' with image: image_1, image_heading: image_heading_1, image_link: image_link_1, classes: grid_class, overlay_bg: overlay_bg, bg_opacity: bg_opacity, aspect: aspect, text_color: image_text_color, animation_grid_item: true %}
+              {% endif %}
+              {% if image_2 %}
+                {%- liquid
+                  if image_3
+                    assign grid_class = 'row-end-4 col-end-5'
+                  else
+                    assign grid_class = 'row-end-4 col-end-6'
+                  endif
+                -%}
+                {% render 'armament-navigation-image' with image: image_2, image_heading: image_heading_2, image_link: image_link_2, classes: grid_class, overlay_bg: overlay_bg, bg_opacity: bg_opacity, aspect: aspect, text_color: image_text_color, animation_grid_item: true %}
+              {% endif %}
+              {% if image_3 %}
+                {% render 'armament-navigation-image' with image: image_3, image_heading: image_heading_3, image_link: image_link_3, classes: 'row-end-4 col-end-6', overlay_bg: overlay_bg, bg_opacity: bg_opacity, aspect: aspect, text_color: image_text_color, animation_grid_item: true %}
+              {% endif %}
+            </div>
+          {% endif %}
+        </div>
+      </details>
+      <template>
+        <div data-armada-selector="navigation-item-drawer" data-armada-animation="fade" class="absolute top-0 left-0 right-0 h-full invisible opacity-0 bg-page z-[1] lg:hidden navigation-item-drawer{% unless visual %} px-xl{% endunless %}" data-block-id="{{ item_index }}">
+          <div class="relative group text-headings{% if visual %} px-4{% endif %}" data-armada-animation="menu-link">
+            <button data-armada-selector="navigation-item-close" type="button" aria-label="Back to previous navigation" class="w-full py-l font-heading heading-font-styles text-h5 leading-none text-center"></button>
+            {% render 'armament-icon' with icon: 'chevron-left', classes: 'absolute top-1/2 -translate-y-1/2 pointer-events-none' %}
+          </div>
+        </div>
+      </template>
+    </navigation-item>
+  {% else %}
+    <div class="navigation-item-link-only border-b border-b-theme lg:border-b-0 lg:h-full{% if link_only_classes %} {{ link_only_classes }}{% endif %}">
+      <div class="relative lg:h-full lg:flex lg:items-center">
+        <nav-link class="list-none flex items-baseline lg:py-s">
+          <a class="w-full py-l lg:p-0" href="{{ heading_link }}" data-armada-animation="menu-link">{% render 'armament-heading' with heading_content: heading, tag: 'h5', heading_type: 'heading-5', classes: '!pb-0' %}</a>
+        </nav-link>
+      </div>
+    </div>
+  {% endif %}
+</li>

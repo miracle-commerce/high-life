@@ -1,0 +1,36 @@
+{% comment %}
+    Renders chevrons in a div that can be used as navigation elements.
+
+    Accepts:
+    - direction: {String} accepts 'left' or 'down'
+    - classes: {String} custom classes
+    - flex_justify: {String} eg. start, end, flex-start, flex-end, center etc.
+
+    Usage:
+    {% render 'armament-ask-a-question' with icon: block.settings.icon, link_title: 'Ask a question', heading: 'Got a question?', text: 'Enter your question below and we will get back to you as soon as possible.', name_input: 'required', phone_input: 'optional' %}
+
+    The contact form can contain hidden input fields which store product information (product title, variant name and SKU) (optional)
+
+{% endcomment %}
+
+{%- liquid
+  case direction
+    when 'left'
+      assign rotate_class = 'rotate-180'
+    when 'down'
+      assign rotate_class = 'rotate-90'
+  endcase
+
+  unless flex_justify
+    assign flex_justify = 'center'
+  endunless
+-%}
+
+<div class="w-11 h-11 flex overflow-hidden {{ rotate_class }}{% if classes %} {{ classes }}{% endif %}" data-armada-scroll>
+  <div class="h-full w-full flex items-center justify-{{ flex_justify }} shrink-0" data-armada-scroll-first>
+    {% render 'armament-icon' with icon: icon, attributes: 'data-armada-arrow-icon', hide_tail: true %}
+  </div>
+  <div class="h-full w-full flex items-center justify-{{ flex_justify }} shrink-0">
+    {% render 'armament-icon' with icon: icon, attributes: 'data-armada-arrow-icon', hide_tail: true %}
+  </div>
+</div>

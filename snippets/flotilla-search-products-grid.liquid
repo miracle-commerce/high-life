@@ -1,0 +1,129 @@
+{% comment %}
+    Renders a collection grid for search results.
+
+    Accepts:
+    - section_blocks {Object} Shopify section blocks.
+    - products_per_row: {Object} Shopify setting value (number of products per row on desktop)
+    - products_per_row_mobile: {Object} Shopify setting value (number of products per row on mobile)
+    - has_pagination (optional): {Boolean} set to true if the grid needs pagination
+    - products_per_page: {Object} Shopify setting value
+    - grid_container_classes: {String} add custom classes to the grid container
+    - product_card_alignment: {String} which way the product cards are aligned
+    - search_icon_block_size: {String} px value of product card icon with text icon size (option)
+
+    Usage:
+    {% render 'flotilla-search-products-grid' with collection: collection, products_per_row: section.settings.products_per_row %}
+{% endcomment %}
+
+{%- capture get_blocks -%}
+  {%- for block in section.blocks -%}
+    {{ block.type | lstrip }}{%- unless forloop.last -%},{%- endunless -%}
+  {%- endfor -%}
+{%- endcapture -%}
+
+{% liquid
+
+  case products_per_row
+    when 1
+      assign desktop_grid = ' md:grid-cols-1'
+    when 2
+      assign desktop_grid = ' md:grid-cols-2'
+    when 3
+      assign desktop_grid = ' md:grid-cols-3'
+    when 4
+      assign desktop_grid = ' md:grid-cols-4'
+    when 5
+      assign desktop_grid = ' md:grid-cols-5'
+  endcase
+
+  case products_per_row_mobile
+    when '1'
+      assign mobile_grid = 'grid-cols-1'
+    when '2'
+      assign mobile_grid = 'grid-cols-2'
+  endcase
+
+  assign grid_class = 'grid items-start justify-items-center theme-grid-gap max-w-content ' | append: mobile_grid | append: desktop_grid
+
+  assign block_order = get_blocks | join: ',' | lstrip | strip
+
+
+  assign sortByHeading = 'products.facets.sort_by_label' | t
+  assign search_type = search.types | join: ''
+
+  for block in section.blocks
+    case block.type
+      when 'image'
+        assign img_block_attr = block.shopify_attributes
+      when 'title'
+        assign title_block_attr = block.shopify_attributes
+      when 'price'
+        assign price_block_attr = block.shopify_attributes
+      when 'swatch'
+        assign swatch_block_attr = block.shopify_attributes
+      when 'quick-add'
+        assign quick_add_block_attr = block.shopify_attributes
+    endcase
+  endfor
+%}
+
+<script src="{{ 'engine-collection-grid.min.js' | asset_url }}" defer="defer" type="module"></script>
+
+<collection-grid class="collection-grid-main block component-collection-grid theme-section-padding upto-md:pt-xl md:pt-2xl no-js-hidden{% if grid_container_classes %} {{ grid_container_classes }}{% endif %}"
+  data-armada-selector="search-grid-main"
+  data-section-id="{{ section.id }}"
+>
+  {% if search.results.size == 0 %}
+    <div class="flex flex-col items-center theme-section-padding">
+      <span class="text-body bg-page text-h5">{{ 'templates.collection.empty' | t }}</span>
+      <span class="text-body bg-page text-h5">{{ 'templates.collection.use_fewer_filters_html' | t: link: collection.url, class: "underline" }}</span>
+    </div>
+  {% else %}
+    {% if has_pagination %}
+      {% paginate search.results by products_per_page %}
+        <div class="{{ grid_class }}" data-armada-selector="collection-card-grid" data-armada-animation="grid-on-scroll" data-armada-animation-threshold="0">
+          {% for product in search.results %}
+          {%- liquid
+            assign gallery_mode = ''
+          -%}
+          <div class="max-w-full block w-full" data-armada-animation="grid-item">
+            <div>
+              {%
+                render 'ship-product-card' with
+                card_product: product,
+                section_blocks: section_blocks,
+                align: product_card_alignment,
+                classes: 'w-full',
+                gallery_mode: '',
+                enable_quick_view: false,
+                card_icon_size: search_icon_block_size
+              %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
+        {% if has_pagination and paginate.pages > 1 %}
+          {% render 'ship-pagination' with paginate: paginate %}
+        {% endif %}
+      {% endpaginate %}
+    {% else %}
+      <div class="{{ grid_class }}" data-armada-selector="collection-card-grid" data-armada-animation="grid-on-scroll" data-armada-animation-threshold="0">
+        {% for product in search.results limit: products_per_page %}
+        <div class="max-w-full block w-full" data-armada-animation="grid-item">
+          {%
+            render 'ship-product-card' with
+            card_product: product,
+            section_blocks: section_blocks,
+            align: product_card_alignment,
+            classes: 'w-full',
+            gallery_mode: '',
+            enable_quick_view: false,
+            card_icon_size: search_icon_block_size
+          %}
+        </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endif %}
+</collection-grid>

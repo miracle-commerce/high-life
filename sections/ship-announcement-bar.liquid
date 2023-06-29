@@ -1,0 +1,187 @@
+{% liquid
+  assign rotation_timimg = section.settings.rotation_interval | times: 1000
+%}
+{% if section.settings.show_announcement %}
+  <announcement-bar>
+    <section 
+      data-armada-selector="announcement-bar"
+      data-color-scheme="{{ section.settings.section_color_scheme }}"
+      class="bg-page text-headings max-w-full flex items-center justify-center overflow-hidden py-s{% if section.settings.show_arrows %} px-2xl{% else %} px-xl lg:px-2xl{% endif %}"
+    >
+      <fade-slider
+      arrows="true"
+      mobile-indicator="false"
+      swipe="true"
+      blocks="true"
+      rotate="true"
+      rotation-interval="{{ rotation_timimg }}"
+      class="block relative"
+      >
+        <ul
+          data-name="fade-slider"
+          class="grid"
+        >
+          {% for block in section.blocks %}
+            {% liquid
+              assign hasLink = false
+              if block.settings.announcement_link != blank
+                assign hasLink = true
+              endif
+            %}
+            {% if block.settings.announcement_text != blank %}
+              <li
+                class="text-h5 font-heading heading-font-styles min-w-[232px] min-h-[24px] flex items-center justify-center row-start-1 col-start-1 text-center{% if forloop.first %} z-[1]{% else %} opacity-0 z-0{% endif %}"
+                data-name="fade-slide"
+                data-armada-animation="fade"
+                data-fade-slider-index={{ forloop.index | minus: 1 }}{% if forloop.first %}
+                data-fade-slider-active{% endif %}
+                {{ block.shopify_attributes }}
+              >
+                {% if hasLink %}
+                  <a class="row-start-1 col-start-1 z-20" href="{{ block.settings.announcement_link }}" {% if forloop.first %} tabindex="0"{% else %} tabindex="-1"{% endif %} data-armada-animation="menu-link">
+                {% endif %}
+                  {{ block.settings.announcement_text }}
+                {% if hasLink %}
+                  </a>
+                {% endif %}
+              </li>
+            {% endif %}
+          {% endfor %}
+        </ul>
+        <template>
+          <button type="button" data-icon-type="prev" data-name="icon-prev" class="absolute top-1/2 -translate-y-1/2 left-0 -translate-x-full{% unless section.settings.show_arrows %} hidden{% endunless %}" data-armada-animation="arrow" aria-label="Go to previous slide">
+            {% render 'armament-arrow' with icon: 'arrow-right', direction: 'left' %}
+          </button>
+          <button type="button" data-icon-type="next" data-name="icon-next" class="absolute top-1/2 -translate-y-1/2 right-0 translate-x-full{% unless section.settings.show_arrows %} hidden{% endunless %}" data-armada-animation="arrow" aria-label="Go to next slide">
+            {% render 'armament-arrow' with icon: 'arrow-right' %}
+          </button>
+        </template>
+      </fade-slider>
+    </section>
+  </announcement-bar>
+
+  <safe-load-scripts>
+    <script defer="defer" src="{{ 'component-announcement-bar.min.js' | asset_url }}" type="module" data-armada-load-key="announcement-bar"></script>
+    <script defer="defer" src="{{ 'engine-fade-slider.min.js' | asset_url }}" type="module" data-armada-load-key="fade-slider"></script>
+  </safe-load-scripts>
+{% endif %}
+
+
+{% if section.settings.enable_sticky_announcement and section.settings.show_announcement %}
+  <style>
+    .sticky-announcement-bar {
+      position: sticky;
+      top: 0;
+      z-index: 101;
+    }
+    .sticky-header {
+      top: var(--announcement-bar-bottom-position);
+    }
+  </style>
+{% else %}
+  <style>
+    .sticky-header {
+      top: 0;
+    }
+  </style>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Announcement bar",
+  "class": "sticky-announcement-bar",
+  "max_blocks": 4,
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_announcement",
+      "label": "Show announcement bar",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_sticky_announcement",
+      "label": "Enable sticky announcement bar",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "rotation_interval",
+      "min": 3,
+      "max": 8,
+      "step": 1,
+      "unit": "sec",
+      "label": "Announcement time",
+      "default": 5
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrows",
+      "label": "Show arrows",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Color scheme"
+    },
+    {
+      "type": "select",
+      "id": "section_color_scheme",
+      "label": "Color scheme",
+      "options": [
+        {
+          "value": "general",
+          "label": "General"
+        },
+        {
+          "value": "accent-1",
+          "label": "Accent 1"
+        },
+        {
+          "value": "accent-2",
+          "label": "Accent 2"
+        },
+        {
+          "value": "accent-3",
+          "label": "Accent 3"
+        }
+      ],
+      "default": "accent-1"
+    }
+  ],
+  "blocks": [
+    {
+      "name": "Announcement",
+      "type": "announcement",
+      "settings": [
+        {
+          "type": "text",
+          "id": "announcement_text",
+          "label": "Heading"
+        },
+        {
+          "type": "url",
+          "id": "announcement_link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "default": {
+    "blocks": [
+      {
+        "type": "announcement",
+        "settings": {
+          "announcement_text": "PROMOTE DISCOUNT SAVINGS"
+        }
+      },
+      {
+        "type": "announcement",
+        "settings": {
+          "announcement_text": "PROMOTE FREE SHIPPING"
+        }
+      }
+    ]
+  }
+}
+{% endschema %}

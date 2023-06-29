@@ -1,0 +1,50 @@
+{
+  "type": "footer",
+  "name": "Footer Group",
+  "sections": {
+    "footer": {
+      "type": "flotilla-footer",
+      "blocks": {
+        "flotilla-footer-0": {
+          "type": "logo",
+          "settings": {
+            "logo_width_desktop": 140,
+            "logo_width_mobile": 140
+          }
+        },
+        "flotilla-footer-1": {
+          "type": "links",
+          "settings": {
+            "footer_navigation": "footer"
+          }
+        },
+        "footer_social_media_icons": {
+          "type": "footer_social_media_icons",
+          "settings": {
+            "show_labels": true,
+            "icons_shape": "floating",
+            "icons_color_scheme": "accent-1"
+          }
+        },
+        "footer_newsletter": {
+          "type": "footer_newsletter",
+          "settings": {
+          }
+        }
+      },
+      "block_order": [
+        "flotilla-footer-0",
+        "flotilla-footer-1",
+        "footer_social_media_icons",
+        "footer_newsletter"
+      ],
+      "settings": {
+        "show_payment_methods": true,
+        "section_color_scheme": "accent-3"
+      }
+    }
+  },
+  "order": [
+    "footer"
+  ]
+}

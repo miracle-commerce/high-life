@@ -1,0 +1,17 @@
+<style>
+  @media (prefers-reduced-motion: no-preference) {
+    {{ selector }} {
+      overflow: hidden;
+    }
+    {{ selector }} img,
+    {{ selector }} svg {
+      transform: scale(1.1);
+      transition: transform .7s ease-in-out;
+    }
+    {{ selector }}[data-animated="true"] img,
+    {{ selector }}[data-animated="true"] svg,
+    .no-js {{ selector }} {
+      transform: scale(1);
+    }
+  }
+</style>
