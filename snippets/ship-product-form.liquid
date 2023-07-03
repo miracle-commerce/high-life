@@ -268,8 +268,9 @@
             data-product-form-block="true"
             class="mb-l md:mb-xl"
             {{ block.shopify_attributes }}
-          >
-            {% render 'armament-quantity-selector' with id: form_product.id, product_name: form_product.title, name: 'quantity', value: '1', min: '1', label: 'Quantity' %}
+          > 
+              {% render 'armament-quantity-range-selector' with id: form_product.id, product_name: form_product.title, name: 'quantity', value: '25', min: '25', label: 'Quantity' %}
+            
           </div>
 
         {% when 'payment-buttons' %}

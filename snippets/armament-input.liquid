@@ -60,7 +60,7 @@
   {% if value %}value="{{ value }}"{% endif %}
   {% if attributes %}{{ attributes }}{% endif %}
   {% if required %}required="required"{% endif %}
-  {% if type == 'number' %}min="{{ min }}" max="{{ max }}"{% endif %}
+  {% if type == 'number' or type == 'range' %}min="{{ min }}" max="{{ max }}"{% endif %}
   {% if data_aid %}data-aid="{{ data_aid }}"{% else %}data-aid="armament-input"{% endif %}
   {% if checked %}checked{% endif %}
   {% if disabled %}disabled{% endif %}

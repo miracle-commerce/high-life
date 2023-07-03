@@ -1,0 +1,95 @@
+quantity-range-selector[data-selector-type="range"]{
+    display: flex;
+    align-items: center;
+    padding-top: 40px; 
+    padding-bottom: 20px;
+}
+
+.quantity-selector[data-selector-type="range"], quantity-range-selector[data-selector-type="range"] .quantity-range-selector-wrapper{
+    width: 100%;
+}
+
+quantity-range-selector[data-selector-type="range"] .quantity-range-selector-wrapper{
+    position: relative; 
+}
+
+.quantity-range-selector-wrapper .quantity-bubbles{
+    position: absolute;
+    left: 0;
+    bottom: calc(100% + 8px);
+    transform: translateX(calc(-50% + 10px));
+}
+
+.quantity-range-selector-wrapper .quantity-bubbles span{
+    padding: 5px;
+    background-color: #04AA6D;
+    display: inline-block; 
+    color: #fff;
+    border-radius: 5px;
+    font-size: 14px;
+    height: 30px;
+    width: 80px;
+    text-align: center; 
+    position: relative;
+}
+.quantity-range-selector-wrapper .quantity-bubbles span::before{
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-top: 5px solid #04AA6D;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    margin-top: -1px;
+}
+
+.armament-quantity-selector input[type="range"]{
+    width: 100%;
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 10px;
+    background: #d3d3d3;
+    outline: none;
+    opacity: 0.7;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+}
+
+.armament-quantity-selector input[type="range"]:hover{
+    opacity: 1; 
+}
+
+.armament-quantity-selector input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; /* Override default look */
+    appearance: none;
+    border-radius: 50%;
+    width: 20px; /* Set a specific slider handle width */
+    height: 20px; /* Slider handle height */
+    background: #04AA6D; /* Green background */
+    cursor: pointer; /* Cursor on hover */
+}
+
+.armament-quantity-selector input[type="range"]::-moz-range-thumb {
+    border-radius: 50%;
+    width: 20px; /* Set a specific slider handle width */
+    height: 20px; /* Slider handle height */
+    background: #04AA6D; /* Green background */
+    cursor: pointer; /* Cursor on hover */
+}
+
+.quantity-range-selector-wrapper .range-label{
+    position: absolute; 
+    top: 100%;
+}
+
+.quantity-range-selector-wrapper .range-label--min{
+    left: 0;
+}
+
+.quantity-range-selector-wrapper .range-label--max{
+    right: 0;
+}
